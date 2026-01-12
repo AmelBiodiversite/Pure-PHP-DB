@@ -49,6 +49,11 @@ define('APP_PATH', __DIR__ . '/..');
 // Remplacez par votre URL Repl
 define('APP_URL', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
+// Chemins des ressources statiques
+define('CSS_URL', APP_URL . '/css');
+define('JS_URL', APP_URL . '/public/js');
+define('IMG_URL', APP_URL . '/public/img');
+
 // Nom de l'application
 define('APP_NAME', 'MarketFlow Pro');
 
