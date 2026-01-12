@@ -4,15 +4,12 @@
  * Fichier : app/controllers/HomeController.php
  */
 
-namespace App\Controllers;
 
+namespace App\Controllers;
 use Core\Controller;
 
 class HomeController extends Controller {
-    
     public function index() {
-        $this->view('home/index', [
-            'title' => 'Accueil - MarketFlow Pro'
-        ]);
+        $this->view('home/index', ['title'=>'Accueil - MarketFlow Pro']);
     }
 }

@@ -4,7 +4,6 @@
  * Fichier : config/routes.php
  */
 
-// 1️⃣ Créer le routeur
 $router = new Core\Router();
 
 // ============================================
@@ -81,8 +80,6 @@ $router->get('/admin/dashboard', 'AdminController@dashboard');
 $router->get('/admin/users', 'AdminController@users');
 $router->post('/admin/users/{id}/toggle', 'AdminController@toggleUser');
 $router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
-
-// … tu peux ajouter toutes les autres routes Admin et API comme avant …
 
 // ============================================
 // DISPATCHER

@@ -1,40 +1,41 @@
 <?php
-// ============================================
-// MARKETFLOW PRO - POINT D'ENTRÉE
-// ============================================
+/**
+ * MARKETFLOW PRO - Point d'entrée
+ */
 
-// 1️⃣ Démarrer la session en tout premier
-session_start();
-
-// 2️⃣ Afficher les erreurs en mode développement
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// 3️⃣ Charger la configuration et helpers
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/helpers/functions.php';
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
 
-// 4️⃣ Autoloader simple pour Core et App
+// Autoload
 spl_autoload_register(function ($class) {
-    $baseDir = __DIR__ . '/';
+    // Debug
+    // error_log("Autoloading: " . $class);
+    
+    $classFile = str_replace('\\', '/', $class);
+    
+    // Gérer les namespaces App et Core vers les dossiers minuscules app/ et core/
+    if (str_starts_with($classFile, 'App/')) {
+        $classFile = 'app/' . substr($classFile, 4);
+    } elseif (str_starts_with($classFile, 'Core/')) {
+        $classFile = 'core/' . substr($classFile, 5);
+    }
 
-    // Convertir namespace en chemin
-    $class = str_replace('\\', '/', $class);
-    $class = str_replace('App/', 'app/', $class);
-    $class = str_replace('Core/', 'core/', $class);
-
-    $file = $baseDir . $class . '.php';
-    if (file_exists($file)) {
+    $file = __DIR__ . '/' . $classFile . '.php';
+    // error_log("Looking for file: " . $file);
+    
+    if(file_exists($file)) {
         require_once $file;
     }
 });
 
-// 5️⃣ Charger explicitement le Router et les classes de base
+// Fichiers helpers et config
+require_once __DIR__ . '/helpers/functions.php';
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Router.php';
-require_once __DIR__ . '/core/Controller.php';
-require_once __DIR__ . '/core/Model.php';
-
-// 6️⃣ Charger et exécuter les routes
 require_once __DIR__ . '/config/routes.php';

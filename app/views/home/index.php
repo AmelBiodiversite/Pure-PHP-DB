@@ -3,7 +3,6 @@
  * PAGE D'ACCUEIL TEMPORAIRE - PREVIEW
  * Fichier : app/views/home/index.php
  */
-?>
 
 <!-- Hero Section -->
 <section class="hero">
