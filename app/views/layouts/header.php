@@ -13,7 +13,7 @@
     <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
     
     <!-- CSS -->
-    <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
+    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
     
     <!-- Favicon -->
     <link rel="icon" href="/public/favicon.ico">

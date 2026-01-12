@@ -54,6 +54,10 @@ define('CSS_URL', APP_URL . '/css');
 define('JS_URL', APP_URL . '/public/js');
 define('IMG_URL', APP_URL . '/public/img');
 
+// Paramètres de devise
+define('CURRENCY_SYMBOL', '€');
+define('CURRENCY_POSITION', 'right'); // 'left' ou 'right'
+
 // Nom de l'application
 define('APP_NAME', 'MarketFlow Pro');
 
