@@ -1,0 +1,90 @@
+<?php
+/**
+ * MARKETFLOW PRO - CONFIGURATION DES ROUTES
+ * Fichier : config/routes.php
+ */
+
+// 1️⃣ Créer le routeur
+$router = new Router();
+
+// ============================================
+// ROUTES PUBLIQUES
+// ============================================
+$router->get('/', 'HomeController@index');
+
+$router->get('/login', 'AuthController@login');
+$router->post('/login', 'AuthController@login');
+$router->get('/register', 'AuthController@register');
+$router->post('/register', 'AuthController@register');
+$router->get('/logout', 'AuthController@logout');
+
+// ============================================
+// ROUTES UTILISATEURS (AUTH REQUISE)
+// ============================================
+$router->get('/profile', 'AuthController@profile');
+$router->post('/profile/update', 'AuthController@updateProfile');
+$router->post('/profile/password', 'AuthController@changePassword');
+$router->post('/profile/seller', 'AuthController@updateSellerProfile');
+
+// ============================================
+// ROUTES PRODUITS
+// ============================================
+$router->get('/products', 'ProductController@index');
+$router->get('/products/search', 'ProductController@search');
+$router->get('/products/{slug}', 'ProductController@show');
+$router->get('/category/{slug}', 'ProductController@category');
+
+// ============================================
+// ROUTES VENDEURS (SELLER AUTH REQUISE)
+// ============================================
+$router->get('/seller/dashboard', 'SellerController@dashboard');
+$router->get('/seller/products', 'SellerController@products');
+$router->get('/seller/products/create', 'SellerController@createProduct');
+$router->post('/seller/products/store', 'SellerController@storeProduct');
+$router->get('/seller/products/{id}/edit', 'SellerController@editProduct');
+$router->post('/seller/products/{id}/update', 'SellerController@updateProduct');
+$router->post('/seller/products/{id}/delete', 'SellerController@deleteProduct');
+$router->get('/seller/sales', 'SellerController@sales');
+$router->get('/seller/earnings', 'SellerController@earnings');
+$router->post('/seller/payout', 'SellerController@requestPayout');
+$router->get('/seller/analytics', 'SellerController@analytics');
+
+// ============================================
+// ROUTES PANIER & COMMANDES
+// ============================================
+$router->get('/cart', 'CartController@index');
+$router->post('/cart/add', 'CartController@add');
+$router->post('/cart/remove', 'CartController@remove');
+$router->post('/cart/update', 'CartController@update');
+$router->post('/cart/clear', 'CartController@clear');
+$router->post('/cart/apply-promo', 'CartController@applyPromo');
+$router->get('/cart/remove-promo', 'CartController@removePromo');
+
+$router->get('/checkout', 'CartController@checkout');
+$router->post('/cart/process-checkout', 'CartController@processCheckout');
+
+// Paiement
+$router->get('/payment/success', 'PaymentController@success');
+$router->get('/payment/cancel', 'PaymentController@cancel');
+$router->post('/webhooks/stripe', 'PaymentController@stripeWebhook');
+
+// Commandes
+$router->get('/orders', 'OrderController@index');
+$router->get('/orders/{orderNumber}', 'OrderController@show');
+$router->get('/orders/{orderNumber}/download/{itemId}', 'OrderController@download');
+
+// ============================================
+// ROUTES ADMIN
+// ============================================
+$router->get('/admin', 'AdminController@index');
+$router->get('/admin/dashboard', 'AdminController@dashboard');
+$router->get('/admin/users', 'AdminController@users');
+$router->post('/admin/users/{id}/toggle', 'AdminController@toggleUser');
+$router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
+
+// … tu peux ajouter toutes les autres routes Admin et API comme avant …
+
+// ============================================
+// DISPATCHER
+// ============================================
+$router->dispatch();
