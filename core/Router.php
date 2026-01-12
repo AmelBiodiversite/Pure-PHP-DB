@@ -40,11 +40,20 @@ class Router {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
+        // 🔹 Debug log
+        // error_log("Request URI: " . $uri);
+        // error_log("Method: " . $method);
+
         // 🔹 Retirer automatiquement le préfixe du projet Replit
-        if (str_starts_with($uri, $this->basePath)) {
+        if (!empty($this->basePath) && str_starts_with($uri, $this->basePath)) {
             $uri = substr($uri, strlen($this->basePath));
         }
-        if ($uri === '') $uri = '/';
+        
+        // S'assurer que l'URI commence par / et n'est pas vide
+        if (empty($uri)) $uri = '/';
+        
+        // 🔹 Debug log
+        // error_log("Processed URI: " . $uri);
 
         // 🔹 Chercher la route correspondante
         foreach ($this->routes as $route) {
@@ -77,9 +86,23 @@ class Router {
     }
 
     private function error404($msg = '') {
-        http_response_code(404);
-        echo "404 - Page non trouvée";
-        if ($msg) echo "<br><small>{$msg}</small>";
+        header("HTTP/1.0 404 Not Found");
+        echo "<h1>404 - Page non trouvée</h1>";
+        if ($msg) echo "<p><small>{$msg}</small></p>";
+        
+        echo "<h3>Debug Info:</h3>";
+        echo "<ul>";
+        echo "<li>URI: " . htmlspecialchars(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)) . "</li>";
+        echo "<li>Method: " . htmlspecialchars($_SERVER['REQUEST_METHOD']) . "</li>";
+        echo "<li>Base Path: '" . htmlspecialchars($this->basePath) . "'</li>";
+        echo "</ul>";
+        
+        echo "<h3>Routes enregistrées :</h3>";
+        echo "<ul>";
+        foreach ($this->routes as $r) {
+            echo "<li>" . htmlspecialchars($r['method']) . " " . htmlspecialchars($r['path']) . " (Pattern: " . htmlspecialchars($r['pattern']) . ")</li>";
+        }
+        echo "</ul>";
         exit;
     }
 }

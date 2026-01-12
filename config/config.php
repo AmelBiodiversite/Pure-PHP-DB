@@ -42,9 +42,12 @@ define('DB_PASS', '');
 // APPLICATION
 // ============================================
 
+// Chemin de base pour l'application
+define('APP_PATH', __DIR__ . '/..');
+
 // URL de base de l'application (Replit)
 // Remplacez par votre URL Repl
-define('APP_URL', 'https://' . $_SERVER['HTTP_HOST']);
+define('APP_URL', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
 // Nom de l'application
 define('APP_NAME', 'MarketFlow Pro');

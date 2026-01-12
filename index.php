@@ -31,8 +31,10 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// 5️⃣ Charger explicitement le Router
+// 5️⃣ Charger explicitement le Router et les classes de base
 require_once __DIR__ . '/core/Router.php';
+require_once __DIR__ . '/core/Controller.php';
+require_once __DIR__ . '/core/Model.php';
 
 // 6️⃣ Charger et exécuter les routes
 require_once __DIR__ . '/config/routes.php';

@@ -1,8 +1,6 @@
 <?php
 namespace Core;
 
-use Database; // Assurez-vous que la classe Database est dans le namespace global ou ajustez ce "use"
-
 /**
  * Contrôleur de base
  */
@@ -16,7 +14,10 @@ class Controller {
         }
 
         // Connexion à la base
-        $this->db = Database::getInstance()->getConnection();
+        // Sur Replit, on utilise Database::getInstance() qui doit être chargé
+        if (class_exists('Database')) {
+            $this->db = \Database::getInstance()->getConnection();
+        }
     }
 
     /**
