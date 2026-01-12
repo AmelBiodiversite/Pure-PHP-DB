@@ -22,6 +22,7 @@ class Router {
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 $callback = $route['callback'];
 
+                if(is_string($callback)){
                     list($controllerName, $methodName) = explode('@', $callback);
                     $fullControllerClass = "App\\Controllers\\" . $controllerName;
 
@@ -30,7 +31,7 @@ class Router {
                         if(method_exists($controllerInstance, $methodName)){
                             return call_user_func_array([$controllerInstance, $methodName], $params);
                         } else $this->error404("Méthode {$methodName} introuvable");
-                    } else $this->error404("Classe {$controller} introuvable");
+                    } else $this->error404("Classe {$fullControllerClass} introuvable");
                 } elseif(is_callable($callback)){
                     return call_user_func_array($callback, $params);
                 }
