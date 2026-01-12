@@ -1,41 +1,51 @@
 <?php
 /**
- * MARKETFLOW PRO - Point d'entrée
+ * MARKETFLOW PRO - POINT D'ENTRÉE
+ * Fichier : index.php (racine du projet)
  */
 
+// Afficher les erreurs en mode développement
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+// Charger la configuration
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/helpers/functions.php';
 
-// Autoload
+// Autoloader corrigé pour PostgreSQL + Namespaces
 spl_autoload_register(function ($class) {
-    // Debug
-    // error_log("Autoloading: " . $class);
-    
-    $classFile = str_replace('\\', '/', $class);
-    
-    // Gérer les namespaces App et Core vers les dossiers minuscules app/ et core/
-    if (str_starts_with($classFile, 'App/')) {
-        $classFile = 'app/' . substr($classFile, 4);
-    } elseif (str_starts_with($classFile, 'Core/')) {
-        $classFile = 'core/' . substr($classFile, 5);
+    $baseDir = __DIR__ . '/';
+
+    // Convertir namespace en chemin
+    // App\Models\User -> app/models/User.php
+    // Core\Model -> core/Model.php
+    $path = str_replace('\\', '/', $class);
+
+    // Remplacer les namespaces par les dossiers
+    $path = str_replace('App/', 'app/', $path);
+    $path = str_replace('Core/', 'core/', $path);
+
+    // Convertir les dossiers en minuscules SAUF le nom du fichier
+    // app/Models/User -> app/models/User
+    $parts = explode('/', $path);
+
+    // Mettre en minuscules tous les dossiers (sauf le dernier qui est le fichier)
+    for ($i = 0; $i < count($parts) - 1; $i++) {
+        $parts[$i] = strtolower($parts[$i]);
     }
 
-    $file = __DIR__ . '/' . $classFile . '.php';
-    // error_log("Looking for file: " . $file);
-    
-    if(file_exists($file)) {
+    $path = implode('/', $parts);
+    $file = $baseDir . $path . '.php';
+
+    if (file_exists($file)) {
         require_once $file;
     }
 });
 
-// Fichiers helpers et config
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/helpers/functions.php';
-require_once __DIR__ . '/config/database.php';
+// Charger le routeur
 require_once __DIR__ . '/core/Router.php';
+
+// Charger et exécuter les routes
 require_once __DIR__ . '/config/routes.php';

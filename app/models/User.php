@@ -1,6 +1,11 @@
 <?php
-/**
- * MARKETFLOW PRO - USER MODEL (POSTGRESQL)
+namespace App\Models;
+
+use Core\Model;
+use PDO;
+use Exception;
+
+/* * MARKETFLOW PRO - USER MODEL (POSTGRESQL)
  * Fichier : app/models/User.php
  */
 
@@ -66,6 +71,13 @@ class User extends Model {
         }
         
         return false;
+    }
+
+    /**
+     * Alias pour authenticate (compatibilité)
+     */
+    public function login($emailOrUsername, $password) {
+        return $this->authenticate($emailOrUsername, $password);
     }
     
     /**

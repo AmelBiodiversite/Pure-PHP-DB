@@ -1,4 +1,7 @@
 <?php
+namespace Core;
+
+use PDO;
 /**
  * MARKETFLOW PRO - MODÈLE DE BASE (POSTGRESQL)
  * Fichier : core/Model.php

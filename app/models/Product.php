@@ -1,4 +1,10 @@
 <?php
+namespace App\Models;
+
+use Core\Model;
+use PDO;
+
+
 /**
  * MARKETFLOW PRO - PRODUCT MODEL (POSTGRESQL)
  * Fichier : app/models/Product.php

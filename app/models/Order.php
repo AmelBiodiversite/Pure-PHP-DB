@@ -1,4 +1,11 @@
 <?php
+namespace App\Models;
+
+use Core\Model;
+use PDO;
+use Exception;
+
+
 /**
  * MARKETFLOW PRO - ORDER MODEL (POSTGRESQL)
  * Fichier : app/models/Order.php

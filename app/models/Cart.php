@@ -1,4 +1,5 @@
 <?php
+namespace App\Models;
 /**
  * MARKETFLOW PRO - CART MODEL
  * Gestion du panier en session
