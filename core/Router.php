@@ -24,7 +24,7 @@ class Router {
 
                 if(is_string($callback)){
                     list($controllerName, $methodName) = explode('@', $callback);
-                    $fullControllerClass = "App\\Controllers\\" . $controllerName;
+                    $fullControllerClass = "app\\controllers\\" . $controllerName;
 
                     if (class_exists($fullControllerClass)) {
                         $controllerInstance = new $fullControllerClass();

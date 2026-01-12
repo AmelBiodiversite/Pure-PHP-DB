@@ -17,9 +17,21 @@ class Database {
             $databaseUrl = getenv('DATABASE_URL');
             
             if ($databaseUrl) {
-                // Parse l'URL PostgreSQL de Replit
-                // Format: postgresql://user:password@host:port/database
-                $this->pdo = new PDO($databaseUrl);
+                // Pour PostgreSQL via PDO, le DSN doit être au format "pgsql:host=...;dbname=..."
+                // getenv('DATABASE_URL') est souvent un format URL complet : postgresql://user:pass@host:port/db
+                // On peut utiliser ce format directement avec PDO si l'extension le supporte
+                // Mais il est plus sûr de construire le DSN pgsql:
+                
+                $url = parse_url($databaseUrl);
+                
+                $host = $url['host'] ?? '';
+                $port = $url['port'] ?? '5432';
+                $user = $url['user'] ?? '';
+                $pass = $url['pass'] ?? '';
+                $path = ltrim($url['path'] ?? '', '/');
+                
+                $dsn = "pgsql:host=$host;port=$port;dbname=$path";
+                $this->pdo = new PDO($dsn, $user, $pass);
             } else {
                 // Fallback : connexion manuelle
                 $host = DB_HOST;
