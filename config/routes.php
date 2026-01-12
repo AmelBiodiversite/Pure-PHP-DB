@@ -5,7 +5,7 @@
  */
 
 // 1️⃣ Créer le routeur
-$router = new Router();
+$router = new Core\Router();
 
 // ============================================
 // ROUTES PUBLIQUES

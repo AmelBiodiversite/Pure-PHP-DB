@@ -10,7 +10,7 @@ class Router {
     private $currentRoute = null;
 
     // ⚡ Indique ici le nom de ton projet Replit
-    private $basePath = '/Pure-PHP-DB';
+    private $basePath = '';
 
     public function get($path, $callback) {
         $this->addRoute('GET', $path, $callback);
