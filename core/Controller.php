@@ -26,14 +26,15 @@ class Controller {
     protected function view($view, $data = []) {
         extract($data);
 
-        $viewPath = APP_PATH . "/views/{$view}.php";
+        // Correction du chemin pour Replit (APP_PATH est défini dans config.php)
+        $viewPath = __DIR__ . "/../app/views/{$view}.php";
 
         if (file_exists($viewPath)) {
-            require_once APP_PATH . '/views/layouts/header.php';
+            require_once __DIR__ . '/../app/views/layouts/header.php';
             require_once $viewPath;
-            require_once APP_PATH . '/views/layouts/footer.php';
+            require_once __DIR__ . '/../app/views/layouts/footer.php';
         } else {
-            die("Vue introuvable : {$view}");
+            die("Vue introuvable : {$view} (Chemin tenté : {$viewPath})");
         }
     }
 
