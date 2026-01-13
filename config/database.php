@@ -11,6 +11,7 @@ use Exception;
  */
 
 class Database {
+
     private static $instance = null;
     private $pdo;
 
@@ -78,164 +79,52 @@ class Database {
     /**
      * Obtenir la connexion PDO
      */
-    public function getConnection() {
+    public function getPdo() {
         return $this->pdo;
     }
 
     /**
-     * Exécuter une requête SELECT
+     * Raccourci : Préparer une requête
      */
-    public function query($sql, $params = []) {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            error_log("Query Error: " . $e->getMessage());
-            return false;
-        }
+    public function prepare($sql) {
+        return $this->pdo->prepare($sql);
     }
 
     /**
-     * Exécuter une requête INSERT/UPDATE/DELETE
+     * Raccourci : Exécuter une requête
      */
-    public function execute($sql, $params = []) {
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute($params);
-        } catch (PDOException $e) {
-            error_log("Execute Error: " . $e->getMessage());
-            return false;
-        }
+    public function query($sql) {
+        return $this->pdo->query($sql);
     }
 
     /**
-     * Obtenir le dernier ID inséré (PostgreSQL utilise RETURNING)
+     * Raccourci : Exécuter du SQL
      */
-    public function lastInsertId($sequence = null) {
-        // Pour PostgreSQL, on utilise currval() sur la séquence
-        // Ou on utilise RETURNING id dans la requête INSERT
-        return $this->pdo->lastInsertId($sequence);
+    public function exec($sql) {
+        return $this->pdo->exec($sql);
     }
 
     /**
-     * Démarrer une transaction
-     */
-    public function beginTransaction() {
-        return $this->pdo->beginTransaction();
-    }
-
-    /**
-     * Valider une transaction
-     */
-    public function commit() {
-        return $this->pdo->commit();
-    }
-
-    /**
-     * Annuler une transaction
-     */
-    public function rollback() {
-        return $this->pdo->rollBack();
-    }
-
-    /**
-     * Échapper une chaîne (prévention SQL Injection)
-     * Note: Utilisez plutôt les prepared statements
-     */
-    public function escape($value) {
-        return $this->pdo->quote($value);
-    }
-
-    /**
-     * Vérifier si une table existe
-     */
-    public function tableExists($tableName) {
-        $sql = "SELECT EXISTS (
-            SELECT FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            AND table_name = :table_name
-        )";
-        $result = $this->query($sql, ['table_name' => $tableName]);
-        return $result[0]['exists'] ?? false;
-    }
-
-    /**
-     * Obtenir toutes les tables
-     */
-    public function getTables() {
-        $sql = "SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public' 
-                ORDER BY table_name";
-        return $this->query($sql);
-    }
-
-    /**
-     * Compter les lignes d'une table
-     */
-    public function countRows($tableName) {
-        $sql = "SELECT COUNT(*) as count FROM " . $this->escapeIdentifier($tableName);
-        $result = $this->query($sql);
-        return $result[0]['count'] ?? 0;
-    }
-
-    /**
-     * Échapper un identifiant (table, colonne)
-     * PostgreSQL utilise des guillemets doubles
-     */
-    private function escapeIdentifier($identifier) {
-        return '"' . str_replace('"', '""', $identifier) . '"';
-    }
-
-    /**
-     * Tester la connexion
-     */
-    public function testConnection() {
-        try {
-            $this->pdo->query('SELECT 1');
-            return true;
-        } catch (PDOException $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Obtenir la version PostgreSQL
-     */
-    public function getVersion() {
-        try {
-            $result = $this->query('SELECT version()');
-            return $result[0]['version'] ?? 'Unknown';
-        } catch (PDOException $e) {
-            return 'Error: ' . $e->getMessage();
-        }
-    }
-
-    /**
-     * Empêcher le clonage (Singleton)
+     * Empêcher le clonage
      */
     private function __clone() {}
 
     /**
-     * Empêcher la désérialisation (Singleton)
+     * Empêcher la désérialisation
      */
     public function __wakeup() {
         throw new Exception("Cannot unserialize singleton");
     }
-}
 
-// Fonction helper globale pour obtenir la connexion
-function db() {
-    return \Core\Database::getInstance()->getConnection();
-}
+    /**
+     * Lister les tables
+     */
+    public function getTables() {
+        $sql = "SELECT table_name FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                ORDER BY table_name";
 
-// Fonction helper pour exécuter une requête simple
-function dbQuery($sql, $params = []) {
-    return \Core\Database::getInstance()->query($sql, $params);
-}
-
-// Fonction helper pour exécuter une commande
-function dbExecute($sql, $params = []) {
-    return \Core\Database::getInstance()->execute($sql, $params);
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
 }

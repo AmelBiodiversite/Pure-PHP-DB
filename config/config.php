@@ -38,6 +38,11 @@ define('DB_PASS', '');
 // Note: Sur Replit, la connexion se fait via DATABASE_URL
 // qui est automatiquement disponible dans getenv('DATABASE_URL')
 
+define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+define('ALLOWED_FILE_TYPES', ['zip', 'pdf', 'jpg', 'jpeg', 'png', 'gif', 'psd', 'ai', 'sketch', 'fig']);
+define('MAX_IMAGE_SIZE', 5 * 1024 * 1024); // 5MB
+define('MAX_FILE_SIZE', 50 * 1024 * 1024); // 50MB
+
 // ============================================
 // APPLICATION
 // ============================================
@@ -111,40 +116,6 @@ define('MIN_PAYOUT_AMOUNT', 50.00); // 50€
 // Dossier de base pour les uploads
 define('UPLOAD_DIR', __DIR__ . '/../public/uploads/');
 
-// Tailles maximales (en bytes)
-define('MAX_AVATAR_SIZE', 2 * 1024 * 1024); // 2 MB
-define('MAX_IMAGE_SIZE', 5 * 1024 * 1024); // 5 MB
-define('MAX_FILE_SIZE', 50 * 1024 * 1024); // 50 MB
-
-// Types de fichiers autorisés
-define('ALLOWED_AVATAR_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
-define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
-define('ALLOWED_FILE_TYPES', [
-    // Archives
-    'application/zip',
-    'application/x-zip-compressed',
-    'application/x-rar-compressed',
-    'application/x-7z-compressed',
-    
-    // Documents
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    
-    // Code
-    'text/plain',
-    'text/html',
-    'text/css',
-    'application/javascript',
-    'application/json',
-    
-    // Images
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'image/svg+xml',
-]);
 
 // ============================================
 // EMAIL (SMTP)

@@ -1,4 +1,15 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+// Servir les fichiers statiques directement
+$requestUri = $_SERVER['REQUEST_URI'];
+$scriptName = $_SERVER['SCRIPT_NAME'];
+
+// Si c'est un fichier CSS, JS, ou image
+if (preg_match('/\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf)$/', $requestUri)) {
+    return false; // Laisser PHP servir le fichier
+}
+
 /**
  * MARKETFLOW PRO - POINT D'ENTRÉE
  * Fichier : index.php (racine du projet)

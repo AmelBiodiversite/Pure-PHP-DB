@@ -13,9 +13,13 @@
         <span style="margin: 0 var(--space-2);">/</span>
         <a href="/products" style="color: var(--text-tertiary);">Produits</a>
         <span style="margin: 0 var(--space-2);">/</span>
-        <a href="/category/<?= e($product['category_slug']) ?>" style="color: var(--text-tertiary);">
-            <?= e($product['category_name']) ?>
-        </a>
+        <?php if (!empty($product['category_slug'])): ?>
+    <a href="/category/<?= e($product['category_slug']) ?>" style="color: var(--text-tertiary);">
+        <?= e($product['category_name']) ?>
+    </a>
+<?php else: ?>
+    <span style="color: var(--text-tertiary);">Produits</span>
+<?php endif; ?>
         <span style="margin: 0 var(--space-2);">/</span>
         <span style="color: var(--text-primary);"><?= e($product['title']) ?></span>
     </nav>
@@ -33,7 +37,7 @@
                 <div style="margin-bottom: var(--space-6);">
                     <img 
                         id="mainImage"
-                        src="<?= e($product['thumbnail']) ?>" 
+                        src="<?= e($product['thumbnail_url'] ?? '/public/img/placeholder.png') ?>" 
                         alt="<?= e($product['title']) ?>"
                         style="
                             width: 100%;
@@ -294,11 +298,11 @@
                         <?php endif; ?>
                         <div class="flex-between">
                             <span style="color: var(--text-tertiary);">Téléchargements</span>
-                            <span style="font-weight: 600;"><?= number_format($product['downloads_count']) ?></span>
+                            <span style="font-weight: 600;"><?= number_format($product['downloads'] ?? 0) ?></span>
                         </div>
                         <div class="flex-between">
                             <span style="color: var(--text-tertiary);">Ventes</span>
-                            <span style="font-weight: 600;"><?= number_format($product['sales_count']) ?></span>
+                            <span style="font-weight: 600;"><?= number_format($product['sales'] ?? 0) ?></span>
                         </div>
                     </div>
                 </div>
@@ -345,18 +349,16 @@
                         </div>
                         <?php if ($product['seller_rating'] > 0): ?>
                         <div style="font-size: 0.875rem; color: var(--text-tertiary);">
-                            ⭐ <?= number_format($product['seller_rating'], 1) ?> 
+                            ⭐ <?= number_format($product['seller_rating']?? 0, 1) ?> 
                             (<?= number_format($product['seller_total_sales']) ?> ventes)
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <?php if ($product['shop_description']): ?>
-                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">
-                    <?= e(truncate($product['shop_description'], 100)) ?>
-                </p>
-                <?php endif; ?>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">
+    Créateur sur MarketFlow Pro
+</p>
 
                 <a href="/seller/<?= e($product['seller_name']) ?>" class="btn btn-ghost" style="width: 100%;">
                     Voir la boutique →

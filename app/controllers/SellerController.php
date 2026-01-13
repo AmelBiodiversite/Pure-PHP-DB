@@ -49,7 +49,7 @@ class SellerController extends Controller {
         $recentSales = $stmt->fetchAll();
 
         // Produits en attente d'approbation
-        $pendingProducts = $this->productModel->getSellerProducts($sellerId, 'pending');
+        $products = $this->productModel->getSellerProducts($sellerId);
 
         // Graphique des ventes (30 derniers jours)
         $stmt = $this->db->prepare("
@@ -60,18 +60,21 @@ class SellerController extends Controller {
             JOIN orders o ON oi.order_id = o.id
             WHERE oi.seller_id = ? 
               AND o.payment_status = 'completed'
-              AND o.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+              AND o.created_at >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY DATE(o.created_at)
             ORDER BY date ASC
         ");
         $stmt->execute([$sellerId]);
         $salesChart = $stmt->fetchAll();
 
+        $pendingProducts = $this->productModel->getSellerProducts($sellerId, 'pending');
+        
         $this->view('seller/dashboard', [
             'title' => 'Dashboard Vendeur',
             'stats' => $stats,
             'recent_sales' => $recentSales,
             'pending_products' => $pendingProducts,
+            'db' => $this->db,
             'sales_chart' => $salesChart
         ]);
     }
@@ -94,7 +97,7 @@ class SellerController extends Controller {
      */
     public function createProduct() {
         // Récupérer les catégories
-        $stmt = $this->db->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY name ASC");
+        $stmt = $this->db->query("SELECT * FROM categories WHERE is_active = TRUE ORDER BY name ASC");
         $categories = $stmt->fetchAll();
 
         $this->view('seller/product_form', [
@@ -144,10 +147,11 @@ class SellerController extends Controller {
         }
 
         $result = $this->productModel->createProduct(
-            $_SESSION['user_id'],
             $data,
+            $_SESSION['user_id'],
             $_FILES
         );
+        
 
         if ($result['success']) {
             redirectWithMessage(
@@ -440,7 +444,7 @@ class SellerController extends Controller {
     private function getCategories() {
         $stmt = $this->db->query("
             SELECT * FROM categories 
-            WHERE is_active = 1 
+            WHERE is_active = TRUE 
             ORDER BY name ASC
         ");
         return $stmt->fetchAll();

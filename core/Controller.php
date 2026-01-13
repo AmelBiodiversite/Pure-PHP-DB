@@ -1,45 +1,57 @@
 <?php
+/**
+ * MARKETFLOW PRO - CONTRÔLEUR DE BASE
+ * Fichier : core/Controller.php
+ */
+
 namespace Core;
 
-/**
- * Contrôleur de base
- */
+use Core\Database;
+
 class Controller {
+
     protected $db;
 
+    /**
+     * Constructeur - Initialise la connexion DB
+     */
     public function __construct() {
-        // Vérifie que la session est démarrée
+        // Démarrer la session si pas déjà fait
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // Connexion à la base
-        // Sur Replit, on utilise Database::getInstance() qui doit être chargé
-        if (class_exists('Database')) {
-            $this->db = \Database::getInstance()->getConnection();
-        }
+        // Initialiser la connexion DB
+        $this->db = Database::getInstance();
     }
 
     /**
-     * Affiche une vue
+     * Charger une vue
      */
     protected function view($view, $data = []) {
-        extract($data);
+    extract($data);
+    
+    $viewFile = __DIR__ . '/../app/views/' . $view . '.php';
+    
+    if (file_exists($viewFile)) {
+        require_once __DIR__ . '/../app/views/layouts/header.php';  // ← DOIT être là
+        require_once $viewFile;
+        require_once __DIR__ . '/../app/views/layouts/footer.php';  // ← DOIT être là
+    } else {
+        die("Vue introuvable : $view");
+    }
+}
 
-        // Correction du chemin pour Replit (APP_PATH est défini dans config.php)
-        $viewPath = __DIR__ . "/../app/views/{$view}.php";
-
-        if (file_exists($viewPath)) {
-            require_once __DIR__ . '/../app/views/layouts/header.php';
-            require_once $viewPath;
-            require_once __DIR__ . '/../app/views/layouts/footer.php';
-        } else {
-            die("Vue introuvable : {$view} (Chemin tenté : {$viewPath})");
-        }
+    /**
+     * Redirection
+     */
+    protected function redirect($url) {
+        header("Location: $url");
+        exit;
     }
 
     /**
-     * Renvoie du JSON
+     * Réponse JSON
      */
     protected function json($data, $statusCode = 200) {
         http_response_code($statusCode);
@@ -49,59 +61,64 @@ class Controller {
     }
 
     /**
-     * Redirection HTTP
+     * Vérifier si l'utilisateur est connecté
      */
-    protected function redirect($url) {
-        header("Location: {$url}");
-        exit;
-    }
-
-    /**
-     * Vérifie si l'utilisateur est connecté
-     */
-    protected function isLoggedIn() {
-        return isset($_SESSION['user_id']);
-    }
-
-    /**
-     * Récupère l'utilisateur courant
-     */
-    protected function getCurrentUser() {
-        if (!$this->isLoggedIn()) {
-            return null;
-        }
-
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ? AND is_active = 1");
-        $stmt->execute([$_SESSION['user_id']]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Nécessite une connexion utilisateur
-     */
-    protected function requireLogin() {
-        if (!$this->isLoggedIn()) {
+    protected function requireAuth() {
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['error'] = "Vous devez être connecté pour accéder à cette page";
             $this->redirect('/login');
         }
     }
 
     /**
-     * Nécessite que l'utilisateur soit vendeur
+     * Récupérer l'utilisateur actuel
      */
-    protected function requireSeller() {
+    protected function getCurrentUser() {
+        if (!isset($_SESSION['user_id'])) {
+            return null;
+        }
+
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
+        $stmt->execute(['id' => $_SESSION['user_id']]);
+        return $stmt->fetch();
+    }
+
+    /**
+     * Vérifier si l'utilisateur est admin
+     */
+    protected function requireAdmin() {
+        $this->requireAuth();
+
         $user = $this->getCurrentUser();
-        if (!$user || $user['user_type'] !== 'seller') {
+
+        if (!$user || $user['role'] !== 'admin') {
+            $_SESSION['error'] = "Accès réservé aux administrateurs";
             $this->redirect('/');
         }
     }
 
     /**
-     * Nécessite que l'utilisateur soit admin
+     * Vérifier si l'utilisateur est vendeur
      */
-    protected function requireAdmin() {
+    protected function requireSeller() {
+        $this->requireAuth();
+
         $user = $this->getCurrentUser();
-        if (!$user || $user['user_type'] !== 'admin') {
+
+        if (!$user || !in_array($user['role'], ['seller', 'admin'])) {
+            $_SESSION['error'] = "Accès réservé aux vendeurs";
             $this->redirect('/');
+        }
+    }
+
+    /**
+     * Vérifier le token CSRF
+     */
+    protected function verifyCsrf() {
+        $token = $_POST['csrf_token'] ?? '';
+
+        if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
+            $this->json(['error' => 'Token CSRF invalide'], 403);
         }
     }
 }

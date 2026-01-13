@@ -28,7 +28,7 @@ class AuthController extends Controller {
      */
     public function login() {
         // Si déjà connecté, rediriger
-        if ($this->isLoggedIn()) {
+        if (isset($_SESSION['user_id'])) {
             $this->redirect('/');
         }
 
@@ -89,7 +89,7 @@ class AuthController extends Controller {
      */
     public function register() {
         // Si déjà connecté, rediriger
-        if ($this->isLoggedIn()) {
+            if (isset($_SESSION['user_id'])) {
             $this->redirect('/');
         }
 
@@ -169,7 +169,19 @@ class AuthController extends Controller {
         }
 
         // Créer l'utilisateur
+        unset($data['password_confirm']);
         $userId = $this->userModel->createUser($data);
+        
+        // Créer session et rediriger
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['user_role'] = $data['role'];
+        $_SESSION['success'] = "Compte créé avec succès !";
+
+        if ($data['role'] === 'seller') {
+            $this->redirect('/seller/dashboard');
+        } else {
+            $this->redirect('/');
+        }
 
         if ($userId) {
             // Récupérer l'utilisateur créé

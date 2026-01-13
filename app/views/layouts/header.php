@@ -12,8 +12,9 @@
     <meta name="description" content="MarketFlow Pro - La marketplace pour créateurs digitaux">
     <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="<?= APP_URL ?>/css/style.css">
+    <!-- CSS et JS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/public/js/app.js"></script>
     
     <!-- Favicon -->
     <link rel="icon" href="/public/favicon.ico">
@@ -32,6 +33,14 @@
                     <li><a href="/seller/dashboard" class="navbar-link">Dashboard</a></li>
                 <?php endif; ?>
             </ul>
+
+
+<?php if (isset($_SESSION['user_id'])): ?>
+    <li><a href="/logout" class="navbar-link">Déconnexion</a></li>
+<?php else: ?>
+   
+<?php endif; ?>
+
             
             <div class="flex gap-4">
                 <!-- Search -->

@@ -18,6 +18,13 @@
         </p>
     </div>
 
+    <div class="flex-between mb-8">
+        <h1>Dashboard Vendeur</h1>
+        <a href="/seller/products/create" class="btn btn-primary">
+            + Ajouter un produit
+        </a>
+    </div>
+
     <!-- Stats principales -->
     <div class="grid grid-4 mb-8">
         
@@ -236,11 +243,11 @@
             <div style="display: flex; flex-direction: column; gap: var(--space-4);">
                 <?php 
                 // Récupérer les top produits
-                $stmt = $GLOBALS['db']->prepare("
-                    SELECT p.id, p.title, p.thumbnail, p.sales_count, p.price
+                $stmt = $db->prepare("
+                    SELECT p.id, p.title, p.thumbnail_url, p.sales, p.price
                     FROM products p
-                    WHERE p.seller_id = ? AND p.sales_count > 0
-                    ORDER BY p.sales_count DESC
+                    WHERE p.seller_id = :seller_id AND p.sales > 0
+                    ORDER BY p.sales DESC
                     LIMIT 5
                 ");
                 $stmt->execute([$_SESSION['user_id']]);

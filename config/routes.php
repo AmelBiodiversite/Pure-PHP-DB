@@ -15,6 +15,14 @@ $router->get('/login', 'AuthController@login');
 $router->post('/login', 'AuthController@login');
 $router->get('/register', 'AuthController@register');
 $router->post('/register', 'AuthController@register');
+$router->get('/sellers', 'HomeController@sellers');
+$router->get('/seller/{username}/products', 'ProductController@sellerProducts');
+$router->get('/about', 'HomeController@about');
+$router->get('/contact', 'HomeController@contact');
+$router->post('/contact', 'HomeController@contactSubmit');
+$router->get('/terms', 'HomeController@terms');
+$router->get('/privacy', 'HomeController@privacy');
+$router->get('/help', 'HomeController@help');
 $router->get('/logout', 'AuthController@logout');
 
 // ============================================

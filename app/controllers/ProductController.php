@@ -42,8 +42,8 @@ class ProductController extends Controller {
         $stmt = $this->db->query("
             SELECT c.*, COUNT(p.id) as product_count
             FROM categories c
-            LEFT JOIN products p ON c.id = p.category_id AND p.status = 'approved' AND p.is_active = 1
-            WHERE c.is_active = 1
+            LEFT JOIN products p ON c.id = p.category_id AND p.status = 'approved' 
+            WHERE c.is_active = TRUE
             GROUP BY c.id
             ORDER BY c.display_order, c.name
         ");
@@ -55,7 +55,7 @@ class ProductController extends Controller {
             FROM tags t
             JOIN product_tags pt ON t.id = pt.tag_id
             JOIN products p ON pt.product_id = p.id
-            WHERE p.status = 'approved' AND p.is_active = 1
+            WHERE p.status = 'approved'
             GROUP BY t.id
             ORDER BY product_count DESC
             LIMIT 20
@@ -66,7 +66,7 @@ class ProductController extends Controller {
         $stmt = $this->db->query("
             SELECT MIN(price) as min_price, MAX(price) as max_price
             FROM products
-            WHERE status = 'approved' AND is_active = 1
+            WHERE status = 'approved'
         ");
         $priceRange = $stmt->fetch();
 
@@ -99,8 +99,8 @@ class ProductController extends Controller {
         // Vérifier si le produit est approuvé (sauf pour le vendeur)
         if ($product['status'] !== 'approved') {
             $isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $product['seller_id'];
-            $isAdmin = isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin';
-            
+            $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+
             if (!$isOwner && !$isAdmin) {
                 redirectWithMessage('/', 'Produit non disponible', 'error');
                 return;
@@ -109,55 +109,62 @@ class ProductController extends Controller {
 
         // Récupérer les avis
         $stmt = $this->db->prepare("
-            SELECT r.*, u.username, u.avatar,
-                   DATE_FORMAT(r.created_at, '%d/%m/%Y') as review_date
+            SELECT r.*, u.username, u.avatar_url,
+                   TO_CHAR(r.created_at, 'DD/MM/YYYY') as review_date
             FROM reviews r
             JOIN users u ON r.buyer_id = u.id
-            WHERE r.product_id = ? AND r.is_approved = 1
+            WHERE r.product_id = :product_id AND r.is_approved = TRUE
             ORDER BY r.created_at DESC
             LIMIT 10
         ");
-        $stmt->execute([$product['id']]);
+        $stmt->execute(['product_id' => $product['id']]);
         $reviews = $stmt->fetchAll();
 
         // Produits similaires (même catégorie)
         $stmt = $this->db->prepare("
-            SELECT p.*, u.username as seller_name, sp.shop_name
+            SELECT p.*, u.username as seller_name
             FROM products p
             JOIN users u ON p.seller_id = u.id
-            LEFT JOIN seller_profiles sp ON u.id = sp.user_id
-            WHERE p.category_id = ? 
-              AND p.id != ? 
+            WHERE p.category_id = :category_id
+              AND p.id != :product_id
               AND p.status = 'approved' 
-              AND p.is_active = 1
-            ORDER BY p.sales_count DESC
+              ORDER BY p.sales DESC
             LIMIT 6
         ");
-        $stmt->execute([$product['category_id'], $product['id']]);
+        $stmt->execute([
+            'category_id' => $product['category_id'], 
+            'product_id' => $product['id']
+        ]);
         $relatedProducts = $stmt->fetchAll();
 
         // Autres produits du vendeur
         $stmt = $this->db->prepare("
             SELECT p.*
             FROM products p
-            WHERE p.seller_id = ? 
-              AND p.id != ?
+            WHERE p.seller_id = :seller_id
+              AND p.id != :product_id
               AND p.status = 'approved' 
-              AND p.is_active = 1
+              
             ORDER BY p.created_at DESC
             LIMIT 4
         ");
-        $stmt->execute([$product['seller_id'], $product['id']]);
+        $stmt->execute([
+            'seller_id' => $product['seller_id'],
+            'product_id' => $product['id']
+        ]);
         $sellerProducts = $stmt->fetchAll();
 
         // Vérifier si dans la wishlist
         $inWishlist = false;
         if (isset($_SESSION['user_id'])) {
             $stmt = $this->db->prepare("
-                SELECT id FROM wishlists 
-                WHERE user_id = ? AND product_id = ?
+                SELECT id FROM wishlist 
+                WHERE user_id = :user_id AND product_id = :product_id
             ");
-            $stmt->execute([$_SESSION['user_id'], $product['id']]);
+            $stmt->execute([
+                'user_id' => $_SESSION['user_id'],
+                'product_id' => $product['id']
+            ]);
             $inWishlist = $stmt->fetch() !== false;
         }
 
@@ -177,31 +184,23 @@ class ProductController extends Controller {
      */
     public function search() {
         $query = $_GET['q'] ?? '';
-        
+
         if (empty($query)) {
             $this->redirect('/products');
         }
 
+        // Recherche avec filtres
         $filters = [
             'search' => $query,
+            'category_id' => $_GET['category'] ?? null,
             'sort' => $_GET['sort'] ?? 'relevance'
         ];
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $result = $this->productModel->getProducts($filters, $page, 24);
 
-        // Suggestions de recherche basées sur les tags
-        $stmt = $this->db->prepare("
-            SELECT DISTINCT t.name
-            FROM tags t
-            WHERE t.name LIKE ?
-            LIMIT 5
-        ");
-        $stmt->execute(['%' . $query . '%']);
-        $suggestions = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-
         $this->view('products/search', [
-            'title' => 'Recherche : ' . $query,
+            'title' => "Résultats pour : $query",
             'query' => $query,
             'products' => $result['products'],
             'pagination' => [
@@ -209,198 +208,54 @@ class ProductController extends Controller {
                 'total' => $result['total_pages'],
                 'total_items' => $result['total']
             ],
-            'suggestions' => $suggestions
+            'active_filters' => $filters
         ]);
     }
 
     /**
-     * Produits par catégorie
-     */
-    public function category($slug) {
-        // Récupérer la catégorie
-        $stmt = $this->db->prepare("
-            SELECT * FROM categories WHERE slug = ? AND is_active = 1
-        ");
-        $stmt->execute([$slug]);
-        $category = $stmt->fetch();
-
-        if (!$category) {
-            redirectWithMessage('/', 'Catégorie introuvable', 'error');
-            return;
-        }
-
-        $filters = [
-            'category_id' => $category['id'],
-            'sort' => $_GET['sort'] ?? 'newest'
-        ];
-
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $result = $this->productModel->getProducts($filters, $page, 24);
-
-        // Sous-catégories si existantes
-        $stmt = $this->db->prepare("
-            SELECT c.*, COUNT(p.id) as product_count
-            FROM categories c
-            LEFT JOIN products p ON c.id = p.category_id AND p.status = 'approved'
-            WHERE c.parent_id = ? AND c.is_active = 1
-            GROUP BY c.id
-            ORDER BY c.display_order
-        ");
-        $stmt->execute([$category['id']]);
-        $subcategories = $stmt->fetchAll();
-
-        $this->view('products/category', [
-            'title' => $category['name'],
-            'category' => $category,
-            'subcategories' => $subcategories,
-            'products' => $result['products'],
-            'pagination' => [
-                'current' => $result['page'],
-                'total' => $result['total_pages'],
-                'total_items' => $result['total']
-            ]
-        ]);
-    }
-
-    /**
-     * Ajouter à la wishlist (AJAX)
+     * Ajouter/retirer de la wishlist (AJAX)
      */
     public function toggleWishlist() {
-        if (!$this->isLoggedIn()) {
-            $this->json(['success' => false, 'error' => 'Connexion requise'], 401);
+        if (!isset($_SESSION['user_id'])) {
+            $this->json(['success' => false, 'message' => 'Connexion requise'], 401);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->json(['success' => false, 'error' => 'Méthode non autorisée'], 405);
-        }
-
-        $productId = $_POST['product_id'] ?? null;
-        
-        if (!$productId) {
-            $this->json(['success' => false, 'error' => 'Produit invalide'], 400);
-        }
-
-        $userId = $_SESSION['user_id'];
+        $productId = $_POST['product_id'] ?? 0;
 
         // Vérifier si déjà dans la wishlist
         $stmt = $this->db->prepare("
-            SELECT id FROM wishlists WHERE user_id = ? AND product_id = ?
+            SELECT id FROM wishlist 
+            WHERE user_id = :user_id AND product_id = :product_id
         ");
-        $stmt->execute([$userId, $productId]);
+        $stmt->execute([
+            'user_id' => $_SESSION['user_id'],
+            'product_id' => $productId
+        ]);
         $exists = $stmt->fetch();
 
         if ($exists) {
             // Retirer de la wishlist
             $stmt = $this->db->prepare("
-                DELETE FROM wishlists WHERE user_id = ? AND product_id = ?
+                DELETE FROM wishlist 
+                WHERE user_id = :user_id AND product_id = :product_id
             ");
-            $stmt->execute([$userId, $productId]);
-            
-            $this->json([
-                'success' => true,
-                'action' => 'removed',
-                'message' => 'Retiré des favoris'
+            $stmt->execute([
+                'user_id' => $_SESSION['user_id'],
+                'product_id' => $productId
             ]);
+            $this->json(['success' => true, 'action' => 'removed']);
         } else {
             // Ajouter à la wishlist
             $stmt = $this->db->prepare("
-                INSERT INTO wishlists (user_id, product_id, created_at)
-                VALUES (?, ?, ?)
+                INSERT INTO wishlist (user_id, product_id) 
+                VALUES (:user_id, :product_id)
             ");
-            $stmt->execute([$userId, $productId, date('Y-m-d H:i:s')]);
-            
-            $this->json([
-                'success' => true,
-                'action' => 'added',
-                'message' => 'Ajouté aux favoris'
+            $stmt->execute([
+                'user_id' => $_SESSION['user_id'],
+                'product_id' => $productId
             ]);
+            $this->json(['success' => true, 'action' => 'added']);
         }
-    }
-
-    /**
-     * Soumettre un avis (AJAX)
-     */
-    public function submitReview() {
-        if (!$this->isLoggedIn()) {
-            $this->json(['success' => false, 'error' => 'Connexion requise'], 401);
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->json(['success' => false, 'error' => 'Méthode non autorisée'], 405);
-        }
-
-        $productId = $_POST['product_id'] ?? null;
-        $orderItemId = $_POST['order_item_id'] ?? null;
-        $rating = $_POST['rating'] ?? null;
-        $comment = $_POST['comment'] ?? '';
-
-        // Validation
-        if (!$productId || !$orderItemId || !$rating) {
-            $this->json(['success' => false, 'error' => 'Données manquantes'], 400);
-        }
-
-        if ($rating < 1 || $rating > 5) {
-            $this->json(['success' => false, 'error' => 'Note invalide'], 400);
-        }
-
-        $userId = $_SESSION['user_id'];
-
-        // Vérifier que l'utilisateur a acheté le produit
-        $stmt = $this->db->prepare("
-            SELECT oi.seller_id 
-            FROM order_items oi
-            JOIN orders o ON oi.order_id = o.id
-            WHERE oi.id = ? 
-              AND oi.product_id = ? 
-              AND o.buyer_id = ?
-              AND o.payment_status = 'completed'
-        ");
-        $stmt->execute([$orderItemId, $productId, $userId]);
-        $orderItem = $stmt->fetch();
-
-        if (!$orderItem) {
-            $this->json(['success' => false, 'error' => 'Achat non vérifié'], 403);
-        }
-
-        // Vérifier qu'il n'a pas déjà laissé un avis
-        $stmt = $this->db->prepare("
-            SELECT id FROM reviews 
-            WHERE order_item_id = ? AND buyer_id = ?
-        ");
-        $stmt->execute([$orderItemId, $userId]);
-        
-        if ($stmt->fetch()) {
-            $this->json(['success' => false, 'error' => 'Avis déjà soumis'], 400);
-        }
-
-        // Créer l'avis
-        $stmt = $this->db->prepare("
-            INSERT INTO reviews (
-                product_id, order_item_id, buyer_id, seller_id, 
-                rating, comment, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
-        
-        $stmt->execute([
-            $productId,
-            $orderItemId,
-            $userId,
-            $orderItem['seller_id'],
-            $rating,
-            $comment,
-            date('Y-m-d H:i:s')
-        ]);
-
-        // Mettre à jour la note moyenne du produit
-        $this->updateProductRating($productId);
-
-        // Mettre à jour la note du vendeur
-        $this->updateSellerRating($orderItem['seller_id']);
-
-        $this->json([
-            'success' => true,
-            'message' => 'Avis publié avec succès'
-        ]);
     }
 
     /**
@@ -412,37 +267,20 @@ class ProductController extends Controller {
             SET rating_average = (
                 SELECT AVG(rating) 
                 FROM reviews 
-                WHERE product_id = ? AND is_approved = 1
+                WHERE product_id = :product_id1 AND is_approved = TRUE
             ),
             rating_count = (
                 SELECT COUNT(*) 
                 FROM reviews 
-                WHERE product_id = ? AND is_approved = 1
+                WHERE product_id = :product_id2 AND is_approved = TRUE
             )
-            WHERE id = ?
+            WHERE id = :product_id3
         ");
-        $stmt->execute([$productId, $productId, $productId]);
-    }
-
-    /**
-     * Mettre à jour la note moyenne d'un vendeur
-     */
-    private function updateSellerRating($sellerId) {
-        $stmt = $this->db->prepare("
-            UPDATE seller_profiles 
-            SET rating_average = (
-                SELECT AVG(rating) 
-                FROM reviews 
-                WHERE seller_id = ? AND is_approved = 1
-            ),
-            rating_count = (
-                SELECT COUNT(*) 
-                FROM reviews 
-                WHERE seller_id = ? AND is_approved = 1
-            )
-            WHERE user_id = ?
-        ");
-        $stmt->execute([$sellerId, $sellerId, $sellerId]);
+        $stmt->execute([
+            'product_id1' => $productId,
+            'product_id2' => $productId,
+            'product_id3' => $productId
+        ]);
     }
 
     /**
@@ -450,31 +288,31 @@ class ProductController extends Controller {
      */
     public function searchSuggestions() {
         $query = $_GET['q'] ?? '';
-        
+
         if (strlen($query) < 2) {
             $this->json(['suggestions' => []]);
         }
 
         // Rechercher dans les titres de produits
         $stmt = $this->db->prepare("
-            SELECT title, slug, thumbnail, price
+            SELECT title, slug, thumbnail_url, price
             FROM products
-            WHERE title LIKE ? 
+            WHERE title ILIKE :query
               AND status = 'approved' 
-              AND is_active = 1
+              
             LIMIT 5
         ");
-        $stmt->execute(['%' . $query . '%']);
+        $stmt->execute(['query' => '%' . $query . '%']);
         $products = $stmt->fetchAll();
 
         // Rechercher dans les tags
         $stmt = $this->db->prepare("
             SELECT name, slug
             FROM tags
-            WHERE name LIKE ?
+            WHERE name ILIKE :query
             LIMIT 3
         ");
-        $stmt->execute(['%' . $query . '%']);
+        $stmt->execute(['query' => '%' . $query . '%']);
         $tags = $stmt->fetchAll();
 
         $this->json([
@@ -482,4 +320,51 @@ class ProductController extends Controller {
             'tags' => $tags
         ]);
     }
+
+    public function sellerProducts($username) {
+        // Récupérer le vendeur
+        $stmt = $this->db->prepare("SELECT id, username, full_name FROM users WHERE username = :username AND role = 'seller'");
+        $stmt->execute(['username' => $username]);
+        $seller = $stmt->fetch();
+
+        if (!$seller) {
+            redirectWithMessage('/', 'Vendeur introuvable', 'error');
+            return;
+        }
+
+        // Récupérer ses produits
+        $products = $this->productModel->getSellerProducts($seller['id'], 'approved');
+
+        $this->view('products/seller', [
+            'title' => 'Produits de ' . $seller['full_name'],
+            'seller' => $seller,
+            'products' => $products
+        ]);
+    }
+    public function category($slug) {
+        // Récupérer la catégorie
+        $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
+        $stmt->execute(['slug' => $slug]);
+        $category = $stmt->fetch();
+
+        if (!$category) {
+            redirectWithMessage('/', 'Catégorie introuvable', 'error');
+            return;
+        }
+
+        // Produits de la catégorie
+        $filters = ['category_id' => $category['id']];
+        $result = $this->productModel->getProducts($filters, 1, 24);
+
+        $this->view('products/category', [
+            'title' => $category['name'],
+            'category' => $category,
+            'products' => $result['products'],
+            'pagination' => [
+                'current' => $result['page'],
+                'total' => $result['total_pages']
+            ]
+        ]);
+    }
+    
 }

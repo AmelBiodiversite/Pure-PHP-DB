@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use \Core\Database;
 /**
  * MARKETFLOW PRO - CART MODEL
  * Gestion du panier en session
@@ -38,7 +39,7 @@ class Cart {
         }
 
         // Vérifier que le produit est disponible
-        if ($product['status'] !== 'approved' || !$product['is_active']) {
+            if ($product['status'] !== 'approved') {
             return ['success' => false, 'error' => 'Produit non disponible'];
         }
 
@@ -56,7 +57,7 @@ class Cart {
             'price' => $product['price'],
             'seller_id' => $product['seller_id'],
             'seller_name' => $product['seller_name'],
-            'shop_name' => $product['shop_name'],
+            
             'quantity' => $quantity,
             'added_at' => time()
         ];
@@ -185,19 +186,17 @@ class Cart {
      * Récupérer les infos d'un produit
      */
     private function getProductInfo($productId) {
-        $db = \Database::getInstance()->getConnection();
-        
+        $db = \Core\Database::getInstance();
+
         $stmt = $db->prepare("
             SELECT p.*, 
-                   u.username as seller_name,
-                   sp.shop_name
+                   u.username as seller_name
             FROM products p
             JOIN users u ON p.seller_id = u.id
-            LEFT JOIN seller_profiles sp ON u.id = sp.user_id
-            WHERE p.id = ?
+            WHERE p.id = :product_id
         ");
-        
-        $stmt->execute([$productId]);
+
+        $stmt->execute(['product_id' => $productId]);
         return $stmt->fetch();
     }
 
@@ -210,17 +209,10 @@ class Cart {
         $checkoutItems = [];
 
         foreach ($items as $item) {
-            // Récupérer le taux de commission du vendeur
-            $db = \Database::getInstance()->getConnection();
-            $stmt = $db->prepare("
-                SELECT commission_rate 
-                FROM seller_profiles 
-                WHERE user_id = ?
-            ");
-            $stmt->execute([$item['seller_id']]);
-            $result = $stmt->fetch();
             
-            $commissionRate = $result ? $result['commission_rate'] : DEFAULT_COMMISSION_RATE;
+            
+            // Commission par défaut
+            $commissionRate = PLATFORM_COMMISSION; // 10%
             $commissionAmount = ($item['price'] * $commissionRate) / 100;
             $sellerAmount = $item['price'] - $commissionAmount;
 
@@ -233,7 +225,7 @@ class Cart {
                 'quantity' => $item['quantity'],
                 'seller_id' => $item['seller_id'],
                 'seller_name' => $item['seller_name'],
-                'shop_name' => $item['shop_name'],
+                
                 'commission_rate' => $commissionRate,
                 'commission_amount' => $commissionAmount,
                 'seller_amount' => $sellerAmount
@@ -261,7 +253,7 @@ class Cart {
         }
 
         // Vérifier que tous les produits sont toujours disponibles
-        $db = \Database::getInstance()->getConnection();
+        $db = \Core\Database::getInstance()->getConnection();
         
         foreach ($this->items() as $productId => $item) {
             $stmt = $db->prepare("
@@ -288,7 +280,7 @@ class Cart {
      * Appliquer un code promo
      */
     public function applyPromoCode($code) {
-        $db = \Database::getInstance()->getConnection();
+        $db = \Core\Database::getInstance()->getConnection();
         
         $stmt = $db->prepare("
             SELECT * FROM promo_codes

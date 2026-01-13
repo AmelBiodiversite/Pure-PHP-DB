@@ -173,7 +173,7 @@
                         <!-- Image -->
                         <a href="/products/<?= e($product['slug']) ?>">
                             <img 
-                                src="<?= e($product['thumbnail']) ?>" 
+                                src="<?= e($product['thumbnail_url'] ?? '/public/img/placeholder.png') ?>" 
                                 alt="<?= e($product['title']) ?>"
                                 class="product-image"
                                 loading="lazy"
@@ -244,8 +244,8 @@
 
                             <!-- Stats -->
                             <div class="flex gap-4 mt-3" style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                <span>👁️ <?= number_format($product['views_count']) ?></span>
-                                <span>💰 <?= number_format($product['sales_count']) ?> ventes</span>
+                                <span>👁️ <?= number_format($product['views_count'] ?? 0) ?></span>
+                                <span>💰 <?= number_format($product['sales_count'] ?? 0) ?> ventes</span>
                             </div>
 
                         </div>
