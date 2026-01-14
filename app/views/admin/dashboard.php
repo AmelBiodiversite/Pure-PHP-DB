@@ -5,10 +5,10 @@
  */
 
 // Données passées par le contrôleur
-$stats = $data['stats'] ?? [];
-$recentUsers = $data['recentUsers'] ?? [];
-$pendingProducts = $data['pendingProducts'] ?? [];
-$recentOrders = $data['recentOrders'] ?? [];
+$stats = $stats ?? [];
+$recentUsers = $recent_users ?? [];
+$pendingProducts = $pending_products ?? [];
+$recentOrders = $recent_orders ?? [];
 ?>
 
 <div class="container mt-8 mb-16">
@@ -28,7 +28,7 @@ $recentOrders = $data['recentOrders'] ?? [];
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Utilisateurs</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['totalUsers'] ?? 0) ?></h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_users'] ?? 0) ?></h3>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@ $recentOrders = $data['recentOrders'] ?? [];
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Produits</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['totalProducts'] ?? 0) ?></h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_products'] ?? 0) ?></h3>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@ $recentOrders = $data['recentOrders'] ?? [];
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Commandes</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['totalOrders'] ?? 0) ?></h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_orders'] ?? 0) ?></h3>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@ $recentOrders = $data['recentOrders'] ?? [];
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Revenus Total</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['totalRevenue'] ?? 0, 2) ?>€</h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_revenue'] ?? 0, 2) ?>€</h3>
                 </div>
             </div>
         </div>
@@ -145,12 +145,12 @@ $recentOrders = $data['recentOrders'] ?? [];
                                      style="width: 48px; height: 48px; object-fit: cover; border-radius: 50%;">
                             <?php else: ?>
                                 <div style="width: 48px; height: 48px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                    <?= strtoupper(substr($user['full_name'], 0, 1)) ?>
+                                    <?= strtoupper(substr($user['full_name'] ?? $user['username'], 0, 1)) ?>
                                 </div>
                             <?php endif; ?>
                             
                             <div style="flex: 1;">
-                                <h4 style="margin: 0 0 0.25rem 0;"><?= htmlspecialchars($user['full_name']) ?></h4>
+                                <h4 style="margin: 0 0 0.25rem 0;"><?= strtoupper(substr($user['full_name'] ?? $user['username'], 0, 1)) ?>
                                 <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
                                     @<?= htmlspecialchars($user['username']) ?>
                                 </p>

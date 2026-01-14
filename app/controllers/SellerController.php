@@ -112,14 +112,21 @@ class SellerController extends Controller {
      * Enregistrer un nouveau produit
      */
     public function storeProduct() {
+        file_put_contents('/tmp/start.log', "DÉBUT storeProduct\n");
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            file_put_contents('/tmp/start.log', "Pas POST\n", FILE_APPEND);
             $this->redirect('/seller/products');
         }
 
-        // Vérifier CSRF
+        file_put_contents('/tmp/start.log', "POST OK\n", FILE_APPEND);
+
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
+            file_put_contents('/tmp/start.log', "CSRF invalide\n", FILE_APPEND);
             $this->json(['success' => false, 'error' => 'Token invalide'], 403);
         }
+
+        file_put_contents('/tmp/start.log', "CSRF OK\n", FILE_APPEND);
 
         $data = [
             'title' => $_POST['title'] ?? '',
@@ -132,8 +139,13 @@ class SellerController extends Controller {
             'tags' => $_POST['tags'] ?? ''
         ];
 
+        file_put_contents('/tmp/start.log', "Data préparé\n", FILE_APPEND);
+
         // Validation des uploads
         $uploadErrors = $this->validateUploads($_FILES);
+        
+        file_put_contents('/tmp/start.log', "Validation: " . print_r($uploadErrors, true) . "\n", FILE_APPEND);
+        
         if (!empty($uploadErrors)) {
             $this->view('seller/product_form', [
                 'title' => 'Ajouter un Produit',
@@ -146,13 +158,16 @@ class SellerController extends Controller {
             return;
         }
 
+        file_put_contents('/tmp/start.log', "Avant createProduct\n", FILE_APPEND);
+
         $result = $this->productModel->createProduct(
             $data,
             $_SESSION['user_id'],
             $_FILES
         );
         
-
+        file_put_contents('/tmp/result.log', print_r($result, true));
+        
         if ($result['success']) {
             redirectWithMessage(
                 '/seller/products',
@@ -218,7 +233,6 @@ class SellerController extends Controller {
             $this->redirect('/seller/products');
         }
 
-        // Vérifier CSRF
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
             $this->json(['success' => false, 'error' => 'Token invalide'], 403);
         }
@@ -316,15 +330,15 @@ class SellerController extends Controller {
         // Revenus par mois (12 derniers mois)
         $stmt = $this->db->prepare("
             SELECT 
-                DATE_FORMAT(o.created_at, '%Y-%m') as month,
+                TO_CHAR(o.created_at, 'YYYY-MM') as month,
                 SUM(oi.seller_amount) as revenue,
                 COUNT(*) as orders
             FROM order_items oi
             JOIN orders o ON oi.order_id = o.id
             WHERE oi.seller_id = ? 
               AND o.payment_status = 'completed'
-              AND o.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-            GROUP BY DATE_FORMAT(o.created_at, '%Y-%m')
+              AND o.created_at >= CURRENT_DATE - INTERVAL '12 months'
+            GROUP BY TO_CHAR(o.created_at, 'YYYY-MM')
             ORDER BY month DESC
         ");
         $stmt->execute([$sellerId]);
@@ -402,7 +416,7 @@ class SellerController extends Controller {
 
         // Produits les plus vendus
         $stmt = $this->db->prepare("
-            SELECT p.id, p.title, p.thumbnail, p.price,
+            SELECT p.id, p.title, p.thumbnail_url, p.price,
                    COUNT(oi.id) as total_sales,
                    SUM(oi.seller_amount) as total_revenue
             FROM products p
@@ -418,14 +432,14 @@ class SellerController extends Controller {
 
         // Sources de trafic (vues par produit)
         $stmt = $this->db->prepare("
-            SELECT id, title, views_count, sales_count,
+            SELECT id, title, views, sales,
                    CASE 
-                       WHEN views_count > 0 THEN (sales_count / views_count * 100)
+                       WHEN views > 0 THEN (sales::float / views * 100)
                        ELSE 0 
                    END as conversion_rate
             FROM products
             WHERE seller_id = ?
-            ORDER BY views_count DESC
+            ORDER BY views DESC
             LIMIT 10
         ");
         $stmt->execute([$sellerId]);

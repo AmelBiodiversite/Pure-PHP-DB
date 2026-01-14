@@ -25,10 +25,13 @@ function slugify($text) {
 
 // Formater un prix
 function formatPrice($price) {
-    if (CURRENCY_POSITION === 'left') {
-        return CURRENCY_SYMBOL . number_format($price, 2, ',', ' ');
+    // Convertir en float pour être sûr
+    $price = floatval($price);
+
+      if (APP_CURRENCY_POS === 'left') {
+        return APP_CURRENCY . number_format($price, 2, ',', ' ');
     }
-    return number_format($price, 2, ',', ' ') . ' ' . CURRENCY_SYMBOL;
+    return number_format($price, 2, ',', ' ') . ' ' . APP_CURRENCY;
 }
 
 // Générer une clé de licence

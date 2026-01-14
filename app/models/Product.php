@@ -18,10 +18,12 @@ class Product extends Model {
      * Créer un nouveau produit
      */
     public function createProduct($data, $sellerId, $files) {
+        file_put_contents('/tmp/step.log', "DEBUT createProduct\n", FILE_APPEND);
         try {
+            file_put_contents('/tmp/step.log', "Génération slug\n", FILE_APPEND);
             // Générer slug unique
             $slug = $this->generateUniqueSlug($data['title']);
-
+            file_put_contents('/tmp/step.log', "Préparation données\n", FILE_APPEND);
             // Préparer les données (sans tags)
             $productData = [
                 'seller_id' => $sellerId,
@@ -37,17 +39,19 @@ class Product extends Model {
             ];
 
             // Upload des fichiers
+            file_put_contents('/tmp/step.log', "Upload thumbnail\n", FILE_APPEND);
             if (!empty($files['thumbnail']['name'])) {
                 $thumbnailPath = $this->uploadThumbnail($files['thumbnail']);
                 $productData['thumbnail_url'] = $thumbnailPath;
             }
 
+            file_put_contents('/tmp/step.log', "Upload fichier\n", FILE_APPEND);
             if (!empty($files['product_file']['name'])) {
                 $filePath = $this->uploadProductFile($files['product_file']);
                 $productData['file_url'] = $filePath;
                 $productData['file_size'] = $files['product_file']['size'];
             }
-
+            file_put_contents('/tmp/step.log', "INSERT produit\n", FILE_APPEND);
             // Insérer le produit
             $fields = array_keys($productData);
             $placeholders = ':' . implode(', :', $fields);
@@ -115,6 +119,28 @@ class Product extends Model {
         }
     }
 
+
+    //Taille des images
+    private function resizeImage($filepath, $maxWidth, $maxHeight) {
+        list($width, $height, $type) = getimagesize($filepath);
+
+        if ($width <= $maxWidth && $height <= $maxHeight) return;
+
+        $ratio = min($maxWidth / $width, $maxHeight / $height);
+        $newWidth = (int)($width * $ratio);
+        $newHeight = (int)($height * $ratio);
+        $src = imagecreatefromstring(file_get_contents($filepath));
+        $dst = imagecreatetruecolor($newWidth, $newHeight);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+        imagejpeg($dst, $filepath, 85);
+        imagedestroy($src);
+        imagedestroy($dst);
+    }
+
+
+
+
+    
     /**
      * Upload thumbnail
      */
@@ -124,6 +150,7 @@ class Product extends Model {
         $filepath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            $this->resizeImage($filepath, 1200, 800);
             return '/public/uploads/products/thumbnails/' . $filename;
         }
 

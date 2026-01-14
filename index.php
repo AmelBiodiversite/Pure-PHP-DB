@@ -21,6 +21,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Charger la configuration
+require_once __DIR__ . '/config/currency.php';
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/helpers/functions.php';

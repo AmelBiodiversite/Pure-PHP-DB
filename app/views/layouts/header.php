@@ -29,17 +29,18 @@
             <ul class="navbar-menu">
                 <li><a href="/products" class="navbar-link">Produits</a></li>
                 <li><a href="/sellers" class="navbar-link">Vendeurs</a></li>
-                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'seller'): ?>
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'seller'): ?>
                     <li><a href="/seller/dashboard" class="navbar-link">Dashboard</a></li>
                 <?php endif; ?>
+
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                    <li><a href="/admin" class="navbar-link">👑 Administration</a></li>
+                <?php endif; ?>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <li><a href="/logout" class="navbar-link">Déconnexion</a></li>
+                <?php endif; ?>
             </ul>
-
-
-<?php if (isset($_SESSION['user_id'])): ?>
-    <li><a href="/logout" class="navbar-link">Déconnexion</a></li>
-<?php else: ?>
-   
-<?php endif; ?>
 
             
             <div class="flex gap-4">
@@ -85,9 +86,10 @@
                 <!-- User Menu -->
                 <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
                     <div style="position: relative;">
-                        <button class="btn btn-ghost btn-sm" id="userMenuBtn">
-                            👤 <?= e($_SESSION['user_name']) ?>
-                        </button>
+                        <a href="<?= $_SESSION['user_role'] === 'seller' ? '/seller/dashboard' :                 '/account' ?>" class="btn btn-ghost btn-sm">
+    👤 <?= e($_SESSION['user_name']) ?>
+</a>
+                        
                         <!-- Dropdown sera ajouté via JS -->
                     </div>
                 <?php else: ?>

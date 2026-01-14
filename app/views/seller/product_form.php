@@ -150,6 +150,7 @@ $old = $old ?? [];
                             placeholder="49.99"
                             step="0.01"
                             min="0"
+                            autocomplete="off"
                             value="<?= $isEdit ? $product['price'] : ($old['price'] ?? '') ?>"
                             required
                             style="padding-right: 40px;"
@@ -181,6 +182,7 @@ $old = $old ?? [];
                             placeholder="99.99"
                             step="0.01"
                             min="0"
+                            autocomplete="off"
                             value="<?= $isEdit ? $product['original_price'] : ($old['original_price'] ?? '') ?>"
                             style="padding-right: 40px;"
                         >
@@ -214,6 +216,13 @@ $old = $old ?? [];
                     <option value="sketch" <?= ($isEdit && $product['file_type'] == 'sketch') || ($old['file_type'] ?? '') == 'sketch' ? 'selected' : '' ?>>Sketch</option>
                     <option value="figma" <?= ($isEdit && $product['file_type'] == 'figma') || ($old['file_type'] ?? '') == 'figma' ? 'selected' : '' ?>>Figma</option>
                     <option value="xd" <?= ($isEdit && $product['file_type'] == 'xd') || ($old['file_type'] ?? '') == 'xd' ? 'selected' : '' ?>>Adobe XD</option>
+                    <option value="xd" <?= ($isEdit && $product['file_type'] == 'xd') || ($old['file_type'] ?? '') == 'xd' ? 'selected' : '' ?>>Adobe XD</option>
+                        <option value="jpg" <?= ($isEdit && $product['file_type'] == 'jpg') || ($old['file_type'] ?? '') == 'jpg' ? 'selected' : '' ?>>JPEG/JPG</option>
+                        <option value="png" <?= ($isEdit && $product['file_type'] == 'png') || ($old['file_type'] ?? '') == 'png' ? 'selected' : '' ?>>PNG</option>
+                        <option value="gif" <?= ($isEdit && $product['file_type'] == 'gif') || ($old['file_type'] ?? '') == 'gif' ? 'selected' : '' ?>>GIF</option>
+                        <option value="svg" <?= ($isEdit && $product['file_type'] == 'svg') || ($old['file_type'] ?? '') == 'svg' ? 'selected' : '' ?>>SVG</option>
+                        <option value="mp4" <?= ($isEdit && $product['file_type'] == 'mp4') || ($old['file_type'] ?? '') == 'mp4' ? 'selected' : '' ?>>Vidéo MP4</option>
+                    </select>
                 </select>
             </div>
 

@@ -234,19 +234,18 @@ class User extends Model {
      */
     public function getSellerStats($userId) {
         $sql = "SELECT 
-                u.total_sales,
-                u.total_earnings,
-                u.total_products,
-                u.rating_average,
-                u.rating_count,
-                COUNT(DISTINCT o.id) as total_orders,
-                COUNT(DISTINCT oi.product_id) as products_sold
+                COUNT(DISTINCT p.id) as total_products,
+                COALESCE(u.rating_average, 0) as rating_average,
+                COALESCE(u.rating_count, 0) as rating_count,
+                COALESCE(SUM(oi.seller_amount), 0) as total_sales,
+                COUNT(DISTINCT o.id) as total_orders
                 FROM users u
+                LEFT JOIN products p ON u.id = p.seller_id AND p.status = 'approved'
                 LEFT JOIN order_items oi ON u.id = oi.seller_id
-                LEFT JOIN orders o ON oi.order_id = o.id AND o.status = 'completed'
+                LEFT JOIN orders o ON oi.order_id = o.id AND o.payment_status = 'completed'
                 WHERE u.id = :user_id
-                GROUP BY u.id";
-        
+                GROUP BY u.id, u.rating_average, u.rating_count";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['user_id' => $userId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);

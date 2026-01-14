@@ -23,6 +23,7 @@ class AdminController extends Controller {
      * Dashboard admin
      */
     public function index() {
+        
         // Stats globales
         $stats = [
             'total_users' => $this->db->query("SELECT COUNT(*) FROM users")->fetchColumn(),
@@ -43,7 +44,7 @@ class AdminController extends Controller {
 
         // Derniers utilisateurs
         $recent_users = $this->db->query("
-            SELECT id, username, email, role, created_at 
+            SELECT id, username, email, role, created_at, avatar_url, full_name
             FROM users 
             ORDER BY created_at DESC 
             LIMIT 10
