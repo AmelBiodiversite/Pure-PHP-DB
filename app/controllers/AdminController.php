@@ -73,14 +73,22 @@ class AdminController extends Controller {
      */
     public function users() {
         $users = $this->db->query("
-            SELECT id, username, email, role, is_active, created_at 
+            SELECT id, username, email, role, created_at, is_active, avatar_url, full_name
             FROM users 
             ORDER BY created_at DESC
         ")->fetchAll();
 
+        // Compteurs par rôle
+        $stats = [
+            'total' => count($users),
+            'admins' => count(array_filter($users, fn($u) => $u['role'] === 'admin')),
+            'sellers' => count(array_filter($users, fn($u) => $u['role'] === 'seller')),
+            'buyers' => count(array_filter($users, fn($u) => $u['role'] === 'buyer'))
+        ];        
         $this->view('admin/users', [
             'title' => 'Gestion Utilisateurs',
-            'users' => $users
+            'users' => $users,
+            'stats' => $stats 
         ]);
     }
 
@@ -117,6 +125,8 @@ class AdminController extends Controller {
         ]);
     }
 
+
+    
     /**
      * Valider un produit
      */
@@ -155,40 +165,56 @@ class AdminController extends Controller {
     }
 
     /**
-     * Suspendre un utilisateur
-     */
-    public function suspendUser() {
-        $user_id = $_POST['user_id'] ?? 0;
-
-        $stmt = $this->db->prepare("UPDATE users SET is_active = FALSE WHERE id = :id");
-        $success = $stmt->execute(['id' => $user_id]);
-
-        if ($success) {
-            $_SESSION['success'] = "Utilisateur suspendu";
-        } else {
-            $_SESSION['error'] = "Erreur lors de la suspension";
-        }
-
-        $this->redirect('/admin/users');
+ * Suspendre un utilisateur
+ */
+public function suspendUser($id) {
+    $stmt = $this->db->prepare("UPDATE users SET is_active = FALSE WHERE id = :id");
+    $success = $stmt->execute(['id' => $id]);
+    
+    if ($success) {
+        redirectWithMessage('/admin/users', 'Utilisateur suspendu', 'success');
+    } else {
+        redirectWithMessage('/admin/users', 'Erreur lors de la suspension', 'error');
     }
+}
 
-    /**
-     * Activer un utilisateur
-     */
-    public function activateUser() {
-        $user_id = $_POST['user_id'] ?? 0;
-
-        $stmt = $this->db->prepare("UPDATE users SET is_active = TRUE WHERE id = :id");
-        $success = $stmt->execute(['id' => $user_id]);
-
-        if ($success) {
-            $_SESSION['success'] = "Utilisateur activé";
-        } else {
-            $_SESSION['error'] = "Erreur lors de l'activation";
-        }
-
-        $this->redirect('/admin/users');
+/**
+ * Activer un utilisateur
+ */
+public function activateUser($id) {
+    $stmt = $this->db->prepare("UPDATE users SET is_active = TRUE WHERE id = :id");
+    $success = $stmt->execute(['id' => $id]);
+    
+    if ($success) {
+        redirectWithMessage('/admin/users', 'Utilisateur activé', 'success');
+    } else {
+        redirectWithMessage('/admin/users', 'Erreur lors de l\'activation', 'error');
     }
+}
+
+/**
+ * Supprimer un utilisateur
+ */
+public function deleteUser($id) {
+    // Vérifier que ce n'est pas l'admin principal
+    $stmt = $this->db->prepare("SELECT email FROM users WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+    $user = $stmt->fetch();
+    
+    if ($user && $user['email'] === 'admin@marketflow.com') {
+        redirectWithMessage('/admin/users', 'Impossible de supprimer l\'admin principal', 'error');
+        return;
+    }
+    
+    $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+    $success = $stmt->execute(['id' => $id]);
+    
+    if ($success) {
+        redirectWithMessage('/admin/users', 'Utilisateur supprimé', 'success');
+    } else {
+        redirectWithMessage('/admin/users', 'Erreur lors de la suppression', 'error');
+    }
+}
 
     /**
      * Statistiques détaillées

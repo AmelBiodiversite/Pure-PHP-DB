@@ -68,14 +68,51 @@
                         Mot de passe oublié ?
                     </a>
                 </div>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    class="form-input"
-                    placeholder="••••••••"
-                    required
-                >
+                <div style="position: relative;">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input"
+                            placeholder="••••••••"
+                            style="padding-right: 45px;"
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            onclick="togglePassword()" 
+                            style="
+                                position: absolute;
+                                right: 10px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                background: none;
+                                border: none;
+                                cursor: pointer;
+                                font-size: 1.2rem;
+                                padding: 5px;
+                            "
+                            title="Afficher/Masquer"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <script>
+                function togglePassword() {
+                    const passwordInput = document.getElementById('password');
+                    const button = event.currentTarget;
+
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        button.textContent = '🙈';
+                    } else {
+                        passwordInput.type = 'password';
+                        button.textContent = '👁️';
+                    }
+                }
+                </script>
             </div>
 
             <!-- Remember me -->

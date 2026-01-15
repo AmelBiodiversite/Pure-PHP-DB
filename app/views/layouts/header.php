@@ -86,8 +86,9 @@
                 <!-- User Menu -->
                 <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
                     <div style="position: relative;">
-                        <a href="<?= $_SESSION['user_role'] === 'seller' ? '/seller/dashboard' :                 '/account' ?>" class="btn btn-ghost btn-sm">
+                        <a href="<?= $_SESSION['user_role'] === 'admin' ? '/admin' : ($_SESSION['user_role'] === 'seller' ? '/seller/dashboard' : '/account') ?>" class="btn btn-ghost btn-sm">
     👤 <?= e($_SESSION['user_name']) ?>
+</a>
 </a>
                         
                         <!-- Dropdown sera ajouté via JS -->

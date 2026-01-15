@@ -92,11 +92,11 @@ $stats = $data['stats'] ?? [];
                                                  style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
                                         <?php else: ?>
                                             <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                                <?= strtoupper(substr($user['full_name'], 0, 1)) ?>
+                                                <?= strtoupper(substr($user['full_name'] ?? $user['username'], 0, 1)) ?>
                                             </div>
                                         <?php endif; ?>
                                         <div>
-                                            <div style="font-weight: 600;"><?= htmlspecialchars($user['full_name']) ?></div>
+                                            <div style="font-weight: 600;"><?= htmlspecialchars($user['full_name'] ?? $user['username']) ?></div>
                                             <div style="color: var(--text-secondary); font-size: 0.875rem;">
                                                 @<?= htmlspecialchars($user['username']) ?>
                                             </div>
@@ -121,43 +121,40 @@ $stats = $data['stats'] ?? [];
                                 </td>
                                 <td style="padding: 1rem;">
                                     <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                        <button onclick="viewUser(<?= $user['id'] ?>)" 
+                                       <!-- <button onclick="viewUser(<?= $user['id'] ?>)" 
                                                 class="btn btn-sm btn-secondary" 
                                                 title="Voir détails">
                                             👁️
-                                        </button>
+                                        </button>-->
                                         
                                         <?php if ($user['is_active']): ?>
-                                            <form method="POST" action="/admin/users/suspend" style="display: inline;">
-                                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-warning" 
-                                                        title="Suspendre"
-                                                        onclick="return confirm('Suspendre cet utilisateur ?')">
-                                                    ⏸️
-                                                </button>
-                                            </form>
-                                        <?php else: ?>
-                                            <form method="POST" action="/admin/users/activate" style="display: inline;">
-                                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-success" 
-                                                        title="Activer"
-                                                        onclick="return confirm('Réactiver cet utilisateur ?')">
-                                                    ▶️
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
-                                        
-                                        <form method="POST" action="/admin/users/delete" style="display: inline;">
-                                            <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                            <button type="submit" 
-                                                    class="btn btn-sm btn-danger" 
-                                                    title="Supprimer"
-                                                    onclick="return confirm('⚠️ ATTENTION ! Supprimer définitivement cet utilisateur et toutes ses données ? Cette action est IRRÉVERSIBLE !')">
-                                                🗑️
-                                            </button>
-                                        </form>
+    <form method="POST" action="/admin/users/<?= $user['id'] ?>/suspend" style="display: inline;">
+        <button type="submit" 
+                class="btn btn-sm btn-warning" 
+                title="Suspendre"
+                onclick="return confirm('Suspendre cet utilisateur ?')">
+            ⏸️
+        </button>
+    </form>
+<?php else: ?>
+    <form method="POST" action="/admin/users/<?= $user['id'] ?>/activate" style="display: inline;">
+        <button type="submit" 
+                class="btn btn-sm btn-success" 
+                title="Activer"
+                onclick="return confirm('Réactiver cet utilisateur ?')">
+            ▶️
+        </button>
+    </form>
+<?php endif; ?>
+
+<form method="POST" action="/admin/users/<?= $user['id'] ?>/delete" style="display: inline;">
+    <button type="submit" 
+            class="btn btn-sm btn-danger" 
+            title="Supprimer"
+            onclick="return confirm('⚠️ ATTENTION ! Supprimer définitivement cet utilisateur ?')">
+        🗑️
+    </button>
+</form>
                                     </div>
                                 </td>
                             </tr>
@@ -169,17 +166,7 @@ $stats = $data['stats'] ?? [];
     </div>
 </div>
 
-<!-- Modal détail utilisateur -->
-<div id="userModal" class="modal">
-    <div class="modal-content" style="max-width: 600px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0;">Détails de l'utilisateur</h2>
-            <button onclick="closeUserModal()" class="btn btn-secondary btn-sm">✕</button>
-        </div>
-        <div id="userDetails">
-            <!-- Contenu chargé dynamiquement -->
-        </div>
-    </div>
+
 </div>
 
 <style>

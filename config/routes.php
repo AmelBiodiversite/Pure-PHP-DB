@@ -83,14 +83,17 @@ $router->get('/orders/{orderNumber}/download/{itemId}', 'OrderController@downloa
 // ============================================
 // ROUTES ADMIN
 // ============================================
-$router->get('/admin', 'AdminController@dashboard');
-$router->get('/admin/dashboard', 'AdminController@dashboard');
+$router->get('/admin', 'AdminController@index');
+$router->get('/admin/dashboard', 'AdminController@index');
 $router->get('/admin/users', 'AdminController@users');
 $router->post('/admin/users/{id}/toggle', 'AdminController@toggleUser');
 $router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
 $router->get('/admin/products', 'AdminController@products');
 $router->post('/admin/products/{id}/approve', 'AdminController@approveProduct');
 $router->get('/admin/stats', 'AdminController@stats');
+$router->post('/admin/users/{id}/suspend', 'AdminController@suspendUser');
+$router->post('/admin/users/{id}/activate', 'AdminController@activateUser');
+$router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
 
 // ============================================
 // DISPATCHER
