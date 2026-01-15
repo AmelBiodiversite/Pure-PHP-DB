@@ -70,6 +70,11 @@ $router->get('/cart/remove-promo', 'CartController@removePromo');
 $router->get('/checkout', 'CartController@checkout');
 $router->post('/cart/process-checkout', 'CartController@processCheckout');
 
+// Checkout Stripe
+$router->post('/checkout/create-session', 'StripeController@createCheckoutSession');
+$router->get('/checkout/success', 'StripeController@success');
+$router->get('/checkout/cancel', 'CartController@index');
+
 // Paiement
 $router->get('/payment/success', 'PaymentController@success');
 $router->get('/payment/cancel', 'PaymentController@cancel');
@@ -94,6 +99,15 @@ $router->get('/admin/stats', 'AdminController@stats');
 $router->post('/admin/users/{id}/suspend', 'AdminController@suspendUser');
 $router->post('/admin/users/{id}/activate', 'AdminController@activateUser');
 $router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
+
+
+// ============================================
+// API REST
+// ============================================
+$router->get('/api', 'ApiController@index');
+$router->get('/api/products', 'ApiController@products');
+$router->get('/api/products/{slug}', 'ApiController@product');
+$router->get('/api/categories', 'ApiController@categories');
 
 // ============================================
 // DISPATCHER

@@ -199,9 +199,40 @@
                     </div>
 
                     <!-- Bouton commander -->
-                    <a href="/checkout" class="btn btn-primary" style="width: 100%; font-size: 1.125rem;">
-                        Passer commande
-                    </a>
+                    <button onclick="proceedToCheckout()" class="btn btn-primary btn-lg" id="checkoutBtn">
+    Passer commande
+</button>
+
+<script>
+async function proceedToCheckout() {
+    const btn = document.getElementById('checkoutBtn');
+    btn.disabled = true;
+    btn.textContent = 'Redirection...';
+    
+    try {
+        const response = await fetch('/checkout/create-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.checkout_url) {
+            window.location.href = data.checkout_url;
+        } else {
+            alert('Erreur : ' + (data.error || 'Erreur inconnue'));
+            btn.disabled = false;
+            btn.textContent = 'Passer commande';
+        }
+    } catch (error) {
+        alert('Erreur de connexion');
+        btn.disabled = false;
+        btn.textContent = 'Passer commande';
+    }
+}
+</script>
 
                     <!-- Infos rassurantes -->
                     <div style="

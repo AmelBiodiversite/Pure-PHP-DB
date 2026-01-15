@@ -53,7 +53,7 @@ class Cart {
             'product_id' => $product['id'],
             'title' => $product['title'],
             'slug' => $product['slug'],
-            'thumbnail' => $product['thumbnail'],
+            'thumbnail' => $product['thumbnail_url'] ?? '/public/img/placeholder.png',
             'price' => $product['price'],
             'seller_id' => $product['seller_id'],
             'seller_name' => $product['seller_name'],

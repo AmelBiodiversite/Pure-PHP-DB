@@ -73,10 +73,10 @@
                     <div style="margin-bottom: var(--space-3);">
                         <input type="range" 
                                id="priceMin" 
-                               min="<?= $price_range['min_price'] ?>" 
-                               max="<?= $price_range['max_price'] ?>"
-                               value="<?= $active_filters['min_price'] ?? $price_range['min_price'] ?>"
-                               style="width: 100%;">
+                               min="<?= $price_range['min_price'] ?? 0 ?>"
+                               max="<?= $price_range['max_price'] ?? 1000 ?>"
+                               value="<?= $active_filters['min_price'] ?? $price_range['min_price'] ?? 0 ?>"
+                            style="width: 100%;">
                         <input type="range" 
                                id="priceMax" 
                                min="<?= $price_range['min_price'] ?>" 
@@ -85,9 +85,12 @@
                                style="width: 100%;">
                     </div>
                     <div style="display: flex; gap: var(--space-2); font-size: 0.875rem; color: var(--text-secondary);">
-                        <span id="priceMinLabel"><?= formatPrice($active_filters['min_price'] ?? $price_range['min_price']) ?></span>
+                        
+                        <span id="priceMinLabel"><?= formatPrice($active_filters['min_price'] ?? $price_range['min_price'] ?? 0) ?></span>
                         <span>-</span>
-                        <span id="priceMaxLabel"><?= formatPrice($active_filters['max_price'] ?? $price_range['max_price']) ?></span>
+                        <span id="priceMaxLabel"><?= formatPrice($active_filters['max_price'] ?? $price_range['max_price'] ?? 1000) ?></span>
+                        
+                    
                     </div>
                 </div>
 
