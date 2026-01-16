@@ -55,7 +55,7 @@ define('APP_PATH', __DIR__ . '/..');
 define('APP_URL', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
 // Chemins des ressources statiques
-define('CSS_URL', APP_URL . '/css');
+define('CSS_URL', APP_URL . '/public/css');
 define('JS_URL', APP_URL . '/public/js');
 define('IMG_URL', APP_URL . '/public/img');
 

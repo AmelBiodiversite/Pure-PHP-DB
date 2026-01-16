@@ -244,80 +244,12 @@ if (isset($_SESSION['user_id'])) {
                                     <?php endif; ?>
                                 </div>
                                 
-                                <!-- 
-                                ================================================
-                                NOUVEAU : Boutons d'action avec Wishlist
-                                ================================================
-                                -->
-                                <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                    
-                                    <!-- Bouton Wishlist -->
-                                    <?php $isInWishlist = in_array($product['id'], $wishlistIds); ?>
-                                    <button 
-                                        type="button"
-                                        class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>" 
-                                        data-product-id="<?= $product['id'] ?>"
-                                        style="padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px;"
-                                        title="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                                        <span style="font-size: 1.25rem; line-height: 1;">
-                                            <?= $isInWishlist ? '❤️' : '🤍' ?>
-                                        </span>
-                                    </button>
-
-                                    <!-- Bouton Voir -->
-                                    <button 
-                                        class="btn btn-primary btn-sm"
-                                        onclick="window.location.href='/products/<?= e($product['slug']) ?>'"
-                                        style="white-space: nowrap;">
-                                        Voir
-                                    </button>
-                                </div>
-                            </div>
-                                ================================================
-                                -->
-                                <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                    
-                                    <!-- Bouton Wishlist (Favoris) -->
-                                    <?php 
-                                    /**
-                                     * Vérifier si le produit est déjà dans la wishlist
-                                     * - Si oui : afficher ❤️ (cœur plein rouge)
-                                     * - Si non : afficher 🤍 (cœur vide blanc)
-                                     */
-                                    $isInWishlist = in_array($product['id'], $wishlistIds); 
-                                    ?>
-                                    <button 
-                                        type="button"
-                                        class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>" 
-                                        data-product-id="<?= $product['id'] ?>"
-                                        style="
-                                            padding: 0.5rem 0.75rem; 
-                                            background: white; 
-                                            border: 1px solid var(--border-color); 
-                                            border-radius: 6px; 
-                                            cursor: pointer; 
-                                            transition: all 0.3s; 
-                                            display: flex; 
-                                            align-items: center; 
-                                            justify-content: center; 
-                                            min-width: 40px;
-                                        "
-                                        title="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
-                                        aria-label="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                                        <span style="font-size: 1.25rem; line-height: 1;">
-                                            <?= $isInWishlist ? '❤️' : '🤍' ?>
-                                        </span>
-                                    </button>
-
-                                    <!-- Bouton Voir le produit -->
-                                    <button 
-                                        class="btn btn-primary btn-sm"
-                                        onclick="window.location.href='/products/<?= e($product['slug']) ?>'"
-                                        style="white-space: nowrap;">
-                                        Voir
-                                    </button>
-                                </div>
-                            </div>
+                                <button 
+                                    class="btn btn-primary btn-sm"
+                                    onclick="window.location.href='/products/<?= e($product['slug']) ?>'"
+                                >
+                                    Voir
+                                </button>
                             </div>
 
                             <!-- Stats -->

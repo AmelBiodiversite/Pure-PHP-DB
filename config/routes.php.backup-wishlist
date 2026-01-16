@@ -129,7 +129,3 @@ $router->post('/wishlist/add', 'WishlistController@add');
 $router->post('/wishlist/remove', 'WishlistController@remove');
 $router->get('/wishlist/count', 'WishlistController@count');
 
-
-// ============================================
-// ROUTES WISHLIST (FAVORIS) ❤️
-// ============================================

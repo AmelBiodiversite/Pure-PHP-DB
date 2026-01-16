@@ -1,0 +1,170 @@
+    <?php
+    /**
+     * =====================================================
+     * MARKETFLOW PRO - HEADER LAYOUT
+     * =====================================================
+     * 
+     * Template du header principal du site
+     * Inclut : Navigation, recherche, panier, menu utilisateur
+     * 
+     * Variables disponibles :
+     * - $title : Titre de la page (optionnel)
+     * - $_SESSION : Variables de session (user, cart, etc.)
+     * 
+     * Fichier : app/views/layouts/header.php
+     * @author MarketFlow Team
+     * @version 1.0
+     * =====================================================
+     */
+    ?>
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="MarketFlow Pro - La marketplace pour créateurs digitaux">
+
+        <!-- Titre dynamique de la page -->
+        <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
+
+        <!-- =====================================================
+             STYLES CSS
+             ===================================================== -->
+        <!-- Style principal du site -->
+        <link rel="stylesheet" href="/public/css/style.css">
+
+        <!-- Système de notifications toast modernes -->
+        <link rel="stylesheet" href="/public/css/notifications.css">
+
+        <!-- =====================================================
+             JAVASCRIPT PRINCIPAL
+             ===================================================== -->
+        <!-- Script principal avec composants (Dropdown, etc.) -->
+        <script src="/public/js/app.js"></script>
+
+        <!-- Favicon -->
+        <link rel="icon" href="/public/favicon.ico">
+    </head>
+    <body>
+
+        <!-- =====================================================
+             BARRE DE NAVIGATION PRINCIPALE
+             ===================================================== -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <!-- Logo / Nom du site -->
+                <a href="/" class="navbar-brand">MarketFlow Pro</a>
+
+                <!-- Menu principal -->
+                <ul class="navbar-menu">
+                    <!-- Catalogue des produits -->
+                    <li><a href="/products" class="navbar-link">Produits</a></li>
+
+                    <!-- Liste des vendeurs -->
+                    <li><a href="/sellers" class="navbar-link">Vendeurs</a></li>
+
+                    <!-- Dashboard vendeur (visible uniquement pour les vendeurs) -->
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'seller'): ?>
+                        <li><a href="/seller/dashboard" class="navbar-link">Dashboard</a></li>
+                    <?php endif; ?>
+
+                    <!-- Panel admin (visible uniquement pour les admins) -->
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                        <li><a href="/admin" class="navbar-link">👑 Administration</a></li>
+                    <?php endif; ?>
+
+                    <!-- Bouton déconnexion (visible si connecté) -->
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li><a href="/logout" class="navbar-link">Déconnexion</a></li>
+                    <?php endif; ?>
+                </ul>
+
+                <!-- =====================================================
+                     ACTIONS UTILISATEUR (Recherche, Panier, Compte)
+                     ===================================================== -->
+                <div class="flex gap-4">
+
+                    <!-- ==================== RECHERCHE ==================== -->
+                    <div style="position: relative;">
+                        <input 
+                            type="search" 
+                            placeholder="Rechercher..."
+                            style="
+                                padding: var(--space-2) var(--space-4);
+                                border: 1px solid var(--border-color);
+                                border-radius: var(--radius-full);
+                                background: var(--bg-secondary);
+                                width: 200px;
+                            "
+                        >
+                    </div>
+
+                    <!-- ==================== PANIER ==================== -->
+                    <a href="/cart" class="btn btn-ghost btn-sm" style="position: relative;">
+                        🛒
+                        <!-- Badge compteur si le panier contient des articles -->
+                        <?php if (isset($_SESSION['cart_count']) && $_SESSION['cart_count'] > 0): ?>
+                        <span style="
+                            position: absolute;
+                            top: -5px;
+                            right: -5px;
+                            background: var(--error);
+                            color: white;
+                            font-size: 0.75rem;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 600;
+                        ">
+                            <?= $_SESSION['cart_count'] ?>
+                        </span>
+                        <?php endif; ?>
+                    </a>
+
+                    <!-- ==================== MENU UTILISATEUR ==================== -->
+                    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+                        <!-- Utilisateur connecté : Afficher nom + lien vers dashboard selon rôle -->
+                        <div style="position: relative;">
+                            <a href="<?= $_SESSION['user_role'] === 'admin' ? '/admin' : ($_SESSION['user_role'] === 'seller' ? '/seller/dashboard' : '/account') ?>" 
+                               class="btn btn-ghost btn-sm">
+                                👤 <?= e($_SESSION['user_name']) ?>
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Utilisateur non connecté : Boutons Connexion / Inscription -->
+                        <a href="/login" class="btn btn-ghost btn-sm">Connexion</a>
+                        <a href="/register" class="btn btn-primary btn-sm">S'inscrire</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </nav>
+
+        <!-- =====================================================
+             MESSAGES FLASH (Notifications)
+             ===================================================== 
+
+             Les messages flash PHP sont automatiquement convertis
+             en notifications toast modernes par notifications.js
+
+             Attributs data-* utilisés pour la conversion :
+             - data-flash-message : Le message à afficher
+             - data-flash-type : Type (success, error, warning, info)
+             ===================================================== -->
+        <?php 
+            $flash = getFlashMessage();
+            if ($flash): 
+        ?>
+        <div data-flash-message="<?= e($flash['message']) ?>" 
+             data-flash-type="<?= $flash['type'] ?>" 
+             style="display: none;">
+            <!-- Ce message sera converti en toast par notifications.js au chargement de la page -->
+        </div>
+        <?php endif; ?>
+
+        <!-- =====================================================
+             DÉBUT DU CONTENU PRINCIPAL
+             ===================================================== -->
+        <!-- Le contenu de chaque page sera inséré ici via les vues -->

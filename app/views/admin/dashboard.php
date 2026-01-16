@@ -81,6 +81,34 @@ $recentOrders = $recent_orders ?? [];
                 <span class="badge badge-warning"><?= count($pendingProducts) ?></span>
             </div>
 
+            <!-- Boutons Export CSV -->
+            <div class="card mb-8">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="margin: 0 0 0.5rem 0;">📊 Exports de données</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                            Téléchargez vos données au format CSV compatible Excel
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <a href="/admin/export/users" class="btn btn-outline hover-lift" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">👥</span>
+                        <span>Utilisateurs</span>
+                    </a>
+                    <a href="/admin/export/products" class="btn btn-outline hover-lift" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">📦</span>
+                        <span>Produits</span>
+                    </a>
+                    <a href="/admin/export/orders" class="btn btn-outline hover-lift" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">🛍️</span>
+                        <span>Commandes</span>
+                    </a>
+                </div>
+            </div>
+            
+
             <?php if (empty($pendingProducts)): ?>
                 <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
                     <p>✅ Aucun produit en attente</p>

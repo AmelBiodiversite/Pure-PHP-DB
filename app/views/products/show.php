@@ -125,10 +125,36 @@
                     </div>
                     <?php endif; ?>
                 </div>
-
+                
                 <!-- Tab Content - Avis -->
                 <div class="tab-content" data-tab-content="reviews" style="padding: var(--space-8); display: none;">
-                    
+                    <?php if ($can_review): ?>
+                        <div class="card" style="background: var(--bg-secondary); padding: var(--space-6); margin-bottom: var(--space-8); border: 1px solid var(--primary-100);">
+                            <h3 style="margin-bottom: var(--space-4); font-size: 1.125rem;">Donner mon avis</h3>
+                            <form action="/reviews/create" method="POST">
+                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                <input type="hidden" name="product_slug" value="<?= $product['slug'] ?>">
+
+                                <div style="margin-bottom: var(--space-4);">
+                                    <label style="display: block; margin-bottom: var(--space-2); font-size: 0.875rem;">Note :</label>
+                                    <div class="star-rating" style="font-size: 1.5rem; color: var(--border-color); cursor: pointer; display: flex; gap: var(--space-1);">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="star-input" data-value="<?= $i ?>">★</span>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <input type="hidden" name="rating" id="rating-input" required>
+                                </div>
+
+                                <input type="text" name="title" placeholder="Titre de votre avis" required 
+                                       style="width: 100%; padding: var(--space-3); border: 1px solid var(--border-color); border-radius: var(--radius); margin-bottom: var(--space-4); background: white;">
+
+                                <textarea name="comment" rows="3" placeholder="Votre commentaire..." required
+                                          style="width: 100%; padding: var(--space-3); border: 1px solid var(--border-color); border-radius: var(--radius); margin-bottom: var(--space-4); background: white;"></textarea>
+
+                                <button type="submit" class="btn btn-primary">Publier mon avis</button>
+                            </form>
+                        </div>
+                        <?php endif; ?>
                     <?php if (empty($reviews)): ?>
                         <div class="text-center" style="padding: var(--space-12); color: var(--text-tertiary);">
                             <div style="font-size: 3rem; margin-bottom: var(--space-4);">💬</div>
@@ -265,6 +291,26 @@
                 <form method="POST" action="/cart/add" style="margin-bottom: var(--space-4);">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                    <?php
+                    // Vérifier si le produit est déjà dans la wishlist
+                    $inWishlist = false;
+                    if (isset($_SESSION['user_id'])) {
+                        $wishlistModel = new Wishlist();
+                        $inWishlist = $wishlistModel->exists($_SESSION['user_id'], $product['id']);
+                    }
+                    ?>
+                    
+                    <!-- Bouton Wishlist (Favoris) -->
+                    <button 
+                        type="button" 
+                        class="btn-wishlist <?= $inWishlist ? 'in-wishlist' : '' ?>" 
+                        data-product-id="<?= $product['id'] ?>"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; background: white; border-radius: 8px; font-size: 1.125rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 0.75rem;"
+                        title="<?= $inWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                        <span style="font-size: 1.5rem;"><?= $inWishlist ? '❤️' : '🤍' ?></span>
+                        <?= $inWishlist ? 'Dans mes favoris' : 'Ajouter aux favoris' ?>
+                    </button>
+                    
                     <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.125rem;">
                         🛒 Ajouter au panier
                     </button>

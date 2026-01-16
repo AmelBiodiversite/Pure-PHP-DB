@@ -4,9 +4,260 @@
  * Fichier : app/views/seller/dashboard.php
  */
 ?>
+<?php
+/**
+ * Dashboard Vendeur avec Graphiques
+ */
+?>
 
-<!-- Chart.js pour les graphiques -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<div class="container mt-8 mb-16">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="mb-2">📊 Dashboard Vendeur</h1>
+        <p style="color: var(--text-secondary);">Suivez vos performances en temps réel</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Produits -->
+        <div class="card hover-lift">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    📦
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Produits</p>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= $stats['total_products'] ?></h3>
+                    <p style="font-size: 0.75rem; color: var(--success); margin: 0;">
+                        <?= $stats['approved_products'] ?> approuvés
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenus -->
+        <div class="card hover-lift">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    💰
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Revenus</p>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= formatPrice($stats['total_revenue']) ?></h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Téléchargements -->
+        <div class="card hover-lift">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    📥
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Téléchargements</p>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_downloads']) ?></h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- En attente -->
+        <div class="card hover-lift">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    ⏳
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">En attente</p>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= $stats['pending_products'] ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Graphique Revenus -->
+        <div class="card">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <h2 style="margin: 0;">📈 Revenus (30 derniers jours)</h2>
+            </div>
+            <div style="padding: 1.5rem;">
+                <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Produits -->
+        <div class="card">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <h2 style="margin: 0;">🏆 Top 5 Produits</h2>
+            </div>
+            <div style="padding: 1.5rem;">
+                <canvas id="topProductsChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="card mb-8">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h2 style="margin: 0;">⚡ Actions rapides</h2>
+        </div>
+        <div style="padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <a href="/seller/products/create" class="btn btn-primary hover-lift">
+                ➕ Nouveau produit
+            </a>
+            <a href="/seller/products" class="btn btn-outline hover-lift">
+                📦 Mes produits
+            </a>
+            <a href="/seller/orders" class="btn btn-outline hover-lift">
+                🛍️ Commandes
+            </a>
+        </div>
+    </div>
+
+    <!-- Produits récents -->
+    <div class="card">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h2 style="margin: 0;">🕒 Produits récents</h2>
+        </div>
+        <div style="overflow-x: auto;">
+            <?php if (empty($recent_products)): ?>
+                <div style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+                    <p style="font-size: 3rem; margin-bottom: 1rem;">📦</p>
+                    <p>Aucun produit pour le moment</p>
+                    <a href="/seller/products/create" class="btn btn-primary" style="margin-top: 1rem;">
+                        Créer mon premier produit
+                    </a>
+                </div>
+            <?php else: ?>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                            <th style="padding: 1rem;">Produit</th>
+                            <th style="padding: 1rem;">Prix</th>
+                            <th style="padding: 1rem;">Statut</th>
+                            <th style="padding: 1rem;">Téléchargements</th>
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recent_products as $product): ?>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <?php if ($product['thumbnail_url']): ?>
+                                        <img src="<?= e($product['thumbnail_url']) ?>" 
+                                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;">
+                                    <?php endif; ?>
+                                    <span style="font-weight: 500;"><?= e($product['title']) ?></span>
+                                </div>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 600;">
+                                <?= formatPrice($product['price']) ?>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <span class="badge badge-<?= $product['status'] === 'approved' ? 'success' : 'warning' ?>">
+                                    <?= $product['status'] ?>
+                                </span>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <?= $product['downloads_count'] ?>
+                            </td>
+                            <td style="padding: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                                <?= date('d/m/Y', strtotime($product['created_at'])) ?>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <a href="/seller/products/<?= $product['id'] ?>/edit" class="btn btn-sm btn-outline">
+                                    ✏️ Modifier
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+// Données PHP vers JS
+const revenueData = <?= json_encode($revenue_by_day) ?>;
+const topProducts = <?= json_encode($top_products) ?>;
+
+// Graphique Revenus
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: revenueData.map(d => new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })),
+        datasets: [{
+            label: 'Revenus (€)',
+            data: revenueData.map(d => parseFloat(d.revenue)),
+            borderColor: 'rgb(67, 233, 123)',
+            backgroundColor: 'rgba(67, 233, 123, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return value + '€';
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Graphique Top Produits
+const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+new Chart(topProductsCtx, {
+    type: 'bar',
+    data: {
+        labels: topProducts.map(p => p.title.length > 20 ? p.title.substring(0, 20) + '...' : p.title),
+        datasets: [{
+            label: 'Revenus (€)',
+            data: topProducts.map(p => parseFloat(p.revenue)),
+            backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(118, 75, 162, 0.8)',
+                'rgba(240, 147, 251, 0.8)',
+                'rgba(245, 87, 108, 0.8)',
+                'rgba(250, 112, 154, 0.8)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return value + '€';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
 
 <div class="container mt-8 mb-16">
     

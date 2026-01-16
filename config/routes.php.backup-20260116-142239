@@ -133,3 +133,4 @@ $router->get('/wishlist/count', 'WishlistController@count');
 // ============================================
 // ROUTES WISHLIST (FAVORIS) ❤️
 // ============================================
+

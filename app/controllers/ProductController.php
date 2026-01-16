@@ -107,18 +107,54 @@ class ProductController extends Controller {
             }
         }
 
-        // Récupérer les avis
+       
+// Récupérer les avis approuvés (ADAPTÉ à votre base : buyer_id + is_approved)
+$stmt = $this->db->prepare("
+    SELECT r.*, u.username
+    FROM reviews r
+    INNER JOIN users u ON r.buyer_id = u.id
+    WHERE r.product_id = :product_id 
+    AND r.is_approved = TRUE
+    ORDER BY r.created_at DESC
+");
+$stmt->execute(['product_id' => $product['id']]);
+$reviews = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+// Vérifier si user peut reviewer
+$canReview = false;
+$userReview = null;
+
+if (isset($_SESSION['user_id'])) {
+    // Vérifier si déjà reviewé (ADAPTÉ : buyer_id)
+    $stmt = $this->db->prepare("
+        SELECT * FROM reviews 
+        WHERE product_id = :product_id AND buyer_id = :buyer_id
+    ");
+    $stmt->execute([
+        'product_id' => $product['id'],
+        'buyer_id' => $_SESSION['user_id']
+    ]);
+    $userReview = $stmt->fetch(\PDO::FETCH_ASSOC);
+    
+    // Peut reviewer si : pas d'avis + a acheté + n'est pas vendeur
+    if (!$userReview && $_SESSION['user_id'] != $product['seller_id']) {
         $stmt = $this->db->prepare("
-            SELECT r.*, u.username, u.avatar_url,
-                   TO_CHAR(r.created_at, 'DD/MM/YYYY') as review_date
-            FROM reviews r
-            JOIN users u ON r.buyer_id = u.id
-            WHERE r.product_id = :product_id AND r.is_approved = TRUE
-            ORDER BY r.created_at DESC
-            LIMIT 10
+            SELECT COUNT(*) as count
+            FROM order_items oi
+            INNER JOIN orders o ON oi.order_id = o.id
+            WHERE oi.product_id = :product_id 
+            AND o.buyer_id = :buyer_id
+            AND o.payment_status = 'completed'
         ");
-        $stmt->execute(['product_id' => $product['id']]);
-        $reviews = $stmt->fetchAll();
+        $stmt->execute([
+            'product_id' => $product['id'],
+            'buyer_id' => $_SESSION['user_id']
+        ]);
+        $purchase = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $canReview = $purchase['count'] > 0;
+    }
+}
+
 
         // Produits similaires (même catégorie)
         $stmt = $this->db->prepare("
@@ -172,6 +208,8 @@ class ProductController extends Controller {
             'title' => $product['title'],
             'product' => $product,
             'reviews' => $reviews,
+            'can_review' => $canReview,            
+            'user_review' => $userReview,
             'related_products' => $relatedProducts,
             'seller_products' => $sellerProducts,
             'in_wishlist' => $inWishlist,

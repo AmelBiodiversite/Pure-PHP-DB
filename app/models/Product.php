@@ -5,60 +5,62 @@ use Core\Model;
 use PDO;
 
 /**
- * MARKETFLOW PRO - PRODUCT MODEL (POSTGRESQL)
- * Fichier : app/models/Product.php
+ * Modèle Product
+ * Responsable de :
+ * - La création et gestion des produits
+ * - L’upload des fichiers associés
+ * - La gestion des tags
+ * - Les requêtes catalogue (listing, filtres, pagination)
  */
-
 class Product extends Model {
 
     protected $table = 'products';
     protected $primaryKey = 'id';
 
     /**
-     * Créer un nouveau produit
+     * Crée un nouveau produit pour un vendeur
+     * Gère :
+     * - Génération d’un slug unique
+     * - Upload image miniature et fichier produit
+     * - Insertion en base
+     * - Association des tags
      */
     public function createProduct($data, $sellerId, $files) {
-        file_put_contents('/tmp/step.log', "DEBUT createProduct\n", FILE_APPEND);
         try {
-            file_put_contents('/tmp/step.log', "Génération slug\n", FILE_APPEND);
-            // Générer slug unique
+            // Génération d’un slug unique basé sur le titre
             $slug = $this->generateUniqueSlug($data['title']);
-            file_put_contents('/tmp/step.log', "Préparation données\n", FILE_APPEND);
-            // Préparer les données (sans tags)
+
+            // Données principales du produit
             $productData = [
-                'seller_id' => $sellerId,
-                'category_id' => $data['category_id'],
-                'title' => $data['title'],
-                'slug' => $slug,
-                'description' => $data['description'],
-                'price' => $data['price'],
-                'original_price' => !empty($data['original_price']) ? $data['original_price'] : null,
-                'file_type' => $data['file_type'] ?? 'digital',
-                'demo_url' => $data['demo_url'] ?? null,
-                'status' => 'pending'
+                'seller_id'       => $sellerId,
+                'category_id'     => $data['category_id'],
+                'title'           => $data['title'],
+                'slug'            => $slug,
+                'description'     => $data['description'],
+                'price'           => $data['price'],
+                'original_price' => $data['original_price'] ?? null,
+                'file_type'       => $data['file_type'] ?? 'digital',
+                'demo_url'        => $data['demo_url'] ?? null,
+                'status'          => 'pending' // soumis à validation admin
             ];
 
-            // Upload des fichiers
-            file_put_contents('/tmp/step.log', "Upload thumbnail\n", FILE_APPEND);
+            // Upload de l’image miniature si fournie
             if (!empty($files['thumbnail']['name'])) {
-                $thumbnailPath = $this->uploadThumbnail($files['thumbnail']);
-                $productData['thumbnail_url'] = $thumbnailPath;
+                $productData['thumbnail_url'] = $this->uploadThumbnail($files['thumbnail']);
             }
 
-            file_put_contents('/tmp/step.log', "Upload fichier\n", FILE_APPEND);
+            // Upload du fichier principal du produit
             if (!empty($files['product_file']['name'])) {
-                $filePath = $this->uploadProductFile($files['product_file']);
-                $productData['file_url'] = $filePath;
+                $productData['file_url']  = $this->uploadProductFile($files['product_file']);
                 $productData['file_size'] = $files['product_file']['size'];
             }
-            file_put_contents('/tmp/step.log', "INSERT produit\n", FILE_APPEND);
-            // Insérer le produit
-            $fields = array_keys($productData);
-            $placeholders = ':' . implode(', :', $fields);
-            $fieldList = implode(', ', $fields);
 
-            $sql = "INSERT INTO products ({$fieldList}) 
-                    VALUES ({$placeholders}) 
+            // Construction dynamique de la requête INSERT
+            $fields       = array_keys($productData);
+            $placeholders = ':' . implode(', :', $fields);
+
+            $sql = "INSERT INTO products (" . implode(', ', $fields) . ")
+                    VALUES ($placeholders)
                     RETURNING id";
 
             $stmt = $this->db->prepare($sql);
@@ -68,137 +70,151 @@ class Product extends Model {
             }
 
             $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $productId = $result['id'];
+            $productId = $stmt->fetch(PDO::FETCH_ASSOC)['id'];
 
-            // Gérer les tags
+            // Association des tags si présents
             if (!empty($data['tags'])) {
                 $this->attachTags($productId, $data['tags']);
             }
 
             return [
-                'success' => true,
-                'product_id' => $productId,
-                'message' => 'Produit créé avec succès'
+                'success'    => true,
+                'product_id'=> $productId,
+                'message'   => 'Produit créé avec succès'
             ];
 
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ];
         }
     }
 
     /**
-     * Attacher des tags à un produit
+     * Associe une liste de tags texte à un produit.
+     * Crée les tags inexistants puis remplit la table pivot product_tags.
      */
     private function attachTags($productId, $tagsString) {
         $tags = explode(',', $tagsString);
 
         foreach ($tags as $tagName) {
             $tagName = trim($tagName);
-            if (empty($tagName)) continue;
+            if (!$tagName) continue;
 
-            // Vérifier si le tag existe
+            // Recherche du tag existant
             $stmt = $this->db->prepare("SELECT id FROM tags WHERE name = :name");
             $stmt->execute(['name' => $tagName]);
             $tag = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // Création du tag s’il n’existe pas encore
             if (!$tag) {
-                // Créer le tag
-                $slug = $this->slugify($tagName);
-                $stmt = $this->db->prepare("INSERT INTO tags (name, slug) VALUES (:name, :slug) RETURNING id");
-                $stmt->execute(['name' => $tagName, 'slug' => $slug]);
+                $stmt = $this->db->prepare(
+                    "INSERT INTO tags (name, slug) VALUES (:name, :slug) RETURNING id"
+                );
+                $stmt->execute([
+                    'name' => $tagName,
+                    'slug' => $this->slugify($tagName)
+                ]);
                 $tag = $stmt->fetch(PDO::FETCH_ASSOC);
             }
 
-            // Attacher le tag au produit
-            $stmt = $this->db->prepare("INSERT INTO product_tags (product_id, tag_id) VALUES (:product_id, :tag_id) ON CONFLICT DO NOTHING");
-            $stmt->execute(['product_id' => $productId, 'tag_id' => $tag['id']]);
+            // Liaison produit ↔ tag (évite doublons via ON CONFLICT)
+            $stmt = $this->db->prepare("
+                INSERT INTO product_tags (product_id, tag_id)
+                VALUES (:product_id, :tag_id)
+                ON CONFLICT DO NOTHING
+            ");
+            $stmt->execute([
+                'product_id' => $productId,
+                'tag_id'     => $tag['id']
+            ]);
         }
     }
 
-
-    //Taille des images
+    /**
+     * Redimensionne une image pour éviter les fichiers trop lourds.
+     * Utilisé uniquement pour les miniatures produits.
+     */
     private function resizeImage($filepath, $maxWidth, $maxHeight) {
-        list($width, $height, $type) = getimagesize($filepath);
+        [$width, $height] = getimagesize($filepath);
 
         if ($width <= $maxWidth && $height <= $maxHeight) return;
 
-        $ratio = min($maxWidth / $width, $maxHeight / $height);
-        $newWidth = (int)($width * $ratio);
+        $ratio      = min($maxWidth / $width, $maxHeight / $height);
+        $newWidth  = (int)($width * $ratio);
         $newHeight = (int)($height * $ratio);
+
         $src = imagecreatefromstring(file_get_contents($filepath));
         $dst = imagecreatetruecolor($newWidth, $newHeight);
-        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, 
+                           $newWidth, $newHeight, $width, $height);
+
         imagejpeg($dst, $filepath, 85);
+
         imagedestroy($src);
         imagedestroy($dst);
     }
 
-
-
-
-    
     /**
-     * Upload thumbnail
+     * Upload et traitement de la miniature produit.
+     * Retourne le chemin public stocké en base.
      */
     private function uploadThumbnail($file) {
         $uploadDir = UPLOAD_DIR . 'products/thumbnails/';
-        $filename = uniqid() . '_' . basename($file['name']);
-        $filepath = $uploadDir . $filename;
+        $filename  = uniqid() . '_' . basename($file['name']);
+        $filepath  = $uploadDir . $filename;
 
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $this->resizeImage($filepath, 1200, 800);
-            return '/public/uploads/products/thumbnails/' . $filename;
+        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            throw new \Exception('Erreur lors de l\'upload de l\'image');
         }
 
-        throw new \Exception('Erreur lors de l\'upload de l\'image');
+        $this->resizeImage($filepath, 1200, 800);
+        return '/public/uploads/products/thumbnails/' . $filename;
     }
 
     /**
-     * Upload product file
+     * Upload du fichier numérique vendu (zip, pdf, etc.)
      */
     private function uploadProductFile($file) {
         $uploadDir = UPLOAD_DIR . 'products/files/';
-        $filename = uniqid() . '_' . basename($file['name']);
-        $filepath = $uploadDir . $filename;
+        $filename  = uniqid() . '_' . basename($file['name']);
+        $filepath  = $uploadDir . $filename;
 
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return '/public/uploads/products/files/' . $filename;
+        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            throw new \Exception('Erreur lors de l\'upload du fichier');
         }
 
-        throw new \Exception('Erreur lors de l\'upload du fichier');
+        return '/public/uploads/products/files/' . $filename;
     }
 
     /**
-     * Générer un slug unique
+     * Génère un slug unique en base à partir d’un titre.
      */
     private function generateUniqueSlug($title) {
         $slug = $this->slugify($title);
-        $originalSlug = $slug;
-        $counter = 1;
+        $base = $slug;
+        $i = 1;
 
         while ($this->slugExists($slug)) {
-            $slug = $originalSlug . '-' . $counter;
-            $counter++;
+            $slug = $base . '-' . $i++;
         }
 
         return $slug;
     }
 
     /**
-     * Vérifier si un slug existe
+     * Vérifie l’existence d’un slug produit.
      */
     private function slugExists($slug) {
         $stmt = $this->db->prepare("SELECT id FROM products WHERE slug = :slug");
         $stmt->execute(['slug' => $slug]);
-        return $stmt->fetch() !== false;
+        return (bool) $stmt->fetch();
     }
 
     /**
-     * Slugifier un texte
+     * Transforme une chaîne en slug URL-safe.
      */
     private function slugify($text) {
         $text = strtolower($text);
@@ -207,79 +223,73 @@ class Product extends Model {
     }
 
     /**
-     * Obtenir les produits d'un vendeur
+     * Retourne les produits d’un vendeur.
+     * Optionnellement filtrés par statut et limités en nombre.
      */
     public function getSellerProducts($sellerId, $status = null, $limit = null) {
         $sql = "SELECT * FROM products WHERE seller_id = :seller_id";
 
-        if ($status) {
-            $sql .= " AND status = :status";
-        }
+        if ($status) $sql .= " AND status = :status";
 
         $sql .= " ORDER BY created_at DESC";
 
-        if ($limit) {
-            $sql .= " LIMIT :limit";
-        }
+        if ($limit) $sql .= " LIMIT :limit";
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':seller_id', $sellerId, PDO::PARAM_INT);
 
-        if ($status) {
-            $stmt->bindValue(':status', $status);
-        }
-
-        if ($limit) {
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        }
+        if ($status) $stmt->bindValue(':status', $status);
+        if ($limit)  $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
     /**
-     * Obtenir un produit par ID avec infos vendeur
+     * Récupère un produit par ID avec informations vendeur et catégorie.
      */
     public function getProductWithSeller($id) {
-        $sql = "SELECT p.*, 
-                u.username as seller_username,
-                u.full_name as seller_name,
-                u.rating_average as seller_rating,
-                c.name as category_name,
-                c.slug as category_slug
-                FROM products p
-                LEFT JOIN users u ON p.seller_id = u.id
-                LEFT JOIN categories c ON p.category_id = c.id
-                WHERE p.id = :id
-                LIMIT 1";
+        $stmt = $this->db->prepare("
+            SELECT p.*, 
+                   u.username as seller_username,
+                   u.full_name as seller_name,
+                   u.rating_average as seller_rating,
+                   c.name as category_name,
+                   c.slug as category_slug
+            FROM products p
+            LEFT JOIN users u ON p.seller_id = u.id
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.id = :id
+            LIMIT 1
+        ");
 
-        $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Obtenir un produit par slug
+     * Récupère un produit par slug (URL publique).
      */
     public function getProductBySlug($slug) {
-        $sql = "SELECT p.*, 
-                u.username as seller_username,
-                u.full_name as seller_name,
-                u.rating_average as seller_rating,
-                c.name as category_name
-                FROM products p
-                LEFT JOIN users u ON p.seller_id = u.id
-                LEFT JOIN categories c ON p.category_id = c.id
-                WHERE p.slug = :slug
-                LIMIT 1";
+        $stmt = $this->db->prepare("
+            SELECT p.*, 
+                   u.username as seller_username,
+                   u.full_name as seller_name,
+                   u.rating_average as seller_rating,
+                   c.name as category_name
+            FROM products p
+            LEFT JOIN users u ON p.seller_id = u.id
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.slug = :slug
+            LIMIT 1
+        ");
 
-        $stmt = $this->db->prepare($sql);
         $stmt->execute(['slug' => $slug]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Obtenir les produits avec filtres
+     * Catalogue produits avec filtres + pagination.
      */
     public function getProducts($filters = [], $page = 1, $perPage = 24) {
         $sql = "SELECT p.*, u.username as seller_name, c.name as category_name
@@ -290,7 +300,7 @@ class Product extends Model {
 
         $params = [];
 
-        // Filtres
+        // Application des filtres dynamiques
         if (!empty($filters['category_id'])) {
             $sql .= " AND p.category_id = :category_id";
             $params['category_id'] = $filters['category_id'];
@@ -311,39 +321,13 @@ class Product extends Model {
             $params['max_price'] = $filters['max_price'];
         }
 
-        // Tri
-        $sort = $filters['sort'] ?? 'newest';
-        switch ($sort) {
-            case 'price_asc':
-                $sql .= " ORDER BY p.price ASC";
-                break;
-            case 'price_desc':
-                $sql .= " ORDER BY p.price DESC";
-                break;
-            case 'popular':
-                $sql .= " ORDER BY p.sales DESC";
-                break;
-            default:
-                $sql .= " ORDER BY p.created_at DESC";
-        }
-
-        // Compter le total
-        $countSql = "SELECT COUNT(*) FROM products p WHERE p.status = 'approved' ";
-        if (!empty($params)) {
-            // Ajouter les mêmes WHERE clauses
-            foreach ($params as $key => $value) {
-                $countSql .= " AND ";
-                if ($key === 'search') {
-                    $countSql .= "(p.title ILIKE :search OR p.description ILIKE :search)";
-                } else {
-                    $countSql .= "p.$key = :$key";
-                }
-            }
-        }
-
-        $stmtCount = $this->db->prepare($countSql);
-        $stmtCount->execute($params);
-        $total = $stmtCount->fetchColumn();
+        // Gestion du tri
+        match ($filters['sort'] ?? 'newest') {
+            'price_asc'  => $sql .= " ORDER BY p.price ASC",
+            'price_desc'=> $sql .= " ORDER BY p.price DESC",
+            'popular'   => $sql .= " ORDER BY p.sales DESC",
+            default     => $sql .= " ORDER BY p.created_at DESC"
+        };
 
         // Pagination
         $offset = ($page - 1) * $perPage;
@@ -352,54 +336,61 @@ class Product extends Model {
         $stmt = $this->db->prepare($sql);
 
         foreach ($params as $key => $value) {
-            $stmt->bindValue(':' . $key, $value);
+            $stmt->bindValue(":$key", $value);
         }
 
         $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
-        $products = $stmt->fetchAll();
 
         return [
-            'products' => $products,
-            'total' => $total,
-            'page' => $page,
-            'total_pages' => ceil($total / $perPage)
+            'products'     => $stmt->fetchAll(),
+            'total'        => $this->countFilteredProducts($params),
+            'page'         => $page,
+            'total_pages'  => ceil($this->countFilteredProducts($params) / $perPage)
         ];
     }
 
     /**
-     * Mettre à jour un produit
+     * Compte les produits pour la pagination.
+     */
+    private function countFilteredProducts($params) {
+        $sql = "SELECT COUNT(*) FROM products p WHERE p.status = 'approved'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
+     * Mise à jour d’un produit par son vendeur.
      */
     public function updateProduct($id, $sellerId, $data, $files) {
-        // Vérifier que le produit appartient au vendeur
-        $stmt = $this->db->prepare("SELECT id FROM products WHERE id = :id AND seller_id = :seller_id");
+        // Vérifie la propriété du produit
+        $stmt = $this->db->prepare("
+            SELECT id FROM products 
+            WHERE id = :id AND seller_id = :seller_id
+        ");
         $stmt->execute(['id' => $id, 'seller_id' => $sellerId]);
 
         if (!$stmt->fetch()) {
             return ['success' => false, 'error' => 'Produit introuvable'];
         }
 
-        // Mettre à jour
-        $updateData = [
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'category_id' => $data['category_id'],
-            'price' => $data['price'],
-            'original_price' => $data['original_price'] ?? null,
-            'demo_url' => $data['demo_url'] ?? null
-        ];
+        // Mise à jour des champs principaux
+        $this->update($id, [
+            'title'          => $data['title'],
+            'description'    => $data['description'],
+            'category_id'    => $data['category_id'],
+            'price'          => $data['price'],
+            'original_price'=> $data['original_price'] ?? null,
+            'demo_url'       => $data['demo_url'] ?? null
+        ]);
 
-        $this->update($id, $updateData);
-
-        // Mettre à jour les tags
+        // Remplacement des tags existants
         if (!empty($data['tags'])) {
-            // Supprimer les anciens tags
-            $stmt = $this->db->prepare("DELETE FROM product_tags WHERE product_id = :product_id");
-            $stmt->execute(['product_id' => $id]);
-
-            // Ajouter les nouveaux
+            $stmt = $this->db->prepare("DELETE FROM product_tags WHERE product_id = :id");
+            $stmt->execute(['id' => $id]);
             $this->attachTags($id, $data['tags']);
         }
 
@@ -407,16 +398,40 @@ class Product extends Model {
     }
 
     /**
-     * Supprimer un produit
+     * Suppression d’un produit par son vendeur.
      */
     public function deleteProduct($id, $sellerId) {
-        $stmt = $this->db->prepare("DELETE FROM products WHERE id = :id AND seller_id = :seller_id");
-        $success = $stmt->execute(['id' => $id, 'seller_id' => $sellerId]);
+        $stmt = $this->db->prepare("
+            DELETE FROM products 
+            WHERE id = :id AND seller_id = :seller_id
+        ");
 
-        if ($success) {
+        if ($stmt->execute(['id' => $id, 'seller_id' => $sellerId])) {
             return ['success' => true, 'message' => 'Produit supprimé'];
         }
 
         return ['success' => false, 'error' => 'Erreur lors de la suppression'];
+    }
+
+    /**
+     * Produits mis en avant sur la page d’accueil.
+     */
+    public function getPopular($limit = 4) {
+        $stmt = $this->db->prepare("
+            SELECT p.*, 
+                   c.name as category_name,
+                   u.username as shop_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN users u ON p.seller_id = u.id
+            WHERE p.status IN ('approved', 'active')
+            ORDER BY p.rating_average DESC, p.created_at DESC
+            LIMIT :limit
+        ");
+
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -28,56 +28,95 @@ class SellerController extends Controller {
      * Dashboard vendeur
      */
     public function dashboard() {
-        $sellerId = $_SESSION['user_id'];
-
-        // Statistiques
-        $stats = $this->userModel->getSellerStats($sellerId);
-
-        // Dernières ventes
-        $stmt = $this->db->prepare("
-            SELECT oi.*, p.title as product_title, o.created_at as order_date,
-                   o.order_number, u.username as buyer_name
-            FROM order_items oi
-            JOIN orders o ON oi.order_id = o.id
-            JOIN products p ON oi.product_id = p.id
-            JOIN users u ON o.buyer_id = u.id
-            WHERE oi.seller_id = ? AND o.payment_status = 'completed'
-            ORDER BY o.created_at DESC
-            LIMIT 10
-        ");
-        $stmt->execute([$sellerId]);
-        $recentSales = $stmt->fetchAll();
-
-        // Produits en attente d'approbation
-        $products = $this->productModel->getSellerProducts($sellerId);
-
-        // Graphique des ventes (30 derniers jours)
-        $stmt = $this->db->prepare("
-            SELECT DATE(o.created_at) as date, 
-                   COUNT(*) as orders,
-                   SUM(oi.seller_amount) as revenue
-            FROM order_items oi
-            JOIN orders o ON oi.order_id = o.id
-            WHERE oi.seller_id = ? 
-              AND o.payment_status = 'completed'
-              AND o.created_at >= CURRENT_DATE - INTERVAL '30 days'
-            GROUP BY DATE(o.created_at)
-            ORDER BY date ASC
-        ");
-        $stmt->execute([$sellerId]);
-        $salesChart = $stmt->fetchAll();
-
-        $pendingProducts = $this->productModel->getSellerProducts($sellerId, 'pending');
-        
-        $this->view('seller/dashboard', [
-            'title' => 'Dashboard Vendeur',
-            'stats' => $stats,
-            'recent_sales' => $recentSales,
-            'pending_products' => $pendingProducts,
-            'db' => $this->db,
-            'sales_chart' => $salesChart
-        ]);
+    $this->requireLogin();
+    $user = $this->getCurrentUser();
+    
+    if ($user['role'] !== 'seller') {
+        redirectWithMessage('/', 'Accès réservé aux vendeurs', 'error');
+        return;
     }
+    
+    $sellerId = $user['id'];
+    
+    // Stats générales
+    $stmt = $this->db->prepare("
+        SELECT 
+            COUNT(*) as total_products,
+            COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved_products,
+            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_products,
+            COALESCE(SUM(downloads_count), 0) as total_downloads
+        FROM products
+        WHERE seller_id = :seller_id
+    ");
+    $stmt->execute(['seller_id' => $sellerId]);
+    $stats = $stmt->fetch();
+    
+    // Revenus totaux
+    $stmt = $this->db->prepare("
+        SELECT COALESCE(SUM(oi.price * oi.quantity), 0) as total_revenue
+        FROM order_items oi
+        INNER JOIN orders o ON oi.order_id = o.id
+        INNER JOIN products p ON oi.product_id = p.id
+        WHERE p.seller_id = :seller_id 
+        AND o.payment_status = 'completed'
+    ");
+    $stmt->execute(['seller_id' => $sellerId]);
+    $revenue = $stmt->fetch();
+    $stats['total_revenue'] = $revenue['total_revenue'] ?? 0;
+    
+    // Revenus par jour (30 derniers jours)
+    $stmt = $this->db->prepare("
+        SELECT 
+            DATE(o.created_at) as date,
+            COALESCE(SUM(oi.price * oi.quantity), 0) as revenue,
+            COUNT(DISTINCT o.id) as orders
+        FROM orders o
+        INNER JOIN order_items oi ON o.id = oi.order_id
+        INNER JOIN products p ON oi.product_id = p.id
+        WHERE p.seller_id = :seller_id 
+        AND o.payment_status = 'completed'
+        AND o.created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY DATE(o.created_at)
+        ORDER BY date ASC
+    ");
+    $stmt->execute(['seller_id' => $sellerId]);
+    $revenueByDay = $stmt->fetchAll();
+    
+    // Top 5 produits
+    $stmt = $this->db->prepare("
+        SELECT 
+            p.id, p.title, p.price, p.downloads_count,
+            COALESCE(SUM(oi.quantity), 0) as sales_count,
+            COALESCE(SUM(oi.price * oi.quantity), 0) as revenue
+        FROM products p
+        LEFT JOIN order_items oi ON p.id = oi.product_id
+        LEFT JOIN orders o ON oi.order_id = o.id AND o.payment_status = 'completed'
+        WHERE p.seller_id = :seller_id AND p.status = 'approved'
+        GROUP BY p.id
+        ORDER BY revenue DESC
+        LIMIT 5
+    ");
+    $stmt->execute(['seller_id' => $sellerId]);
+    $topProducts = $stmt->fetchAll();
+    
+    // Produits récents
+    $stmt = $this->db->prepare("
+        SELECT * FROM products 
+        WHERE seller_id = :seller_id 
+        ORDER BY created_at DESC 
+        LIMIT 5
+    ");
+    $stmt->execute(['seller_id' => $sellerId]);
+    $recentProducts = $stmt->fetchAll();
+    
+    $this->view('seller/dashboard', [
+        'title' => 'Dashboard Vendeur',
+        'stats' => $stats,
+        'revenue_by_day' => $revenueByDay,
+        'top_products' => $topProducts,
+        'recent_products' => $recentProducts
+    ]);
+}
 
     /**
      * Liste des produits du vendeur

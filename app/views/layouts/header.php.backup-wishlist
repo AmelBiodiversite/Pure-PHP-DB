@@ -53,8 +53,6 @@
         
         <!-- Favicon -->
         <link rel="icon" href="<?= IMG_URL ?>/favicon.ico">
-            <!-- Script Wishlist (Favoris) -->
-        <script src="<?= JS_URL ?>/wishlist.js" defer></script>
     </head>
     
     <body>
@@ -142,10 +140,6 @@
                                 <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-200">
                                     <a href="/account" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">Mon compte</a>
                                     <a href="/orders" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">Mes commandes</a>
-                                    <a href="/wishlist" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
-                                        ❤️ Mes Favoris
-                                        <span class="wishlist-count" style="display: none; background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.75rem; margin-left: 4px;">0</span>
-                                    </a>
                                     
                                     <?php if ($currentUser['role'] === 'seller'): ?>
                                         <hr class="my-2">

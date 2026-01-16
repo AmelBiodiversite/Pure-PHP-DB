@@ -1,15 +1,11 @@
-<!-- Main Content -->
-    <main>
-<?php
-/**
- * MARKETFLOW PRO - FOOTER LAYOUT
- * Fichier : app/views/layouts/footer.php
- */
-?>
-
+<!-- =====================================================
+         FIN DU CONTENU PRINCIPAL
+         ===================================================== -->
     </main>
 
-    <!-- Footer -->
+    <!-- =====================================================
+         FOOTER DU SITE
+         ===================================================== -->
     <footer style="
         background: var(--bg-secondary);
         border-top: 1px solid var(--border-color);
@@ -17,9 +13,10 @@
         padding: var(--space-12) 0 var(--space-8);
     ">
         <div class="container">
+            <!-- Grille de 4 colonnes pour le footer -->
             <div class="grid grid-4" style="margin-bottom: var(--space-8);">
                 
-                <!-- About -->
+                <!-- ==================== À PROPOS ==================== -->
                 <div>
                     <h4 style="margin-bottom: var(--space-4);">MarketFlow Pro</h4>
                     <p style="font-size: 0.875rem; color: var(--text-tertiary);">
@@ -28,7 +25,7 @@
                     </p>
                 </div>
 
-                <!-- Products -->
+                <!-- ==================== PRODUITS ==================== -->
                 <div>
                     <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Produits</h5>
                     <ul style="list-style: none; font-size: 0.875rem;">
@@ -39,7 +36,7 @@
                     </ul>
                 </div>
 
-                <!-- Company -->
+                <!-- ==================== ENTREPRISE ==================== -->
                 <div>
                     <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Entreprise</h5>
                     <ul style="list-style: none; font-size: 0.875rem;">
@@ -50,7 +47,7 @@
                     </ul>
                 </div>
 
-                <!-- Support -->
+                <!-- ==================== SUPPORT ==================== -->
                 <div>
                     <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Support</h5>
                     <ul style="list-style: none; font-size: 0.875rem;">
@@ -62,7 +59,7 @@
 
             </div>
 
-            <!-- Bottom -->
+            <!-- ==================== BAS DU FOOTER ==================== -->
             <div style="
                 border-top: 1px solid var(--border-color);
                 padding-top: var(--space-6);
@@ -72,7 +69,10 @@
                 font-size: 0.875rem;
                 color: var(--text-tertiary);
             ">
+                <!-- Copyright -->
                 <p>© <?= date('Y') ?> MarketFlow Pro. Tous droits réservés.</p>
+                
+                <!-- Réseaux sociaux -->
                 <div class="flex gap-6">
                     <a href="#" style="color: var(--text-tertiary);">Twitter</a>
                     <a href="#" style="color: var(--text-tertiary);">LinkedIn</a>
@@ -82,21 +82,52 @@
         </div>
     </footer>
 
-    <!-- JavaScript -->
+    <!-- =====================================================
+         SCRIPTS JAVASCRIPT
+         ===================================================== -->
+    
+    <!-- Script principal avec composants (Dropdown, utilitaires, etc.) -->
     <script src="<?= JS_URL ?>/app.js"></script>
     
-    <!-- User Menu Dropdown -->
+    <!-- Système de notifications toast modernes -->
+    <!-- Convertit automatiquement les messages flash PHP en toast -->
+    <script src="<?= JS_URL ?>/notifications.js"></script>
+    
+  <!-- Chart.js Library v4.4.0 - Graphiques modernes pour dashboard vendeur -->
+<!-- Utilisé dans : app/views/seller/dashboard.php -->
+<!-- Documentation : https://www.chartjs.org/docs/latest/ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- =====================================================
+         MENU UTILISATEUR DROPDOWN
+         ===================================================== 
+         
+         Initialise le dropdown du menu utilisateur si connecté
+         Utilise le composant Dropdown de app.js
+         ===================================================== -->
     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
     <script>
-    // Créer le dropdown du menu utilisateur
+    /**
+     * Création du dropdown menu utilisateur
+     * Points d'accès selon le rôle :
+     * - Admin : Panel admin
+     * - Seller : Dashboard vendeur
+     * - Buyer : Compte acheteur
+     */
     const userMenuBtn = document.getElementById('userMenuBtn');
     if (userMenuBtn) {
         const dropdown = new MarketFlow.Dropdown('#userMenuBtn');
+        
+        // Menu pour tous les utilisateurs
         dropdown.addItem('Mon profil', () => window.location.href = '/profile');
         dropdown.addItem('Mes commandes', () => window.location.href = '/orders');
+        
+        // Menu spécifique vendeur
         <?php if ($_SESSION['user_type'] === 'seller'): ?>
         dropdown.addItem('Dashboard vendeur', () => window.location.href = '/seller/dashboard');
         <?php endif; ?>
+        
+        // Déconnexion
         dropdown.addItem('Déconnexion', () => window.location.href = '/logout');
     }
     </script>
