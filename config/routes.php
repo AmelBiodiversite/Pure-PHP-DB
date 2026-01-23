@@ -1,20 +1,25 @@
 <?php
 /**
- * MARKETFLOW PRO - CONFIGURATION DES ROUTES
- * Fichier : config/routes.php
+ * MARKETFLOW PRO - ROUTES
+ * Toutes les routes AVANT $router->dispatch() !
  */
 
 $router = new Core\Router();
 
-// ============================================
+// ================================================================
 // ROUTES PUBLIQUES
-// ============================================
+// ================================================================
+
 $router->get('/', 'HomeController@index');
 
+// Authentification
 $router->get('/login', 'AuthController@login');
 $router->post('/login', 'AuthController@login');
 $router->get('/register', 'AuthController@register');
 $router->post('/register', 'AuthController@register');
+$router->get('/logout', 'AuthController@logout');
+
+// Pages info
 $router->get('/sellers', 'HomeController@sellers');
 $router->get('/seller/{username}/products', 'ProductController@sellerProducts');
 $router->get('/about', 'HomeController@about');
@@ -23,11 +28,11 @@ $router->post('/contact', 'HomeController@contactSubmit');
 $router->get('/terms', 'HomeController@terms');
 $router->get('/privacy', 'HomeController@privacy');
 $router->get('/help', 'HomeController@help');
-$router->get('/logout', 'AuthController@logout');
 
-// ============================================
-// ROUTES UTILISATEURS (AUTH REQUISE)
-// ============================================
+// ================================================================
+// ROUTES UTILISATEURS (Auth requise)
+// ================================================================
+
 $router->get('/profile', 'AuthController@profile');
 $router->post('/profile/update', 'AuthController@updateProfile');
 $router->post('/profile/password', 'AuthController@changePassword');
@@ -35,32 +40,35 @@ $router->post('/profile/seller', 'AuthController@updateSellerProfile');
 $router->get('/account', 'AccountController@index');
 $router->get('/account/downloads', 'AccountController@downloads');
 
-// ============================================
+// ================================================================
 // ROUTES PRODUITS
-// ============================================
+// ================================================================
+
+// Routes fixes AVANT routes dynamiques
 $router->get('/products', 'ProductController@index');
 $router->get('/products/search', 'ProductController@search');
-$router->get('/products/{slug}', 'ProductController@show');
+
+// Routes catégories (AVANT /products/{slug} pour éviter conflit)
+$router->get('/category', 'ProductController@categories');
 $router->get('/category/{slug}', 'ProductController@category');
 
-// ============================================
-// ROUTES VENDEURS (SELLER AUTH REQUISE)
-// ============================================
-$router->get('/seller/dashboard', 'SellerController@dashboard');
-$router->get('/seller/products', 'SellerController@products');
-$router->get('/seller/products/create', 'SellerController@createProduct');
-$router->post('/seller/products/store', 'SellerController@storeProduct');
-$router->get('/seller/products/{id}/edit', 'SellerController@editProduct');
-$router->post('/seller/products/{id}/update', 'SellerController@updateProduct');
-$router->post('/seller/products/{id}/delete', 'SellerController@deleteProduct');
-$router->get('/seller/sales', 'SellerController@sales');
-$router->get('/seller/earnings', 'SellerController@earnings');
-$router->post('/seller/payout', 'SellerController@requestPayout');
-$router->get('/seller/analytics', 'SellerController@analytics');
+// Route dynamique produit (EN DERNIER)
+$router->get('/products/{slug}', 'ProductController@show');
 
-// ============================================
-// ROUTES PANIER & COMMANDES
-// ============================================
+// ================================================================
+// WISHLIST
+// ================================================================
+
+$router->get('/wishlist', 'WishlistController@index');
+$router->post('/wishlist/add', 'WishlistController@add');
+$router->post('/wishlist/remove', 'WishlistController@remove');
+$router->get('/wishlist/count', 'WishlistController@count');
+
+// ================================================================
+// PANIER & COMMANDES
+// ================================================================
+
+// Panier
 $router->get('/cart', 'CartController@index');
 $router->post('/cart/add', 'CartController@add');
 $router->post('/cart/remove', 'CartController@remove');
@@ -69,12 +77,13 @@ $router->post('/cart/clear', 'CartController@clear');
 $router->post('/cart/apply-promo', 'CartController@applyPromo');
 $router->get('/cart/remove-promo', 'CartController@removePromo');
 
+// Checkout
 $router->get('/checkout', 'CartController@checkout');
-$router->post('/cart/process-checkout', 'CartController@processCheckout');
-
-// Checkout Stripe
-$router->post('/checkout/create-session', 'StripeController@createCheckoutSession');
+$router->post('/checkout/create-session', 'CartController@processCheckout');
+$router->get('/checkout/success', 'PaymentController@success');
 $router->get('/checkout/success', 'StripeController@success');
+$router->post('/checkout/create-session', 'StripeController@createCheckoutSession');
+$router->post('/stripe/create-checkout-session', 'StripeController@createCheckoutSession');
 $router->get('/checkout/cancel', 'CartController@index');
 
 // Paiement
@@ -87,49 +96,54 @@ $router->get('/orders', 'OrderController@index');
 $router->get('/orders/{orderNumber}', 'OrderController@show');
 $router->get('/orders/{orderNumber}/download/{itemId}', 'OrderController@download');
 
-// ============================================
-// ROUTES ADMIN
-// ============================================
+// ================================================================
+// VENDEURS (Auth seller/admin)
+// ================================================================
+
+$router->get('/seller/dashboard', 'SellerController@dashboard');
+$router->get('/seller/products', 'SellerController@products');
+$router->get('/seller/products/create', 'SellerController@createProduct');
+$router->post('/seller/products/store', 'SellerController@storeProduct');
+$router->get('/seller/products/{id}/edit', 'SellerController@editProduct');
+$router->post('/seller/products/{id}/update', 'SellerController@updateProduct');
+$router->post('/seller/products/{id}/delete', 'SellerController@deleteProduct');
+$router->get('/seller/sales', 'SellerController@sales');
+$router->get('/seller/earnings', 'SellerController@earnings');
+$router->post('/seller/payout', 'SellerController@requestPayout');
+$router->get('/seller/analytics', 'SellerController@analytics');
+
+// ================================================================
+// ADMIN (Auth admin)
+// ================================================================
+
 $router->get('/admin', 'AdminController@index');
 $router->get('/admin/dashboard', 'AdminController@index');
 $router->get('/admin/users', 'AdminController@users');
 $router->post('/admin/users/{id}/toggle', 'AdminController@toggleUser');
-$router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
-$router->get('/admin/products', 'AdminController@products');
-$router->post('/admin/products/{id}/approve', 'AdminController@approveProduct');
-$router->get('/admin/stats', 'AdminController@stats');
 $router->post('/admin/users/{id}/suspend', 'AdminController@suspendUser');
 $router->post('/admin/users/{id}/activate', 'AdminController@activateUser');
 $router->post('/admin/users/{id}/delete', 'AdminController@deleteUser');
+$router->get('/admin/products', 'AdminController@products');
+$router->get('/admin/products/approve/{id}', 'AdminController@approveProduct');
+$router->post('/admin/products/approve/{id}', 'AdminController@approveProduct');
+$router->get('/admin/stats', 'AdminController@stats');
 
-// Export CSV Admin
+// Exports CSV
 $router->get('/admin/export/users', 'ExportController@users');
 $router->get('/admin/export/products', 'ExportController@products');
 $router->get('/admin/export/orders', 'ExportController@orders');
 
-
-// ============================================
+// ================================================================
 // API REST
-// ============================================
+// ================================================================
+
 $router->get('/api', 'ApiController@index');
 $router->get('/api/products', 'ApiController@products');
 $router->get('/api/products/{slug}', 'ApiController@product');
 $router->get('/api/categories', 'ApiController@categories');
 
-// ============================================
-// DISPATCHER
-// ============================================
+// ================================================================
+// DISPATCHER - TOUJOURS EN DERNIER !
+// ================================================================
+
 $router->dispatch();
-
-// ============================================
-// ROUTES WISHLIST (FAVORIS) ❤️
-// ============================================
-$router->get('/wishlist', 'WishlistController@index');
-$router->post('/wishlist/add', 'WishlistController@add');
-$router->post('/wishlist/remove', 'WishlistController@remove');
-$router->get('/wishlist/count', 'WishlistController@count');
-
-
-// ============================================
-// ROUTES WISHLIST (FAVORIS) ❤️
-// ============================================

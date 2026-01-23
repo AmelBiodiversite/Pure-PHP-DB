@@ -1,6 +1,5 @@
 <?php
 namespace Core;
-
 use PDO;
 use PDOException;
 use Exception;
@@ -9,9 +8,7 @@ use Exception;
  * MARKETFLOW PRO - CONNEXION POSTGRESQL (REPLIT)
  * Fichier : config/database.php
  */
-
 class Database {
-
     private static $instance = null;
     private $pdo;
 
@@ -126,5 +123,26 @@ class Database {
 
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Démarrer une transaction
+     */
+    public function beginTransaction() {
+        return $this->pdo->beginTransaction();
+    }
+
+    /**
+     * Valider une transaction
+     */
+    public function commit() {
+        return $this->pdo->commit();
+    }
+
+    /**
+     * Annuler une transaction
+     */
+    public function rollBack() {
+        return $this->pdo->rollBack();
     }
 }

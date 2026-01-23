@@ -163,7 +163,7 @@
                                 </span>
                             </td>
                             <td style="padding: 1rem;">
-                                <?= $product['downloads_count'] ?>
+                                <?= $product['downloads'] ?? 0 ?>
                             </td>
                             <td style="padding: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
                                 <?= date('d/m/Y', strtotime($product['created_at'])) ?>
@@ -492,26 +492,16 @@ new Chart(topProductsCtx, {
             </h2>
             
             <div style="display: flex; flex-direction: column; gap: var(--space-4);">
-                <?php 
-                // Récupérer les top produits
-                $stmt = $db->prepare("
-                    SELECT p.id, p.title, p.thumbnail_url, p.sales, p.price
-                    FROM products p
-                    WHERE p.seller_id = :seller_id AND p.sales > 0
-                    ORDER BY p.sales DESC
-                    LIMIT 5
-                ");
-                $stmt->execute([$_SESSION['user_id']]);
-                $topProducts = $stmt->fetchAll();
-                ?>
                 
+                            
                 <?php if (empty($topProducts)): ?>
+                    
                     <div style="text-align: center; padding: var(--space-12); color: var(--text-tertiary);">
                         <div style="font-size: 3rem; margin-bottom: var(--space-3);">🎯</div>
                         <p>Vos meilleures ventes apparaîtront ici</p>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($topProducts as $index => $product): ?>
+                    <?php foreach ($top_products as $index => $product): ?>
                     <div style="
                         display: grid;
                         grid-template-columns: 40px 60px 1fr auto;
@@ -536,7 +526,7 @@ new Chart(topProductsCtx, {
                         
                         <!-- Image -->
                         <img 
-                            src="<?= e($product['thumbnail']) ?>" 
+                            src="<?= e($product['thumbnail_url']) ?>" 
                             alt="<?= e($product['title']) ?>"
                             style="width: 60px; height: 40px; object-fit: cover; border-radius: var(--radius-sm);"
                         >

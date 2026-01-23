@@ -16,7 +16,7 @@
             Rejoignez des milliers de créateurs qui génèrent des revenus passifs.
         </p>
         <div class="flex-center gap-4 animate-fade-in">
-            <a href="/products" class="btn btn-primary btn-lg">Explorer les produits</a>
+            <a href="/products" class="btn btn-primary btn-lg btn-hero">Explorer les produits</a>
             <a href="/register" class="btn btn-outline btn-lg">Devenir vendeur</a>
         </div>
     </div>

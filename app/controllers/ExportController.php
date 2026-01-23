@@ -12,14 +12,14 @@ class ExportController extends Controller {
         $this->requireAdmin();
         
         $stmt = $this->db->query("
-            SELECT id, username, email, role, status, created_at
+            SELECT id, username, email, role, is_active, created_at
             FROM users
             ORDER BY created_at DESC
         ");
         $users = $stmt->fetchAll();
         
         $this->exportCSV('users', $users, [
-            'ID', 'Username', 'Email', 'Role', 'Status', 'Date création'
+            'ID', 'Username', 'Email', 'Role', 'Actif', 'Date création'
         ]);
     }
     
@@ -32,7 +32,7 @@ class ExportController extends Controller {
         $stmt = $this->db->query("
             SELECT p.id, p.title, p.slug, p.price, p.status, 
                    u.username as seller, c.name as category,
-                   p.downloads_count, p.created_at
+                   p.downloads, p.created_at
             FROM products p
             LEFT JOIN users u ON p.seller_id = u.id
             LEFT JOIN categories c ON p.category_id = c.id

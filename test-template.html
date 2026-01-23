@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketFlow Pro - Test Design</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="nav-brand">
+                <span class="logo-icon">MF</span>
+                MarketFlow Pro
+            </a>
+            
+            <button class="hamburger" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <ul class="nav-menu" id="mainMenu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#products" class="nav-link">Produits</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#categories" class="nav-link">Catégories</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#pricing" class="nav-link">Tarifs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-particles">
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+            <div class="hero-particle"></div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title animate-fade-in-up">
+                    Votre Marketplace Digitale <span class="text-gradient">Premium</span>
+                </h1>
+                <p class="hero-subtitle animate-fade-in-up delay-200">
+                    Découvrez des produits digitaux exclusifs, optimisés pour votre succès en ligne.
+                    Rejoignez +10,000 créateurs satisfaits.
+                </p>
+                <div class="hero-actions">
+                    <a href="#products" class="btn btn-primary btn-lg">Explorer les produits</a>
+                    <a href="#pricing" class="btn btn-outline btn-lg">Voir les tarifs</a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Utilisateurs</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Produits</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">4.9/5</span>
+                        <span class="stat-label">Évaluation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produits Section -->
+    <section class="container mt-16" id="products">
+        <h2 class="text-center mb-8">Produits Populaires</h2>
+        
+        <div class="grid grid-3">
+            <!-- Produit 1 -->
+            <article class="product-card animate-fade-in-up">
+                <div class="product-badges">
+                    <span class="product-badge badge-popular">Populaire</span>
+                    <span class="product-badge badge-new">Nouveau</span>
+                </div>
+                
+                <div class="product-image-container">
+                    <img src="https://picsum.photos/400/250?random=1" alt="Produit digital" loading="lazy">
+                    <div class="product-overlay">
+                        <button class="quick-action" title="Aperçu rapide">👁️</button>
+                        <button class="quick-action" title="Ajouter aux favoris">❤️</button>
+                        <button class="quick-action" title="Ajouter au panier">🛒</button>
+                    </div>
+                </div>
+                
+                <div class="product-content">
+                    <span class="product-category">Template</span>
+                    <h3 class="product-title">Template Figma UI/UX Pro</h3>
+                    <p class="product-description">
+                        Kit de design complet avec système de design, composants réutilisables et documentation détaillée.
+                    </p>
+                    
+                    <div class="product-meta">
+                        <div class="product-rating">
+                            <div class="stars">★★★★★</div>
+                            <span class="rating-count">(128)</span>
+                        </div>
+                        <span class="product-sales">500+ ventes</span>
+                    </div>
+                    
+                    <div class="product-footer">
+                        <div class="product-price">
+                            $49.99
+                            <span class="price-old">$79.99</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-sm">Acheter</button>
+                            <button class="btn btn-ghost btn-sm">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Produit 2 -->
+            <article class="product-card animate-fade-in-up delay-200">
+                <div class="product-badges">
+                    <span class="product-badge badge-limited">Édition limitée</span>
+                </div>
+                
+                <div class="product-image-container">
+                    <img src="https://picsum.photos/400/250?random=2" alt="Produit digital" loading="lazy">
+                    <div class="product-overlay">
+                        <button class="quick-action" title="Aperçu rapide">👁️</button>
+                        <button class="quick-action" title="Ajouter aux favoris">❤️</button>
+                        <button class="quick-action" title="Ajouter au panier">🛒</button>
+                    </div>
+                </div>
+                
+                <div class="product-content">
+                    <span class="product-category">Plugin</span>
+                    <h3 class="product-title">Plugin WordPress SEO Master</h3>
+                    <p class="product-description">
+                        Optimisez votre SEO avec cet outil complet d'analyse et d'optimisation pour WordPress.
+                    </p>
+                    
+                    <div class="product-meta">
+                        <div class="product-rating">
+                            <div class="stars">★★★★☆</div>
+                            <span class="rating-count">(89)</span>
+                        </div>
+                        <span class="product-sales">300+ ventes</span>
+                    </div>
+                    
+                    <div class="product-footer">
+                        <div class="product-price">
+                            $29.99
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-sm">Acheter</button>
+                            <button class="btn btn-ghost btn-sm">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Produit 3 -->
+            <article class="product-card animate-fade-in-up delay-400">
+                <div class="product-badges">
+                    <span class="product-badge badge-sale">-30%</span>
+                </div>
+                
+                <div class="product-image-container">
+                    <img src="https://picsum.photos/400/250?random=3" alt="Produit digital" loading="lazy">
+                    <div class="product-overlay">
+                        <button class="quick-action" title="Aperçu rapide">👁️</button>
+                        <button class="quick-action" title="Ajouter aux favoris">❤️</button>
+                        <button class="quick-action" title="Ajouter au panier">🛒</button>
+                    </div>
+                </div>
+                
+                <div class="product-content">
+                    <span class="product-category">E-book</span>
+                    <h3 class="product-title">Guide Complet Marketing Digital 2024</h3>
+                    <p class="product-description">
+                        300 pages de stratégies prouvées pour booster votre présence en ligne et augmenter vos ventes.
+                    </p>
+                    
+                    <div class="product-meta">
+                        <div class="product-rating">
+                            <div class="stars">★★★★★</div>
+                            <span class="rating-count">(256)</span>
+                        </div>
+                        <span class="product-sales">750+ ventes</span>
+                    </div>
+                    
+                    <div class="product-footer">
+                        <div class="product-price">
+                            $19.99
+                            <span class="price-old">$28.99</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-sm">Acheter</button>
+                            <button class="btn btn-ghost btn-sm">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container mt-16 text-center">
+        <div class="card bg-gradient-primary text-inverse">
+            <h2>Prêt à lancer votre business digital ?</h2>
+            <p class="mb-6">Rejoignez notre communauté de créateurs et commencez à vendre dès aujourd'hui.</p>
+            <a href="#signup" class="btn btn-outline btn-lg">Commencer gratuitement</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-16">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h3 class="footer-col-title">MarketFlow Pro</h3>
+                    <p>La marketplace ultime pour produits digitaux de qualité.</p>
+                </div>
+                
+                <div>
+                    <h3 class="footer-col-title">Navigation</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Accueil</a></li>
+                        <li><a href="#products" class="footer-link">Produits</a></li>
+                        <li><a href="#categories" class="footer-link">Catégories</a></li>
+                        <li><a href="#pricing" class="footer-link">Tarifs</a></li>
+                        <li><a href="#contact" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-col-title">Légal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="footer-link">Politique de confidentialité</a></li>
+                        <li><a href="#" class="footer-link">Politique de remboursement</a></li>
+                        <li><a href="#" class="footer-link">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 MarketFlow Pro. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bouton flottant -->
+    <button class="floating-action" id="backToTop" title="Retour en haut">
+        ↑
+    </button>
+
+    <!-- Script d'interaction basique -->
+    <script>
+        // Menu mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const mainMenu = document.getElementById('mainMenu');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                mainMenu.classList.toggle('active');
+            });
+        }
+        
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        if (backToTop) {
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
+</body>
+</html>

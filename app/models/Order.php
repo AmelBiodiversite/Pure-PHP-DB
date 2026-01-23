@@ -80,7 +80,20 @@ class Order extends Model {
      * Créer un item de commande
      */
     private function createOrderItem($data) {
-        $fields = array_keys($data);
+        // Mapper les champs du panier vers les colonnes de order_items
+        $itemData = [
+            'order_id' => $data['order_id'],
+            'product_id' => $data['product_id'],
+            'seller_id' => $data['seller_id'],
+            'product_title' => $data['title'],
+            'product_price' => $data['price'],
+            'quantity' => $data['quantity'] ?? 1,
+            'seller_amount' => $data['seller_amount'],
+            'platform_fee' => $data['commission_amount'],
+            'license_key' => $data['license_key']
+        ];
+
+        $fields = array_keys($itemData);
         $placeholders = ':' . implode(', :', $fields);
         $fieldList = implode(', ', $fields);
 
@@ -90,7 +103,7 @@ class Order extends Model {
 
         $stmt = $this->db->prepare($sql);
 
-        foreach ($data as $key => $value) {
+        foreach ($itemData as $key => $value) {
             $stmt->bindValue(':' . $key, $value);
         }
 
@@ -207,6 +220,7 @@ class Order extends Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    
     /**
      * Marquer comme payée
      */
@@ -400,4 +414,47 @@ class Order extends Model {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+/**
+     * Récupérer les commandes d'un vendeur (ses ventes)
+     */
+    public function getSellerOrders($sellerId, $limit = 100) {
+        $stmt = $this->db->prepare("
+            SELECT o.*, 
+                   u.username as buyer_username,
+                   u.email as buyer_email,
+                   COUNT(oi.id) as items_count
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            WHERE o.seller_id = ?
+            GROUP BY o.id, u.username, u.email
+            ORDER BY o.created_at DESC
+            LIMIT ?
+        ");
+        $stmt->execute([$sellerId, $limit]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Récupérer les commandes d'un utilisateur (ses achats)
+     */
+    public function getUserOrders($userId, $limit = 100) {
+        $stmt = $this->db->prepare("
+            SELECT o.*, 
+                   COUNT(oi.id) as items_count,
+                   u.username as seller_username
+            FROM orders o
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            LEFT JOIN users u ON o.seller_id = u.id
+            WHERE o.user_id = ?
+            GROUP BY o.id, u.username
+            ORDER BY o.created_at DESC
+            LIMIT ?
+        ");
+        $stmt->execute([$userId, $limit]);
+        return $stmt->fetchAll();
+    }
+
+
 }

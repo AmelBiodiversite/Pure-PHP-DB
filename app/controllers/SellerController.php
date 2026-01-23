@@ -12,6 +12,11 @@ use App\Models\Product;
 use App\Models\User;
 
 class SellerController extends Controller {
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const ALLOWED_FILE_TYPES = ['application/zip', 'application/pdf', 'application/x-zip-compressed'];
+    const MAX_IMAGE_SIZE = 5242880; // 5MB en bytes
+    const MAX_FILE_SIZE = 52428800; // 50MB en bytes
+    
     private $productModel;
     private $userModel;
 
@@ -44,7 +49,7 @@ class SellerController extends Controller {
             COUNT(*) as total_products,
             COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved_products,
             COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_products,
-            COALESCE(SUM(downloads_count), 0) as total_downloads
+            COALESCE(SUM(downloads), 0) as total_downloads
         FROM products
         WHERE seller_id = :seller_id
     ");
@@ -53,7 +58,7 @@ class SellerController extends Controller {
     
     // Revenus totaux
     $stmt = $this->db->prepare("
-        SELECT COALESCE(SUM(oi.price * oi.quantity), 0) as total_revenue
+        SELECT COALESCE(SUM(oi.product_price * oi.quantity), 0) as total_revenue
         FROM order_items oi
         INNER JOIN orders o ON oi.order_id = o.id
         INNER JOIN products p ON oi.product_id = p.id
@@ -68,7 +73,7 @@ class SellerController extends Controller {
     $stmt = $this->db->prepare("
         SELECT 
             DATE(o.created_at) as date,
-            COALESCE(SUM(oi.price * oi.quantity), 0) as revenue,
+            COALESCE(SUM(oi.product_price * oi.quantity), 0) as revenue,
             COUNT(DISTINCT o.id) as orders
         FROM orders o
         INNER JOIN order_items oi ON o.id = oi.order_id
@@ -85,9 +90,9 @@ class SellerController extends Controller {
     // Top 5 produits
     $stmt = $this->db->prepare("
         SELECT 
-            p.id, p.title, p.price, p.downloads_count,
+            p.id, p.title, p.price, p.downloads,
             COALESCE(SUM(oi.quantity), 0) as sales_count,
-            COALESCE(SUM(oi.price * oi.quantity), 0) as revenue
+            COALESCE(SUM(oi.product_price * oi.quantity), 0) as revenue
         FROM products p
         LEFT JOIN order_items oi ON p.id = oi.product_id
         LEFT JOIN orders o ON oi.order_id = o.id AND o.payment_status = 'completed'
@@ -101,20 +106,44 @@ class SellerController extends Controller {
     
     // Produits récents
     $stmt = $this->db->prepare("
-        SELECT * FROM products 
-        WHERE seller_id = :seller_id 
-        ORDER BY created_at DESC 
-        LIMIT 5
+         SELECT * FROM products 
+         WHERE seller_id = :seller_id 
+         ORDER BY created_at DESC 
+         LIMIT 5
+     ");
+     $stmt->execute(['seller_id' => $sellerId]);
+     $recentProducts = $stmt->fetchAll();
+
+     // Ventes récentes (30 derniers jours)       
+    $stmt = $this->db->prepare("
+         SELECT 
+        o.id,
+        o.order_number,
+        o.created_at,
+        o.total_amount,
+        o.payment_status,
+        u.username as buyer_name,
+        COUNT(oi.id) as items_count
+    FROM orders o
+    INNER JOIN order_items oi ON o.id = oi.order_id
+    INNER JOIN products p ON oi.product_id = p.id
+    INNER JOIN users u ON o.buyer_id = u.id
+    WHERE p.seller_id = :seller_id 
+    AND o.created_at >= NOW() - INTERVAL '30 days'
+    GROUP BY o.id, o.order_number, o.created_at, o.total_amount, o.payment_status, u.username
+    ORDER BY o.created_at DESC
+    LIMIT 10
     ");
     $stmt->execute(['seller_id' => $sellerId]);
-    $recentProducts = $stmt->fetchAll();
+    $recentSales = $stmt->fetchAll();
     
-    $this->view('seller/dashboard', [
+    $this->render('seller/dashboard', [
         'title' => 'Dashboard Vendeur',
         'stats' => $stats,
         'revenue_by_day' => $revenueByDay,
         'top_products' => $topProducts,
-        'recent_products' => $recentProducts
+        'recent_products' => $recentProducts,
+        'recent_sales' => $recentSales
     ]);
 }
 
@@ -125,7 +154,7 @@ class SellerController extends Controller {
         $sellerId = $_SESSION['user_id'];
         $products = $this->productModel->getSellerProducts($sellerId);
 
-        $this->view('seller/products', [
+        $this->render('seller/products', [
             'title' => 'Mes Produits',
             'products' => $products
         ]);
@@ -139,7 +168,7 @@ class SellerController extends Controller {
         $stmt = $this->db->query("SELECT * FROM categories WHERE is_active = TRUE ORDER BY name ASC");
         $categories = $stmt->fetchAll();
 
-        $this->view('seller/product_form', [
+        $this->render('seller/product_form', [
             'title' => 'Ajouter un Produit',
             'categories' => $categories,
             'csrf_token' => generateCsrfToken(),
@@ -186,7 +215,7 @@ class SellerController extends Controller {
         file_put_contents('/tmp/start.log', "Validation: " . print_r($uploadErrors, true) . "\n", FILE_APPEND);
         
         if (!empty($uploadErrors)) {
-            $this->view('seller/product_form', [
+            $this->render('seller/product_form', [
                 'title' => 'Ajouter un Produit',
                 'errors' => $uploadErrors,
                 'old' => $data,
@@ -214,7 +243,7 @@ class SellerController extends Controller {
                 'success'
             );
         } else {
-            $this->view('seller/product_form', [
+            $this->render('seller/product_form', [
                 'title' => 'Ajouter un Produit',
                 'errors' => $result['errors'] ?? ['general' => $result['error']],
                 'old' => $data,
@@ -250,12 +279,12 @@ class SellerController extends Controller {
 
         // Récupérer les images
         $stmt = $this->db->prepare("
-            SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order
+            SELECT * FROM product_gallery WHERE product_id = ? ORDER BY display_order
         ");
         $stmt->execute([$id]);
         $product['images'] = $stmt->fetchAll();
 
-        $this->view('seller/product_form', [
+        $this->render('seller/product_form', [
             'title' => 'Modifier le Produit',
             'product' => $product,
             'categories' => $this->getCategories(),
@@ -341,7 +370,7 @@ class SellerController extends Controller {
         $stmt->execute([$sellerId]);
         $sales = $stmt->fetchAll();
 
-        $this->view('seller/sales', [
+        $this->render('seller/sales', [
             'title' => 'Mes Ventes',
             'sales' => $sales
         ]);
@@ -392,7 +421,7 @@ class SellerController extends Controller {
         $stmt->execute([$sellerId]);
         $payouts = $stmt->fetchAll();
 
-        $this->view('seller/earnings', [
+        $this->render('seller/earnings', [
             'title' => 'Mes Revenus',
             'earnings' => $earnings,
             'monthly_earnings' => $monthlyEarnings,
@@ -484,7 +513,7 @@ class SellerController extends Controller {
         $stmt->execute([$sellerId]);
         $traffic = $stmt->fetchAll();
 
-        $this->view('seller/analytics', [
+        $this->render('seller/analytics', [
             'title' => 'Analytics',
             'top_products' => $topProducts,
             'traffic' => $traffic
@@ -512,18 +541,18 @@ class SellerController extends Controller {
         // Thumbnail obligatoire pour nouveau produit
         if (empty($files['thumbnail']['name'])) {
             $errors['thumbnail'] = 'L\'image principale est requise';
-        } elseif (!isAllowedFileType($files['thumbnail']['name'], ALLOWED_IMAGE_TYPES)) {
+        } elseif (!in_array($files['thumbnail']['type'], self::ALLOWED_IMAGE_TYPES)) {
             $errors['thumbnail'] = 'Format d\'image non autorisé';
-        } elseif ($files['thumbnail']['size'] > MAX_IMAGE_SIZE) {
+        } elseif ($files['thumbnail']['size'] > self::MAX_IMAGE_SIZE) {
             $errors['thumbnail'] = 'Image trop volumineuse (max 5MB)';
         }
 
         // Fichier produit obligatoire
         if (empty($files['product_file']['name'])) {
             $errors['product_file'] = 'Le fichier produit est requis';
-        } elseif (!isAllowedFileType($files['product_file']['name'], ALLOWED_FILE_TYPES)) {
+        } elseif (!in_array($files['product_file']['type'], self::ALLOWED_FILE_TYPES)) {
             $errors['product_file'] = 'Format de fichier non autorisé';
-        } elseif ($files['product_file']['size'] > MAX_FILE_SIZE) {
+        } elseif ($files['product_file']['size'] > self::MAX_FILE_SIZE) {
             $errors['product_file'] = 'Fichier trop volumineux (max 50MB)';
         }
 

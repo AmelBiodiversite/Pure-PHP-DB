@@ -35,7 +35,7 @@ class AuthController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleLogin();
         } else {
-            $this->view('auth/login', [
+            $this->render('auth/login', [
                 'title' => 'Connexion'
             ]);
         }
@@ -51,7 +51,7 @@ class AuthController extends Controller {
 
         // Validation basique
         if (empty($email) || empty($password)) {
-            $this->view('auth/login', [
+            $this->render('auth/login', [
                 'title' => 'Connexion',
                 'error' => 'Veuillez remplir tous les champs',
                 'email' => $email
@@ -76,7 +76,7 @@ class AuthController extends Controller {
             }
         } else {
             // Échec de connexion
-            $this->view('auth/login', [
+            $this->render('auth/login', [
                 'title' => 'Connexion',
                 'error' => 'Email ou mot de passe incorrect',
                 'email' => $email
@@ -96,7 +96,7 @@ class AuthController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleRegister();
         } else {
-            $this->view('auth/register', [
+            $this->render('auth/register', [
                 'title' => 'Inscription'
             ]);
         }
@@ -140,7 +140,7 @@ class AuthController extends Controller {
         }
 
         if (!empty($errors)) {
-            $this->view('auth/register', [
+            $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => $errors,
                 'old' => $data
@@ -150,7 +150,7 @@ class AuthController extends Controller {
 
         // Vérifier si email existe
         if ($this->userModel->emailExists($data['email'])) {
-            $this->view('auth/register', [
+            $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Cet email est déjà utilisé'],
                 'old' => $data
@@ -160,7 +160,7 @@ class AuthController extends Controller {
 
         // Vérifier si username existe
         if ($this->userModel->usernameExists($data['username'])) {
-            $this->view('auth/register', [
+            $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Ce nom d\'utilisateur est déjà pris'],
                 'old' => $data
@@ -171,17 +171,6 @@ class AuthController extends Controller {
         // Créer l'utilisateur
         unset($data['password_confirm']);
         $userId = $this->userModel->createUser($data);
-        
-        // Créer session et rediriger
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['user_role'] = $data['role'];
-        $_SESSION['success'] = "Compte créé avec succès !";
-
-        if ($data['role'] === 'seller') {
-            $this->redirect('/seller/dashboard');
-        } else {
-            $this->redirect('/');
-        }
 
         if ($userId) {
             // Récupérer l'utilisateur créé
@@ -197,7 +186,7 @@ class AuthController extends Controller {
                 $this->redirect('/');
             }
         } else {
-            $this->view('auth/register', [
+            $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Erreur lors de l\'inscription'],
                 'old' => $data

@@ -31,7 +31,7 @@
             ❤️ Mes Favoris
         </h1>
         <p style="color: #666; font-size: 1rem;">
-            <?php if ($wishlistCount > 0): ?>
+            <?php if (count($wishlist_items ?? []) > 0): ?>
                 Vous avez <strong><?= $wishlistCount ?></strong> produit<?= $wishlistCount > 1 ? 's' : '' ?> en favoris
             <?php else: ?>
                 Vous n'avez pas encore de produits en favoris
@@ -39,7 +39,7 @@
         </p>
     </div>
 
-    <?php if (empty($wishlistItems)): ?>
+    <?php if (empty($wishlist_items)): ?>
         
         <!-- ========================================
              ÉTAT VIDE (Aucun favori)
@@ -66,7 +66,7 @@
              ======================================== -->
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
             
-            <?php foreach ($wishlistItems as $item): ?>
+            <?php foreach ($wishlist_items as $item): ?>
                 
                 <!-- ========================================
                      CARTE PRODUIT FAVORI

@@ -253,18 +253,18 @@ class Cart {
         }
 
         // Vérifier que tous les produits sont toujours disponibles
-        $db = \Core\Database::getInstance()->getConnection();
+        $db = \Core\Database::getInstance()->getPdo();
         
         foreach ($this->items() as $productId => $item) {
             $stmt = $db->prepare("
-                SELECT status, is_active 
+                SELECT status 
                 FROM products 
                 WHERE id = ?
             ");
             $stmt->execute([$productId]);
             $product = $stmt->fetch();
 
-            if (!$product || $product['status'] !== 'approved' || !$product['is_active']) {
+            if (!$product || $product["status"] !== "approved") {
                 $errors[] = "Le produit \"{$item['title']}\" n'est plus disponible";
                 $this->remove($productId);
             }
@@ -280,14 +280,13 @@ class Cart {
      * Appliquer un code promo
      */
     public function applyPromoCode($code) {
-        $db = \Core\Database::getInstance()->getConnection();
+        $db = \Core\Database::getInstance()->getPdo();
         
         $stmt = $db->prepare("
             SELECT * FROM promo_codes
             WHERE code = ? 
-              AND is_active = 1
-              AND (valid_until IS NULL OR valid_until > NOW())
-              AND (usage_limit IS NULL OR usage_count < usage_limit)
+              AND (expires_at IS NULL OR expires_at > NOW())
+              AND (max_uses IS NULL OR used_count < max_uses)
         ");
         
         $stmt->execute([strtoupper($code)]);
@@ -306,10 +305,10 @@ class Cart {
         }
 
         // Calculer la réduction
-        if ($promo['discount_type'] === 'percentage') {
-            $discount = ($this->total() * $promo['discount_value']) / 100;
+        if ($promo['type'] === 'percentage') {
+            $discount = ($this->total() * $promo['value']) / 100;
         } else {
-            $discount = $promo['discount_value'];
+            $discount = $promo['value'];
         }
 
         // Ne pas dépasser le total
@@ -317,8 +316,8 @@ class Cart {
 
         $_SESSION[$this->sessionKey]['promo'] = [
             'code' => $promo['code'],
-            'type' => $promo['discount_type'],
-            'value' => $promo['discount_value'],
+            'type' => $promo['type'],
+            'value' => $promo['value'],
             'discount' => $discount
         ];
 

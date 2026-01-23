@@ -28,6 +28,11 @@
  * ================================================
  */
 
+namespace App\Models;
+
+use PDO;
+use Core\Database;
+
 class Wishlist {
     /**
      * Connexion à la base de données PostgreSQL
@@ -42,7 +47,7 @@ class Wishlist {
      * Initialise la connexion à la base de données
      */
     public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = Database::getInstance()->getPdo();
     }
 
     /**

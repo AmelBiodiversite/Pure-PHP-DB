@@ -43,7 +43,7 @@ class AccountController extends Controller {
             $orders = [];
         }
         
-        $this->view('account/index', [
+        $this->render('account/index', [
             'title' => 'Mon Compte',
             'user' => $user,
             'stats' => $stats,
@@ -71,7 +71,7 @@ class AccountController extends Controller {
         $stmt->execute(['user_id' => $user['id']]);
         $products = $stmt->fetchAll();
         
-        $this->view('account/downloads', [
+        $this->render('account/downloads', [
             'title' => 'Mes Téléchargements',
             'products' => $products
         ]);

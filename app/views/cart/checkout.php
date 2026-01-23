@@ -321,7 +321,7 @@ form.addEventListener('submit', async function(e) {
 
     try {
         // Créer la session Stripe via notre API
-        const response = await fetch('/cart/process-checkout', {
+        const response = await fetch('/checkout/create-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

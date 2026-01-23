@@ -1,0 +1,6 @@
+/* Module principal - Importer les autres modules */
+@import url('variables.css');
+@import url('reset.css');
+@import url('components.css');
+@import url('animations.css');
+@import url('responsive.css');

@@ -70,12 +70,12 @@ class ProductController extends Controller {
         ");
         $priceRange = $stmt->fetch();
 
-        $this->view('products/index', [
+        $this->render('products/index', [
             'title' => 'Catalogue de Produits',
             'products' => $result['products'],
             'pagination' => [
                 'current' => $result['page'],
-                'total' => $result['total_pages'],
+                'total_pages' => $result['total_pages'],
                 'total_items' => $result['total']
             ],
             'categories' => $categories,
@@ -204,7 +204,7 @@ if (isset($_SESSION['user_id'])) {
             $inWishlist = $stmt->fetch() !== false;
         }
 
-        $this->view('products/show', [
+        $this->render('products/show', [
             'title' => $product['title'],
             'product' => $product,
             'reviews' => $reviews,
@@ -237,13 +237,13 @@ if (isset($_SESSION['user_id'])) {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $result = $this->productModel->getProducts($filters, $page, 24);
 
-        $this->view('products/search', [
+        $this->render('products/search', [
             'title' => "Résultats pour : $query",
             'query' => $query,
             'products' => $result['products'],
             'pagination' => [
                 'current' => $result['page'],
-                'total' => $result['total_pages'],
+                'total_pages' => $result['total_pages'],
                 'total_items' => $result['total']
             ],
             'active_filters' => $filters
@@ -373,18 +373,39 @@ if (isset($_SESSION['user_id'])) {
         // Récupérer ses produits
         $products = $this->productModel->getSellerProducts($seller['id'], 'approved');
 
-        $this->view('products/seller', [
+        $this->render('products/seller', [
             'title' => 'Produits de ' . $seller['full_name'],
             'seller' => $seller,
             'products' => $products
         ]);
     }
-    public function category($slug) {
-        // Récupérer la catégorie
-        $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
-        $stmt->execute(['slug' => $slug]);
-        $category = $stmt->fetch();
+        /**
+         * Liste toutes les catégories
+         */
+        public function categories() {
+            // Récupérer toutes les catégories actives
+            $stmt = $this->db->query("
+                SELECT c.*, COUNT(p.id) as product_count
+                FROM categories c
+                LEFT JOIN products p ON c.id = p.category_id AND p.status = 'approved'
+                WHERE c.is_active = TRUE
+                GROUP BY c.id
+                ORDER BY c.name ASC
+            ");
+            $categories = $stmt->fetchAll();
 
+            $this->render('products/categories', [
+                'title' => 'Toutes les catégories',
+                'categories' => $categories
+            ]);
+        }
+
+        public function category($slug) {
+            // Récupérer la catégorie
+            $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
+            $stmt->execute(['slug' => $slug]);
+            $category = $stmt->fetch();
+        
         if (!$category) {
             redirectWithMessage('/', 'Catégorie introuvable', 'error');
             return;
@@ -394,13 +415,13 @@ if (isset($_SESSION['user_id'])) {
         $filters = ['category_id' => $category['id']];
         $result = $this->productModel->getProducts($filters, 1, 24);
 
-        $this->view('products/category', [
+        $this->render('products/category', [
             'title' => $category['name'],
             'category' => $category,
             'products' => $result['products'],
             'pagination' => [
                 'current' => $result['page'],
-                'total' => $result['total_pages']
+                'total_pages' => $result['total_pages']
             ]
         ]);
     }

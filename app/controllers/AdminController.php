@@ -59,7 +59,7 @@ class AdminController extends Controller {
             LIMIT 10
         ")->fetchAll();
 
-        $this->view('admin/dashboard', [
+        $this->render('admin/dashboard', [
             'title' => 'Admin Dashboard',
             'stats' => $stats,
             'pending_products' => $pending_products,
@@ -85,7 +85,7 @@ class AdminController extends Controller {
             'sellers' => count(array_filter($users, fn($u) => $u['role'] === 'seller')),
             'buyers' => count(array_filter($users, fn($u) => $u['role'] === 'buyer'))
         ];        
-        $this->view('admin/users', [
+        $this->render('admin/users', [
             'title' => 'Gestion Utilisateurs',
             'users' => $users,
             'stats' => $stats 
@@ -118,33 +118,27 @@ class AdminController extends Controller {
 
         $products = $stmt->fetchAll();
 
-        $this->view('admin/products', [
+        $this->render('admin/products', [
             'title' => 'Gestion Produits',
             'products' => $products,
             'current_status' => $status
         ]);
     }
-
-
     
-    /**
-     * Valider un produit
-     */
-    public function approveProduct() {
-        $product_id = $_POST['product_id'] ?? 0;
-
-        $stmt = $this->db->prepare("UPDATE products SET status = 'active' WHERE id = :id");
-        $success = $stmt->execute(['id' => $product_id]);
-
-        if ($success) {
-            $_SESSION['success'] = "Produit approuvé avec succès";
-        } else {
-            $_SESSION['error'] = "Erreur lors de l'approbation";
-        }
-
-        $this->redirect('/admin/products');
+/**
+ * Valider un produit
+ */
+public function approveProduct($id) {
+    $stmt = $this->db->prepare("UPDATE products SET status = 'approved', approved_at = NOW() WHERE id = ?");
+    $success = $stmt->execute([$id]);
+    
+    if ($success) {
+        setFlashMessage('Produit approuvé avec succès', 'success');
+    } else {
+        setFlashMessage('Erreur lors de l\'approbation', 'error');
     }
-
+    redirect('/admin/products');
+}
     /**
      * Rejeter un produit
      */
@@ -248,7 +242,7 @@ public function deleteUser($id) {
             LIMIT 10
         ")->fetchAll();
 
-        $this->view('admin/stats', [
+        $this->render('admin/stats', [
             'title' => 'Statistiques',
             'monthly_stats' => $monthly_stats,
             'top_sellers' => $top_sellers

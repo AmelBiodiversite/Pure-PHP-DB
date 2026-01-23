@@ -1,466 +1,1046 @@
 <?php
-// Récupérer les IDs des produits en favoris de l'utilisateur
-$wishlistIds = [];
-if (isset($_SESSION['user_id'])) {
-    $wishlistModel = new Wishlist();
-    $wishlistIds = $wishlistModel->getUserWishlistIds($_SESSION['user_id']);
-}
-
 /**
  * MARKETFLOW PRO - PAGE CATALOGUE PRODUITS
  * Fichier : app/views/products/index.php
  */
+// Récupérer les IDs des produits en favoris de l'utilisateur
+$wishlistIds = [];
+if (isset($_SESSION['user_id'])) {
+    $wishlistModel = new \App\Models\Wishlist();
+    $wishlistIds = $wishlistModel->getUserWishlistIds($_SESSION['user_id']);
+}
+// Helper function pour les query params (améliorée pour supporter la suppression)
+function updateQueryParam($key, $value = null) {
+    $params = $_GET;
+    if ($value === null) {
+        unset($params[$key]);
+    } else {
+        $params[$key] = $value;
+    }
+    $query = http_build_query($params);
+    return '/products' . ($query ? '?' . $query : '');
+}
 ?>
-
 <div class="container mt-8 mb-16">
-    
     <!-- Header -->
     <div class="mb-8">
         <h1 class="mb-4">Catalogue de Produits</h1>
-        <p style="color: var(--text-secondary); font-size: 1.125rem;">
+        <p class="text-secondary" style="font-size: 1.125rem;">
             Découvrez <?= number_format($pagination['total_items']) ?> produits digitaux premium
         </p>
     </div>
-
-    <div style="display: grid; grid-template-columns: 280px 1fr; gap: var(--space-8);">
-        
+    <div class="catalog-grid">
         <!-- SIDEBAR FILTRES -->
-        <aside style="position: sticky; top: 100px; height: fit-content;">
-            
-            <div class="card" style="padding: var(--space-6);">
-                
+        <aside class="filters-sidebar">
+            <div class="card filters-card">
                 <!-- Catégories -->
-                <div style="margin-bottom: var(--space-6);">
-                    <h3 style="font-size: 1rem; margin-bottom: var(--space-4);">Catégories</h3>
-                    <ul style="list-style: none;">
-                        <li style="margin-bottom: var(--space-2);">
-                            <a href="/products" style="
-                                display: flex;
-                                justify-content: space-between;
-                                padding: var(--space-2);
-                                border-radius: var(--radius-sm);
-                                color: <?= empty($active_filters['category_id']) ? 'var(--primary-600)' : 'var(--text-secondary)' ?>;
-                                font-weight: <?= empty($active_filters['category_id']) ? '600' : 'normal' ?>;
-                            " onmouseover="this.style.background='var(--bg-secondary)'" 
-                               onmouseout="this.style.background='transparent'">
+                <div class="filter-section">
+                    <h3 class="filter-title">Catégories</h3>
+                    <ul class="categories-list">
+                        <li class="category-item">
+                            <a href="<?= updateQueryParam('category', null) ?>"
+                               class="category-link <?= empty($active_filters['category_id']) ? 'active' : '' ?>">
                                 <span>Toutes</span>
-                                <span style="color: var(--text-tertiary);"><?= number_format($pagination['total_items']) ?></span>
+                                <span class="count"><?= number_format($pagination['total_items']) ?></span>
                             </a>
                         </li>
                         <?php foreach ($categories as $cat): ?>
-                        <li style="margin-bottom: var(--space-2);">
-                            <a href="/products?category=<?= $cat['id'] ?>" style="
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                padding: var(--space-2);
-                                border-radius: var(--radius-sm);
-                                color: <?= $active_filters['category_id'] == $cat['id'] ? 'var(--primary-600)' : 'var(--text-secondary)' ?>;
-                                font-weight: <?= $active_filters['category_id'] == $cat['id'] ? '600' : 'normal' ?>;
-                            " onmouseover="this.style.background='var(--bg-secondary)'" 
-                               onmouseout="this.style.background='transparent'">
+                        <li class="category-item">
+                            <a href="<?= updateQueryParam('category', $cat['id']) ?>"
+                               class="category-link <?= ($active_filters['category_id'] ?? null) == $cat['id'] ? 'active' : '' ?>">
                                 <span>
-                                    <?php if ($cat['icon']): ?>
-                                        <span style="margin-right: var(--space-2);"><?= $cat['icon'] ?></span>
+                                    <?php if (!empty($cat['icon'])): ?>
+                                        <span class="category-icon"><?= $cat['icon'] ?></span>
                                     <?php endif; ?>
                                     <?= e($cat['name']) ?>
                                 </span>
-                                <span class="badge badge-primary" style="font-size: 0.7rem;">
-                                    <?= $cat['product_count'] ?>
-                                </span>
+                                <span class="badge badge-primary"><?= $cat['product_count'] ?></span>
                             </a>
                         </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
-
                 <!-- Prix -->
-                <div style="margin-bottom: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--border-color);">
-                    <h3 style="font-size: 1rem; margin-bottom: var(--space-4);">Prix</h3>
-                    <div style="margin-bottom: var(--space-3);">
-                        <input type="range" 
-                               id="priceMin" 
-                               min="<?= $price_range['min_price'] ?? 0 ?>"
-                               max="<?= $price_range['max_price'] ?? 1000 ?>"
-                               value="<?= $active_filters['min_price'] ?? $price_range['min_price'] ?? 0 ?>"
-                            style="width: 100%;">
-                        <input type="range" 
-                               id="priceMax" 
-                               min="<?= $price_range['min_price'] ?>" 
-                               max="<?= $price_range['max_price'] ?>"
-                               value="<?= $active_filters['max_price'] ?? $price_range['max_price'] ?>"
-                               style="width: 100%;">
-                    </div>
-                    <div style="display: flex; gap: var(--space-2); font-size: 0.875rem; color: var(--text-secondary);">
-                        
-                        <span id="priceMinLabel"><?= formatPrice($active_filters['min_price'] ?? $price_range['min_price'] ?? 0) ?></span>
-                        <span>-</span>
-                        <span id="priceMaxLabel"><?= formatPrice($active_filters['max_price'] ?? $price_range['max_price'] ?? 1000) ?></span>
-                        
-                    
+                <div class="filter-section">
+                    <h3 class="filter-title">Prix</h3>
+                    <div class="price-filter">
+                        <div class="price-inputs">
+                            <input type="range"
+                                   id="priceMin"
+                                   class="price-range"
+                                   min="<?= $price_range['min_price'] ?? 0 ?>"
+                                   max="<?= $price_range['max_price'] ?? 1000 ?>"
+                                   value="<?= $active_filters['min_price'] ?? $price_range['min_price'] ?? 0 ?>"
+                                   aria-label="Prix minimum">
+                            <input type="range"
+                                   id="priceMax"
+                                   class="price-range"
+                                   min="<?= $price_range['min_price'] ?? 0 ?>"
+                                   max="<?= $price_range['max_price'] ?? 1000 ?>"
+                                   value="<?= $active_filters['max_price'] ?? $price_range['max_price'] ?? 1000 ?>"
+                                   aria-label="Prix maximum">
+                        </div>
+                        <div class="price-labels">
+                            <span id="priceMinLabel">
+                                <?= formatPrice($active_filters['min_price'] ?? $price_range['min_price'] ?? 0) ?>
+                            </span>
+                            <span>-</span>
+                            <span id="priceMaxLabel">
+                                <?= formatPrice($active_filters['max_price'] ?? $price_range['max_price'] ?? 1000) ?>
+                            </span>
+                        </div>
                     </div>
                 </div>
-
                 <!-- Tags populaires -->
-                <div style="padding-top: var(--space-6); border-top: 1px solid var(--border-color);">
-                    <h3 style="font-size: 1rem; margin-bottom: var(--space-4);">Tags populaires</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                <div class="filter-section">
+                    <h3 class="filter-title">Tags populaires</h3>
+                    <div class="tags-container">
                         <?php foreach (array_slice($popular_tags, 0, 10) as $tag): ?>
-                        <a href="/products?tag=<?= e($tag['slug']) ?>" 
-                           class="badge <?= $active_filters['tag'] == $tag['slug'] ? 'badge-primary' : '' ?>"
-                           style="
-                               <?= $active_filters['tag'] != $tag['slug'] ? 'background: var(--bg-secondary); color: var(--text-secondary);' : '' ?>
-                               cursor: pointer;
-                           ">
+                        <a href="<?= updateQueryParam('tag', urlencode($tag['slug'])) ?>"
+                           class="badge <?= ($active_filters['tag'] ?? null) == $tag['slug'] ? 'badge-primary' : 'badge-secondary' ?>">
                             <?= e($tag['name']) ?>
                         </a>
                         <?php endforeach; ?>
                     </div>
                 </div>
-
             </div>
-
         </aside>
-
         <!-- CONTENU PRINCIPAL -->
-        <main>
-            
+        <main class="catalog-main">
             <!-- Barre de tri et recherche -->
-            <div class="flex-between mb-6" style="flex-wrap: wrap; gap: var(--space-4);">
-                
+            <div class="catalog-toolbar">
+                <!-- Bouton toggle filtres (mobile) -->
+                <button id="toggleFilters" class="btn btn-secondary btn-sm toggle-filters" aria-label="Ouvrir les filtres">
+                    Filtres
+                </button>
                 <!-- Résultats -->
-                <div style="color: var(--text-secondary);">
-                    <?= number_format($pagination['total_items']) ?> produit<?= $pagination['total_items'] > 1 ? 's' : '' ?> trouvé<?= $pagination['total_items'] > 1 ? 's' : '' ?>
+                <div class="results-count">
+                    <?= number_format($pagination['total_items']) ?>
+                    produit<?= $pagination['total_items'] > 1 ? 's' : '' ?>
+                    trouvé<?= $pagination['total_items'] > 1 ? 's' : '' ?>
                 </div>
-
                 <!-- Tri -->
-                <div class="flex gap-4" style="align-items: center;">
-                    <label style="font-size: 0.875rem; color: var(--text-secondary);">Trier par :</label>
-                    <select 
-                        id="sortSelect" 
-                        class="form-select" 
-                        style="width: 200px; padding: var(--space-2) var(--space-3);"
-                        onchange="window.location.href = updateQueryParam('sort', this.value)">
-                        <option value="newest" <?= ($active_filters['sort'] ?? 'newest') == 'newest' ? 'selected' : '' ?>>
+                <div class="sort-container">
+                    <label for="sortSelect" class="sort-label">Trier par :</label>
+                    <select
+                        id="sortSelect"
+                        class="form-select"
+                        onchange="window.location.href = this.value">
+                        <option value="<?= updateQueryParam('sort', 'newest') ?>" <?= ($active_filters['sort'] ?? 'newest') == 'newest' ? 'selected' : '' ?>>
                             Plus récents
                         </option>
-                        <option value="popular" <?= $active_filters['sort'] == 'popular' ? 'selected' : '' ?>>
+                        <option value="<?= updateQueryParam('sort', 'popular') ?>" <?= ($active_filters['sort'] ?? '') == 'popular' ? 'selected' : '' ?>>
                             Plus populaires
                         </option>
-                        <option value="price_asc" <?= $active_filters['sort'] == 'price_asc' ? 'selected' : '' ?>>
+                        <option value="<?= updateQueryParam('sort', 'price_asc') ?>" <?= ($active_filters['sort'] ?? '') == 'price_asc' ? 'selected' : '' ?>>
                             Prix croissant
                         </option>
-                        <option value="price_desc" <?= $active_filters['sort'] == 'price_desc' ? 'selected' : '' ?>>
+                        <option value="<?= updateQueryParam('sort', 'price_desc') ?>" <?= ($active_filters['sort'] ?? '') == 'price_desc' ? 'selected' : '' ?>>
                             Prix décroissant
                         </option>
-                        <option value="rating" <?= $active_filters['sort'] == 'rating' ? 'selected' : '' ?>>
+                        <option value="<?= updateQueryParam('sort', 'rating') ?>" <?= ($active_filters['sort'] ?? '') == 'rating' ? 'selected' : '' ?>>
                             Meilleures notes
                         </option>
                     </select>
                 </div>
-
             </div>
-
             <!-- Grille de produits -->
             <?php if (empty($products)): ?>
-                
-                <div class="card text-center" style="padding: var(--space-16);">
-                    <div style="font-size: 4rem; margin-bottom: var(--space-4);">🔍</div>
-                    <h3 style="margin-bottom: var(--space-3);">Aucun produit trouvé</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">
+                <div class="card text-center empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h3 class="empty-title">Aucun produit trouvé</h3>
+                    <p class="empty-description">
                         Essayez de modifier vos critères de recherche
                     </p>
-                    <a href="/products" class="btn btn-primary">Voir tous les produits</a>
+                    <a href="<?= updateQueryParam('reset', null) ?>" class="btn btn-primary">Voir tous les produits</a>
                 </div>
-
             <?php else: ?>
-
-                <div class="grid grid-4" style="gap: var(--space-6);">
-                    <?php foreach ($products as $product): ?>
-                    
-                    <div class="product-card">
-                        
+                <div class="products-grid">
+                    <?php foreach ($products as $product):
+                        $isInWishlist = in_array($product['id'], $wishlistIds);
+                    ?>
+                    <article class="product-card">
                         <!-- Image -->
-                        <a href="/products/<?= e($product['slug']) ?>">
-                            <img 
-                                src="<?= e($product['thumbnail_url'] ?? '/public/img/placeholder.png') ?>" 
-                                alt="<?= e($product['title']) ?>"
-                                class="product-image"
-                                loading="lazy"
-                            >
+                        <a href="/products/<?= e($product['slug']) ?>" class="product-link">
+                            <div class="product-image-container">
+                                <img
+                                    src="<?= e($product['thumbnail_url'] ?? '/public/img/placeholder.png') ?>"
+                                    alt="<?= e($product['title']) ?>"
+                                    class="product-image"
+                                    loading="lazy"
+                                    width="300"
+                                    height="200">
+                            </div>
                         </a>
-
                         <!-- Contenu -->
                         <div class="product-content">
-                            
                             <!-- Header -->
-                            <div class="flex-between mb-3">
+                            <div class="product-header">
                                 <span class="badge badge-primary">
                                     <?= e($product['category_name']) ?>
                                 </span>
                                 <?php if ($product['rating_count'] > 0): ?>
-                                <div class="flex gap-2" style="align-items: center;">
-                                    <span style="color: var(--warning); font-size: 0.875rem;">★</span>
-                                    <span style="font-size: 0.875rem; font-weight: 600;">
+                                <div class="product-rating">
+                                    <span class="rating-star">★</span>
+                                    <span class="rating-score">
                                         <?= number_format($product['rating_average'], 1) ?>
                                     </span>
-                                    <span style="font-size: 0.75rem; color: var(--text-tertiary);">
+                                    <span class="rating-count">
                                         (<?= $product['rating_count'] ?>)
                                     </span>
                                 </div>
                                 <?php endif; ?>
                             </div>
-
                             <!-- Titre -->
                             <h3 class="product-title">
-                                <a href="/products/<?= e($product['slug']) ?>" style="color: inherit;">
+                                <a href="/products/<?= e($product['slug']) ?>">
                                     <?= e($product['title']) ?>
                                 </a>
                             </h3>
-
                             <!-- Vendeur -->
-                            <p style="font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: var(--space-4);">
-                                Par 
-                                <a href="/seller/<?= e($product['seller_name']) ?>" style="color: var(--primary-600);">
+                            <p class="product-seller">
+                                Par
+                                <a href="/seller/<?= urlencode($product['seller_name']) ?>" class="seller-link">
                                     <?= e($product['shop_name'] ?? $product['seller_name']) ?>
                                 </a>
                             </p>
-
                             <!-- Prix et actions -->
-                            <div class="flex-between" style="align-items: center;">
-                                <div>
+                            <div class="product-footer">
+                                <div class="price-container">
                                     <span class="product-price">
                                         <?= formatPrice($product['price']) ?>
                                     </span>
-                                    <?php if ($product['original_price'] && $product['original_price'] > $product['price']): ?>
-                                    <span style="
-                                        font-size: 0.875rem; 
-                                        color: var(--text-tertiary); 
-                                        text-decoration: line-through;
-                                        margin-left: var(--space-2);
-                                    ">
+                                    <?php if (!empty($product['original_price']) && $product['original_price'] > $product['price']): ?>
+                                    <span class="product-price-original">
                                         <?= formatPrice($product['original_price']) ?>
                                     </span>
                                     <?php endif; ?>
                                 </div>
-                                
-                                <!-- 
-                                ================================================
-                                NOUVEAU : Boutons d'action avec Wishlist
-                                ================================================
-                                -->
-                                <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                    
+                                <!-- Boutons d'action -->
+                                <div class="product-actions">
                                     <!-- Bouton Wishlist -->
-                                    <?php $isInWishlist = in_array($product['id'], $wishlistIds); ?>
-                                    <button 
+                                    <button
                                         type="button"
-                                        class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>" 
+                                        class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>"
                                         data-product-id="<?= $product['id'] ?>"
-                                        style="padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px;"
-                                        title="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                                        <span style="font-size: 1.25rem; line-height: 1;">
-                                            <?= $isInWishlist ? '❤️' : '🤍' ?>
-                                        </span>
-                                    </button>
-
-                                    <!-- Bouton Voir -->
-                                    <button 
-                                        class="btn btn-primary btn-sm"
-                                        onclick="window.location.href='/products/<?= e($product['slug']) ?>'"
-                                        style="white-space: nowrap;">
-                                        Voir
-                                    </button>
-                                </div>
-                            </div>
-                                ================================================
-                                -->
-                                <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                    
-                                    <!-- Bouton Wishlist (Favoris) -->
-                                    <?php 
-                                    /**
-                                     * Vérifier si le produit est déjà dans la wishlist
-                                     * - Si oui : afficher ❤️ (cœur plein rouge)
-                                     * - Si non : afficher 🤍 (cœur vide blanc)
-                                     */
-                                    $isInWishlist = in_array($product['id'], $wishlistIds); 
-                                    ?>
-                                    <button 
-                                        type="button"
-                                        class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>" 
-                                        data-product-id="<?= $product['id'] ?>"
-                                        style="
-                                            padding: 0.5rem 0.75rem; 
-                                            background: white; 
-                                            border: 1px solid var(--border-color); 
-                                            border-radius: 6px; 
-                                            cursor: pointer; 
-                                            transition: all 0.3s; 
-                                            display: flex; 
-                                            align-items: center; 
-                                            justify-content: center; 
-                                            min-width: 40px;
-                                        "
                                         title="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
                                         aria-label="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                                        <span style="font-size: 1.25rem; line-height: 1;">
+                                        <span class="wishlist-icon">
                                             <?= $isInWishlist ? '❤️' : '🤍' ?>
                                         </span>
                                     </button>
-
-                                    <!-- Bouton Voir le produit -->
-                                    <button 
-                                        class="btn btn-primary btn-sm"
-                                        onclick="window.location.href='/products/<?= e($product['slug']) ?>'"
-                                        style="white-space: nowrap;">
+                                    <!-- Bouton Voir -->
+                                    <a href="/products/<?= e($product['slug']) ?>" class="btn btn-primary btn-sm">
                                         Voir
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
-                            </div>
-
                             <!-- Stats -->
-                            <div class="flex gap-4 mt-3" style="font-size: 0.75rem; color: var(--text-tertiary);">
+                            <div class="product-stats">
                                 <span>👁️ <?= number_format($product['views_count'] ?? 0) ?></span>
                                 <span>💰 <?= number_format($product['sales_count'] ?? 0) ?> ventes</span>
                             </div>
-
                         </div>
-                    </div>
-
+                    </article>
                     <?php endforeach; ?>
                 </div>
-
                 <!-- Pagination -->
                 <?php if ($pagination['total_pages'] > 1): ?>
-                <div class="flex-center mt-12" style="gap: var(--space-2);">
-                    
+                <nav class="pagination-container" aria-label="Pagination">
                     <?php if ($pagination['current'] > 1): ?>
-                    <a href="<?= updateQueryParam('page', $pagination['current'] - 1) ?>" 
-                       class="btn btn-secondary btn-sm">
+                    <a href="<?= updateQueryParam('page', $pagination['current'] - 1) ?>"
+                       class="btn btn-secondary btn-sm"
+                       rel="prev">
                         ← Précédent
                     </a>
                     <?php endif; ?>
-
-                    <?php for ($i = max(1, $pagination['current'] - 2); $i <= min($pagination['total_pages'], $pagination['current'] + 2); $i++): ?>
-                    <a href="<?= updateQueryParam('page', $i) ?>" 
-                       class="btn btn-sm <?= $i == $pagination['current'] ? 'btn-primary' : 'btn-secondary' ?>">
+                    <?php
+                    $start = max(1, $pagination['current'] - 2);
+                    $end = min($pagination['total_pages'], $pagination['current'] + 2);
+                    for ($i = $start; $i <= $end; $i++):
+                    ?>
+                    <a href="<?= updateQueryParam('page', $i) ?>"
+                       class="btn btn-sm <?= $i == $pagination['current'] ? 'btn-primary' : 'btn-secondary' ?>"
+                       <?= $i == $pagination['current'] ? 'aria-current="page"' : '' ?>>
                         <?= $i ?>
                     </a>
                     <?php endfor; ?>
-
                     <?php if ($pagination['current'] < $pagination['total_pages']): ?>
-                    <a href="<?= updateQueryParam('page', $pagination['current'] + 1) ?>" 
-                       class="btn btn-secondary btn-sm">
+                    <a href="<?= updateQueryParam('page', $pagination['current'] + 1) ?>"
+                       class="btn btn-secondary btn-sm"
+                       rel="next">
                         Suivant →
                     </a>
                     <?php endif; ?>
-
-                </div>
+                </nav>
                 <?php endif; ?>
-
             <?php endif; ?>
-
         </main>
-
     </div>
-
 </div>
-
-<!-- JavaScript -->
-<script>
-// Fonction helper pour mettre à jour les query params
-function updateQueryParam(key, value) {
-    const url = new URL(window.location.href);
-    url.searchParams.set(key, value);
-    return url.toString();
-}
-
-// Filtres de prix avec mise à jour en temps réel
-const priceMin = document.getElementById('priceMin');
-const priceMax = document.getElementById('priceMax');
-const priceMinLabel = document.getElementById('priceMinLabel');
-const priceMaxLabel = document.getElementById('priceMaxLabel');
-
-if (priceMin && priceMax) {
-    let priceTimeout;
-    
-    priceMin.addEventListener('input', function() {
-        priceMinLabel.textContent = formatPrice(this.value);
-        
-        clearTimeout(priceTimeout);
-        priceTimeout = setTimeout(() => {
-            applyPriceFilter();
-        }, 500);
-    });
-    
-    priceMax.addEventListener('input', function() {
-        priceMaxLabel.textContent = formatPrice(this.value);
-        
-        clearTimeout(priceTimeout);
-        priceTimeout = setTimeout(() => {
-            applyPriceFilter();
-        }, 500);
-    });
-}
-
-function applyPriceFilter() {
-    const url = new URL(window.location.href);
-    url.searchParams.set('min_price', priceMin.value);
-    url.searchParams.set('max_price', priceMax.value);
-    window.location.href = url.toString();
-}
-
-function formatPrice(price) {
-    return parseFloat(price).toFixed(2).replace('.', ',') + ' €';
-}
-
-// Animation des cards au scroll
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeIn 0.5s ease-out';
-        }
-    });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.product-card').forEach(card => {
-    observer.observe(card);
-});
-</script>
-
 <style>
+/* Layout principal */
+.catalog-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-8);
+}
+
+/* Sidebar */
+.filters-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    transition: all 0.3s ease;
+}
+
+.filters-card {
+    padding: var(--space-6);
+}
+
+.filter-section {
+    margin-bottom: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-color);
+}
+
+.filter-section:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.filter-title {
+    font-size: 1rem;
+    margin-bottom: var(--space-4);
+    font-weight: 600;
+}
+
+/* Catégories */
+.categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    margin-bottom: var(--space-2);
+}
+
+.category-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.category-link:hover {
+    background: var(--bg-secondary);
+}
+
+.category-link.active {
+    color: var(--primary-600);
+    font-weight: 600;
+}
+
+.category-icon {
+    margin-right: var(--space-2);
+}
+
+.category-link .count {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+/* Filtres de prix */
+.price-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.price-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.price-range {
+    width: 100%;
+    cursor: pointer;
+    accent-color: var(--primary-600);
+    height: 6px;
+    border-radius: 3px;
+}
+
+.price-labels {
+    display: flex;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    justify-content: space-between;
+}
+
+/* Tags */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.badge-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.badge-secondary:hover {
+    background: var(--primary-100);
+    color: var(--primary-600);
+}
+
+/* Toolbar */
+.catalog-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    padding: var(--space-3);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+}
+
+.results-count {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.sort-container {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+}
+
+.sort-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.form-select {
+    min-width: 180px;
+    padding: var(--space-2) var(--space-3);
+}
+
+/* Grille de produits */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+/* Card produit - Marges intérieures améliorées */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.product-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 66.67%;
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-content {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--space-3);
+}
+
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.product-rating {
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+}
+
+.rating-star {
+    color: var(--warning);
+    font-size: 0.875rem;
+}
+
+.rating-score {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.rating-count {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.product-title {
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.4;
+    min-height: 2.8em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.product-title a:hover {
+    color: var(--primary-600);
+}
+
+.product-seller {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    margin: 0;
+}
+
+.seller-link {
+    color: var(--primary-600);
+    text-decoration: none;
+}
+
+.seller-link:hover {
+    text-decoration: underline;
+}
+
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-color);
+    gap: var(--space-3);
+}
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.product-price {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--primary-600);
+    line-height: 1;
+}
+
+.product-price-original {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    text-decoration: line-through;
+}
+
+.product-actions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.btn-wishlist {
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 38px;
+}
+
+.btn-wishlist:hover {
+    border-color: var(--primary-600);
+    background: var(--primary-50);
+}
+
+.btn-wishlist.in-wishlist {
+    background: var(--error-50);
+    border-color: var(--error-600);
+}
+
+.wishlist-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.product-stats {
+    display: flex;
+    gap: var(--space-4);
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    padding-top: var(--space-2);
+}
+
+/* État vide */
+.empty-state {
+    padding: var(--space-16) var(--space-8);
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+}
+
+.empty-title {
+    margin-bottom: var(--space-3);
+}
+
+.empty-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-12);
+    flex-wrap: wrap;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Responsive */
+.toggle-filters {
+    display: none;
+}
+
+/* Tablette - 1024px et moins */
 @media (max-width: 1024px) {
-    [style*="grid-template-columns: 280px 1fr"] {
-        grid-template-columns: 1fr !important;
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
     }
     
-    aside {
-        position: relative !important;
-        top: 0 !important;
+    .filters-sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 320px;
+        height: 100vh;
+        background: var(--bg-primary);
+        z-index: 1000;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease;
+    }
+    
+    .filters-sidebar.active {
+        left: 0;
+    }
+    
+    .toggle-filters {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: var(--space-5);
     }
 }
 
+/* Tablette moyenne - 768px et moins */
 @media (max-width: 768px) {
-    .grid-4 {
-        grid-template-columns: repeat(2, 1fr) !important;
+    .container {
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
+    }
+    
+    .catalog-toolbar {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
+    
+    .results-count {
+        order: 2;
+        flex: 1;
+        text-align: center;
+        font-size: 0.875rem;
+    }
+    
+    .toggle-filters {
+        order: 1;
+    }
+    
+    .sort-container {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .form-select {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-4);
+    }
+    
+    .product-content {
+        padding: var(--space-4);
+        gap: var(--space-2);
+    }
+    
+    .product-title {
+        font-size: 0.95rem;
+        min-height: 2.6em;
+    }
+    
+    .product-price {
+        font-size: 1.15rem;
+    }
+    
+    .product-stats {
+        gap: var(--space-3);
+        font-size: 0.75rem;
+    }
+    
+    .filters-sidebar {
+        width: 280px;
     }
 }
 
+/* Mobile - 480px et moins */
 @media (max-width: 480px) {
-    .grid-4 {
-        grid-template-columns: 1fr !important;
+    .container {
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
+    }
+    
+    .mb-8 h1 {
+        font-size: 1.5rem;
+    }
+    
+    .catalog-toolbar {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+    
+    .results-count {
+        font-size: 0.8rem;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+    
+    .product-card {
+        max-width: 100%;
+    }
+    
+    .product-content {
+        padding: var(--space-3);
+    }
+    
+    .product-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .product-title {
+        font-size: 0.9rem;
+    }
+    
+    .product-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+    
+    .price-container {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-2);
+    }
+    
+    .product-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .btn-wishlist {
+        flex: 0 0 auto;
+    }
+    
+    .product-actions .btn {
+        flex: 1;
+    }
+    
+    .pagination-container {
+        gap: var(--space-1);
+        margin-top: var(--space-8);
+    }
+    
+    .pagination-container .btn {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.875rem;
+        min-width: 38px;
+    }
+    
+    .filters-sidebar {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .filters-card {
+        padding: var(--space-4);
+    }
+}
+
+/* Très petit mobile - 360px et moins */
+@media (max-width: 360px) {
+    .product-price {
+        font-size: 1rem;
+    }
+    
+    .product-stats {
+        font-size: 0.7rem;
+        gap: var(--space-2);
+    }
+    
+    .pagination-container .btn {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.8rem;
+    }
+}
+
+/* Overlay pour le menu mobile */
+.filters-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+@media (max-width: 1024px) {
+    .filters-overlay.active {
+        display: block;
     }
 }
 </style>
+<script>
+// Filtres de prix avec debouncing et validation min/max
+(function() {
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+    const priceMinLabel = document.getElementById('priceMinLabel');
+    const priceMaxLabel = document.getElementById('priceMaxLabel');
+    if (!priceMin || !priceMax) return;
+    let priceTimeout;
+    function formatPrice(price) {
+        return parseFloat(price).toFixed(2).replace('.', ',') + ' €';
+    }
+    function applyPriceFilter() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('min_price', priceMin.value);
+        url.searchParams.set('max_price', priceMax.value);
+        window.location.href = url.toString();
+    }
+    function updateLabels() {
+        priceMinLabel.textContent = formatPrice(priceMin.value);
+        priceMaxLabel.textContent = formatPrice(priceMax.value);
+    }
+    priceMin.addEventListener('input', function() {
+        if (parseFloat(this.value) > parseFloat(priceMax.value)) {
+            this.value = priceMax.value;
+        }
+        updateLabels();
+        clearTimeout(priceTimeout);
+        priceTimeout = setTimeout(applyPriceFilter, 500);
+    });
+    priceMax.addEventListener('input', function() {
+        if (parseFloat(this.value) < parseFloat(priceMin.value)) {
+            this.value = priceMin.value;
+        }
+        updateLabels();
+        clearTimeout(priceTimeout);
+        priceTimeout = setTimeout(applyPriceFilter, 500);
+    });
+})();
 
-<?php
-// Helper function pour les query params
-function updateQueryParam($key, $value) {
-    $params = $_GET;
-    $params[$key] = $value;
-    return '/products?' . http_build_query($params);
-}
-?>
+// Animation des cards au scroll
+(function() {
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '50px'
+    });
+    document.querySelectorAll('.product-card').forEach(card => {
+        observer.observe(card);
+    });
+})();
+
+// Gestion des boutons wishlist
+document.addEventListener('click', async function(e) {
+    if (e.target.closest('.btn-wishlist')) {
+        const btn = e.target.closest('.btn-wishlist');
+        const productId = btn.dataset.productId;
+        const isAdding = !btn.classList.contains('in-wishlist');
+       
+        try {
+            const url = isAdding ? '/wishlist/add' : '/wishlist/remove';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ product_id: productId, add: isAdding })
+            });
+           
+            if (response.ok) {
+                btn.classList.toggle('in-wishlist');
+                const icon = btn.querySelector('.wishlist-icon');
+                icon.textContent = btn.classList.contains('in-wishlist') ? '❤️' : '🤍';
+                btn.title = btn.classList.contains('in-wishlist') ? 'Retirer des favoris' : 'Ajouter aux favoris';
+                btn.setAttribute('aria-label', btn.title);
+            } else {
+                console.error('Erreur lors de la mise à jour de la wishlist');
+            }
+        } catch (error) {
+            console.error('Erreur réseau:', error);
+        }
+    }
+});
+
+// Toggle filtres sur mobile avec overlay
+(function() {
+    const toggleBtn = document.getElementById('toggleFilters');
+    const sidebar = document.querySelector('.filters-sidebar');
+    if (!toggleBtn || !sidebar) return;
+
+    // Créer l'overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'filters-overlay';
+    document.body.appendChild(overlay);
+
+    function openFilters() {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        toggleBtn.textContent = 'Fermer filtres';
+        toggleBtn.setAttribute('aria-label', 'Fermer les filtres');
+        document.body.style.overflow = 'hidden'; // Empêcher le scroll
+    }
+
+    function closeFilters() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        toggleBtn.textContent = 'Filtres';
+        toggleBtn.setAttribute('aria-label', 'Ouvrir les filtres');
+        document.body.style.overflow = ''; // Restaurer le scroll
+    }
+
+    toggleBtn.addEventListener('click', function() {
+        if (sidebar.classList.contains('active')) {
+            closeFilters();
+        } else {
+            openFilters();
+        }
+    });
+
+    // Fermer les filtres si clic sur l'overlay
+    overlay.addEventListener('click', closeFilters);
+
+    // Fermer avec la touche Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+            closeFilters();
+        }
+    });
+})();
+</script>

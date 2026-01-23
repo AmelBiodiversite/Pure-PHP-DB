@@ -20,17 +20,46 @@ class OrderController extends Controller {
     }
 
     /**
-     * Liste des commandes de l'utilisateur
-     */
-    public function index() {
-        $userId = $_SESSION['user_id'];
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $perPage = 10;
-
-        // Récupérer les commandes
+     /**
+ * Liste des commandes de l'utilisateur
+ */
+public function index() {
+    $user = getCurrentUser();
+    $userId = $user['id'];
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $perPage = 10;
+    
+    // Vérifier le rôle
+    if ($user['role'] === 'seller') {
+        // Pour un vendeur : ses ventes
+        $orders = $this->orderModel->getSellerOrders($userId, $perPage * 10);
+        
+        // Statistiques vendeur
+        $stmt = $this->db->prepare("
+            SELECT 
+                COUNT(*) as total_orders,
+                SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_revenue,
+                COUNT(DISTINCT oi.product_id) as total_products
+            FROM orders o
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            WHERE o.seller_id = ?
+        ");
+        $stmt->execute([$userId]);
+        $stats = $stmt->fetch();
+        
+        $this->view('orders/index', [
+            'title' => 'Mes Ventes',
+            'orders' => $orders,
+            'stats' => $stats,
+            'current_page' => $page,
+            'is_seller' => true
+        ]);
+        
+    } else {
+        // Pour un acheteur : ses achats
         $orders = $this->orderModel->getUserOrders($userId, $perPage * 10);
-
-        // Calculer les statistiques
+        
+        // Statistiques acheteur
         $stmt = $this->db->prepare("
             SELECT 
                 COUNT(*) as total_orders,
@@ -42,14 +71,16 @@ class OrderController extends Controller {
         ");
         $stmt->execute([$userId]);
         $stats = $stmt->fetch();
-
+        
         $this->view('orders/index', [
             'title' => 'Mes Commandes',
             'orders' => $orders,
             'stats' => $stats,
-            'current_page' => $page
+            'current_page' => $page,
+            'is_seller' => false
         ]);
     }
+}
 
     /**
      * Détail d'une commande

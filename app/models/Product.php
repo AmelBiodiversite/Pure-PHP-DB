@@ -276,7 +276,8 @@ class Product extends Model {
                    u.username as seller_username,
                    u.full_name as seller_name,
                    u.rating_average as seller_rating,
-                   c.name as category_name
+                   c.name as category_name,
+                   c.slug as category_slug
             FROM products p
             LEFT JOIN users u ON p.seller_id = u.id
             LEFT JOIN categories c ON p.category_id = c.id
@@ -291,13 +292,30 @@ class Product extends Model {
     /**
      * Catalogue produits avec filtres + pagination.
      */
+    /**
+     * Catalogue produits avec filtres + pagination.
+     * 
+     * @param array $filters Filtres disponibles :
+     *                       - category_id : ID de catégorie
+     *                       - search : Recherche texte
+     *                       - min_price : Prix minimum
+     *                       - max_price : Prix maximum
+     *                       - sort : Tri (newest, price_asc, price_desc, popular)
+     * @param int $page Numéro de page (commence à 1)
+     * @param int $perPage Nombre de produits par page
+     * @return array Tableau avec products, total, page, total_pages
+     */
     public function getProducts($filters = [], $page = 1, $perPage = 24) {
-        $sql = "SELECT p.*, u.username as seller_name, c.name as category_name
+        // Construction de la requête SQL de base
+        $sql = "SELECT p.*, 
+                       u.username as seller_name, 
+                       c.name as category_name
                 FROM products p
                 LEFT JOIN users u ON p.seller_id = u.id
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.status = 'approved'";
 
+        // Tableau pour stocker les paramètres PDO
         $params = [];
 
         // Application des filtres dynamiques
@@ -311,54 +329,92 @@ class Product extends Model {
             $params['search'] = '%' . $filters['search'] . '%';
         }
 
-        if (isset($filters['min_price'])) {
+        if (isset($filters['min_price']) && $filters['min_price'] !== '') {
             $sql .= " AND p.price >= :min_price";
             $params['min_price'] = $filters['min_price'];
         }
 
-        if (isset($filters['max_price'])) {
+        if (isset($filters['max_price']) && $filters['max_price'] !== '') {
             $sql .= " AND p.price <= :max_price";
             $params['max_price'] = $filters['max_price'];
         }
 
         // Gestion du tri
-        match ($filters['sort'] ?? 'newest') {
-            'price_asc'  => $sql .= " ORDER BY p.price ASC",
-            'price_desc'=> $sql .= " ORDER BY p.price DESC",
-            'popular'   => $sql .= " ORDER BY p.sales DESC",
-            default     => $sql .= " ORDER BY p.created_at DESC"
+        $sortSql = match ($filters['sort'] ?? 'newest') {
+            'price_asc'  => " ORDER BY p.price ASC",
+            'price_desc' => " ORDER BY p.price DESC",
+            'popular'    => " ORDER BY p.sales DESC",
+            default      => " ORDER BY p.created_at DESC"
         };
+        $sql .= $sortSql;
 
         // Pagination
         $offset = ($page - 1) * $perPage;
         $sql .= " LIMIT :limit OFFSET :offset";
 
+        // Préparation de la requête
         $stmt = $this->db->prepare($sql);
 
+        // Bind des paramètres
         foreach ($params as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
 
-        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', (int)$perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
 
+        // Exécution
         $stmt->execute();
+        $products = $stmt->fetchAll();
+
+        // Comptage total avec les mêmes filtres
+        $total = $this->countFilteredProducts($params);
 
         return [
-            'products'     => $stmt->fetchAll(),
-            'total'        => $this->countFilteredProducts($params),
+            'products'     => $products,
+            'total'        => $total,
             'page'         => $page,
-            'total_pages'  => ceil($this->countFilteredProducts($params) / $perPage)
+            'total_pages'  => ceil($total / $perPage)
         ];
     }
 
     /**
-     * Compte les produits pour la pagination.
+     * Compte les produits correspondant aux filtres.
+     * 
+     * @param array $params Paramètres de filtrage (mêmes que getProducts)
+     * @return int Nombre total de produits
      */
     private function countFilteredProducts($params) {
+        // Construction de la requête COUNT avec les mêmes conditions
         $sql = "SELECT COUNT(*) FROM products p WHERE p.status = 'approved'";
+
+        // Reconstruction des conditions (doit correspondre à getProducts)
+        if (isset($params['category_id'])) {
+            $sql .= " AND p.category_id = :category_id";
+        }
+
+        if (isset($params['search'])) {
+            $sql .= " AND (p.title ILIKE :search OR p.description ILIKE :search)";
+        }
+
+        if (isset($params['min_price'])) {
+            $sql .= " AND p.price >= :min_price";
+        }
+
+        if (isset($params['max_price'])) {
+            $sql .= " AND p.price <= :max_price";
+        }
+
+        // Préparation et exécution
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
+        
+        // Bind des paramètres
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        
+        $stmt->execute();
+        
         return (int)$stmt->fetchColumn();
     }
 

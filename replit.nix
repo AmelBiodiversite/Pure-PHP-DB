@@ -1,5 +1,8 @@
 { pkgs }: {
   deps = [
+    pkgs.zip
+    pkgs.rsync
+    pkgs.php82Packages.composer-local-repo-plugin
     pkgs.nano
     pkgs.tree
     pkgs.php82

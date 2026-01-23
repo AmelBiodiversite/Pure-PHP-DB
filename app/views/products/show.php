@@ -8,19 +8,17 @@
 <div class="container mt-8 mb-16">
 
     <!-- Breadcrumb -->
-    <nav style="margin-bottom: var(--space-6); font-size: 0.875rem; color: var(--text-tertiary);">
+        <nav style="margin-bottom: var(--space-6); font-size: 0.875rem; color: var(--text-tertiary); position: relative; z-index: 1;">
         <a href="/" style="color: var(--text-tertiary);">Accueil</a>
         <span style="margin: 0 var(--space-2);">/</span>
         <a href="/products" style="color: var(--text-tertiary);">Produits</a>
         <span style="margin: 0 var(--space-2);">/</span>
-        <?php if (!empty($product['category_slug'])): ?>
+<?php if (!empty($product['category_slug'])): ?>
     <a href="/category/<?= e($product['category_slug']) ?>" style="color: var(--text-tertiary);">
         <?= e($product['category_name']) ?>
     </a>
-<?php else: ?>
-    <span style="color: var(--text-tertiary);">Produits</span>
+    <span style="margin: 0 var(--space-2);">/</span>
 <?php endif; ?>
-        <span style="margin: 0 var(--space-2);">/</span>
         <span style="color: var(--text-primary);"><?= e($product['title']) ?></span>
     </nav>
 
@@ -289,43 +287,41 @@
 
                 <!-- Boutons d'action -->
                 <form method="POST" action="/cart/add" style="margin-bottom: var(--space-4);">
-                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                    <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
                     <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                     <?php
                     // Vérifier si le produit est déjà dans la wishlist
                     $inWishlist = false;
                     if (isset($_SESSION['user_id'])) {
-                        $wishlistModel = new Wishlist();
+                        $wishlistModel = new \App\Models\Wishlist();
                         $inWishlist = $wishlistModel->exists($_SESSION['user_id'], $product['id']);
                     }
                     ?>
                     
                     <!-- Bouton Wishlist (Favoris) -->
-                    <button 
-                        type="button" 
-                        class="btn-wishlist <?= $inWishlist ? 'in-wishlist' : '' ?>" 
-                        data-product-id="<?= $product['id'] ?>"
-                        style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; background: white; border-radius: 8px; font-size: 1.125rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 0.75rem;"
-                        title="<?= $inWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                        <span style="font-size: 1.5rem;"><?= $inWishlist ? '❤️' : '🤍' ?></span>
-                        <?= $inWishlist ? 'Dans mes favoris' : 'Ajouter aux favoris' ?>
-                    </button>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <button 
+                            type="button" 
+                            class="btn-wishlist <?= $inWishlist ? 'in-wishlist' : '' ?>" 
+                            data-product-id="<?= $product['id'] ?>"
+                            style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; background: white; border-radius: 8px; font-size: 1.125rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 0.75rem;"
+                            title="<?= $inWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                            <span style="font-size: 1.5rem;"><?= $inWishlist ? '❤️' : '🤍' ?></span>
+                            <?= $inWishlist ? 'Dans mes favoris' : 'Ajouter aux favoris' ?>
+                        </button>
+                    <?php else: ?>
+                        <a href="/login" 
+                            style="display: block; width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; background: white; border-radius: 8px; font-size: 1.125rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 0.75rem; text-align: center; text-decoration: none; color: inherit;">
+                            <span style="font-size: 1.5rem;">🤍</span>
+                            Connectez-vous pour ajouter aux favoris
+                        </a>
+                    <?php endif; ?>
                     
-                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.125rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.125rem;; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-6);">
                         🛒 Ajouter au panier
                     </button>
                 </form>
 
-                <button 
-                    onclick="toggleWishlist(<?= $product['id'] ?>)"
-                    class="btn btn-outline" 
-                    id="wishlistBtn"
-                    style="width: 100%;">
-                    <?= $in_wishlist ? '💖' : '🤍' ?> 
-                    <?= $in_wishlist ? 'Dans les favoris' : 'Ajouter aux favoris' ?>
-                </button>
-
-                <!-- Infos -->
                 <div style="
                     margin-top: var(--space-6);
                     padding-top: var(--space-6);
@@ -334,12 +330,12 @@
                     <div style="display: flex; flex-direction: column; gap: var(--space-4); font-size: 0.875rem;">
                         <div class="flex-between">
                             <span style="color: var(--text-tertiary);">Type de fichier</span>
-                            <span style="font-weight: 600;"><?= strtoupper($product['file_type']) ?></span>
+                            <span style="font-weight: 600;"><?= !empty($product['file_type']) ? strtoupper($product['file_type']) : 'N/A' ?></span>
                         </div>
-                        <?php if ($product['file_size']): ?>
+                        <?php if (!empty($product['file_size']) && $product['file_size'] > 0): ?>
                         <div class="flex-between">
                             <span style="color: var(--text-tertiary);">Taille</span>
-                            <span style="font-weight: 600;"><?= number_format($product['file_size'] / 1024, 1) ?> MB</span>
+                            <span style="font-weight: 600;"><?= formatFileSize($product['file_size']) ?></span>
                         </div>
                         <?php endif; ?>
                         <div class="flex-between">
@@ -352,7 +348,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Garanties -->
                 <div style="
                     margin-top: var(--space-6);
@@ -374,7 +369,7 @@
             <div class="card" style="padding: var(--space-6); margin-top: var(--space-6);">
                 <h4 style="margin-bottom: var(--space-4); font-size: 1rem;">Vendu par</h4>
                 
-                <div class="flex gap-3 mb-4" style="align-items: center;">
+                <div class="flex gap-4 mb-4" style="align-items: center;">
                     <div style="
                         width: 50px;
                         height: 50px;
@@ -406,7 +401,7 @@
     Créateur sur MarketFlow Pro
 </p>
 
-                <a href="/seller/<?= e($product['seller_name']) ?>" class="btn btn-ghost" style="width: 100%;">
+                <a href="/seller/<?= e($product['seller_username']) ?>/products" class="btn btn-ghost" style="width: 100%;">
                     Voir la boutique →
                 </a>
             </div>
@@ -423,7 +418,7 @@
             <?php foreach ($related_products as $rp): ?>
             <div class="product-card">
                 <a href="/products/<?= e($rp['slug']) ?>">
-                    <img src="<?= e($rp['thumbnail']) ?>" alt="<?= e($rp['title']) ?>" class="product-image">
+                    <img src="<?= e($rp['thumbnail_url'] ?? $rp['thumbnail_url'] ?? $rp['thumbnail'] ?? '/public/img/placeholder.png' ?? '/public/img/placeholder.png') ?>" alt="<?= e($rp['title']) ?>" style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-md);" class="product-image">
                 </a>
                 <div class="product-content">
                     <h3 class="product-title">
@@ -441,7 +436,6 @@
     <?php endif; ?>
 
 </div>
-
 <!-- JavaScript -->
 <script>
 // Changement d'image principale
@@ -482,40 +476,96 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
-// Toggle wishlist
-async function toggleWishlist(productId) {
-    try {
-        const response = await fetch('/api/products/wishlist', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `product_id=${productId}`
-        });
+// Gestion des boutons wishlist
+document.querySelectorAll('.btn-wishlist').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const productId = this.dataset.productId;
+        const isInWishlist = this.classList.contains('in-wishlist');
         
-        const data = await response.json();
-        
-        if (data.success) {
-            const btn = document.getElementById('wishlistBtn');
-            if (data.action === 'added') {
-                btn.innerHTML = '💖 Dans les favoris';
-            } else {
-                btn.innerHTML = '🤍 Ajouter aux favoris';
-            }
+        try {
+            const url = isInWishlist ? '/wishlist/remove' : '/wishlist/add';
             
-            MarketFlow.Toast.show(data.message, 'success');
-        } else {
-            if (response.status === 401) {
-                window.location.href = '/login';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_id: productId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Inverser l'état du bouton
+                if (isInWishlist) {
+                    // Retirer des favoris
+                    this.classList.remove('in-wishlist');
+                    this.innerHTML = '<span style="font-size: 1.5rem;">🤍</span> Ajouter aux favoris';
+                    this.title = 'Ajouter aux favoris';
+                } else {
+                    // Ajouter aux favoris
+                    this.classList.add('in-wishlist');
+                    this.innerHTML = '<span style="font-size: 1.5rem;">❤️</span> Dans mes favoris';
+                    this.title = 'Retirer des favoris';
+                }
+                
+                // Toast notification
+                if (typeof MarketFlow !== 'undefined' && MarketFlow.Toast) {
+                    MarketFlow.Toast.show(data.message || 'Favoris mis à jour', 'success');
+                } else {
+                    // Fallback si pas de système de toast
+                    console.log(data.message || 'Favoris mis à jour');
+                }
             } else {
-                MarketFlow.Toast.show(data.error, 'error');
+                alert(data.message || 'Une erreur est survenue');
             }
+        } catch (error) {
+            console.error('Erreur wishlist:', error);
+            alert('Une erreur est survenue. Veuillez réessayer.');
         }
-    } catch (error) {
-        console.error('Erreur:', error);
-        MarketFlow.Toast.show('Une erreur est survenue', 'error');
-    }
-}
+    });
+});
+
+// Système de notation par étoiles pour les avis
+document.querySelectorAll('.star-input').forEach(star => {
+    star.addEventListener('click', function() {
+        const value = this.dataset.value;
+        document.getElementById('rating-input').value = value;
+        
+        // Mettre à jour l'affichage visuel
+        document.querySelectorAll('.star-input').forEach((s, index) => {
+            if (index < value) {
+                s.style.color = 'var(--warning)';
+            } else {
+                s.style.color = 'var(--border-color)';
+            }
+        });
+    });
+    
+    // Effet hover
+    star.addEventListener('mouseenter', function() {
+        const value = this.dataset.value;
+        document.querySelectorAll('.star-input').forEach((s, index) => {
+            if (index < value) {
+                s.style.color = 'var(--warning)';
+            } else {
+                s.style.color = 'var(--border-color)';
+            }
+        });
+    });
+});
+
+// Rétablir les étoiles sélectionnées au mouseout
+document.querySelector('.star-rating')?.addEventListener('mouseleave', function() {
+    const selectedValue = document.getElementById('rating-input')?.value || 0;
+    document.querySelectorAll('.star-input').forEach((s, index) => {
+        if (index < selectedValue) {
+            s.style.color = 'var(--warning)';
+        } else {
+            s.style.color = 'var(--border-color)';
+        }
+    });
+});
 </script>
 
 <style>

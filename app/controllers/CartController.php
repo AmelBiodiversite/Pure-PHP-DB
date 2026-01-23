@@ -26,7 +26,7 @@ class CartController extends Controller {
         $cartData = $this->cart->getCheckoutData();
         $promo = $this->cart->getPromoCode();
 
-        $this->view('cart/index', [
+        $this->render('cart/index', [
             'title' => 'Mon Panier',
             'cart' => $cartData,
             'promo' => $promo,

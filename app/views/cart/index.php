@@ -210,7 +210,7 @@ async function proceedToCheckout() {
     btn.textContent = 'Redirection...';
     
     try {
-        const response = await fetch('/checkout/create-session', {
+        const response = await fetch('/stripe/create-checkout-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
