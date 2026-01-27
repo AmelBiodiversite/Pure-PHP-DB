@@ -127,7 +127,7 @@
                         align-items:center;
                         justify-content:center;
                     ">
-                        <?= $wishlistCount ?>
+                        <?= e($wishlistCount) ?>
                     </span>
                     <?php endif; ?>
                 </a>
@@ -150,7 +150,7 @@
                     align-items:center;
                     justify-content:center;
                 ">
-                    <?= $cartCount ?>
+                    <?= e($cartCount) ?>
                 </span>
                 <?php endif; ?>
             </a>
@@ -283,22 +283,54 @@
                     <?php endif; ?>
 
                     <?php if ($currentUser['role']==='admin'): ?>
-                        <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-                        <a href="/admin" style="
-                            display: block;
-                            padding: 0.75rem 1rem;
-                            border-radius: 8px;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            text-decoration: none;
-                            transition: all 0.2s;
-                            font-weight: 600;
-                            font-size: 0.95rem;
-                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-                        " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
-                            👑 Administration
-                        </a>
-                    <?php endif; ?>
+    <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
+    
+    <!-- Lien Administration -->
+    <a href="/admin" style="
+        display: block;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
+        👑 Administration
+    </a>
+    
+    <!-- Lien Monitoring Sécurité -->
+    <?php $criticalCount = getSecurityAlerts(); ?>
+    
+    <a href="/admin/security" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        <?= $criticalCount > 0 ? 'background: rgba(245, 87, 108, 0.1);' : '' ?>
+        color: <?= $criticalCount > 0 ? '#f5576c' : 'var(--text-primary)' ?>;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        <?= $criticalCount > 0 ? 'font-weight: 600;' : '' ?>
+    " onmouseover="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.15)' : 'var(--bg-secondary)' ?>'" onmouseout="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.1)' : 'transparent' ?>'">
+        <span>🔒 Monitoring Sécurité</span>
+        <?php if ($criticalCount > 0): ?>
+            <span style="
+                background: #f5576c;
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 700;
+                padding: 0.15rem 0.5rem;
+                border-radius: 12px;
+                margin-left: 0.5rem;
+            "><?= $criticalCount ?></span>
+        <?php endif; ?>
+    </a>
+<?php endif; ?>
 
                     <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
                     
@@ -333,7 +365,7 @@
 <?php if ($flash = getFlashMessage()): ?>
 
 <div data-flash-message="<?= e($flash['message']) ?>"
-     data-flash-type="<?= $flash['type'] ?>" style="display:none;"></div>
+     data-flash-type="<?= e($flash['type']) ?>" style="display:none;"></div>
 <?php endif; ?>
 
 <!-- CONTENU PRINCIPAL -->

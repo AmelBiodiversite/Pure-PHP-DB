@@ -88,7 +88,7 @@
                         <!-- Téléchargement -->
                         <div style="text-align: right;">
                             <a 
-                                href="/orders/<?= e($order['order_number']) ?>/download/<?= $item['id'] ?>" 
+                                href="/orders/<?= e($order['order_number']) ?>/download/<?= e($item['id']) ?>" 
                                 class="btn btn-primary btn-sm"
                             >
                                 📥 Télécharger

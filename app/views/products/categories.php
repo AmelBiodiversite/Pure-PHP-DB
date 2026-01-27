@@ -41,7 +41,7 @@
                 <?php endif; ?>
                 
                 <div class="text-primary-600 font-semibold text-sm">
-                    <?= $category['product_count'] ?> produit<?= $category['product_count'] > 1 ? 's' : '' ?>
+                    <?= e($category['product_count']) ?> produit<?= $category['product_count'] > 1 ? 's' : '' ?>
                 </div>
             </a>
         <?php endforeach; ?>

@@ -100,9 +100,9 @@
                                     align-items: center;
                                     gap: var(--space-2);
                                 ">
-                                    <span id="license-<?= $item['id'] ?>"><?= e($item['license_key']) ?></span>
+                                    <span id="license-<?= e($item['id']) ?>"><?= e($item['license_key']) ?></span>
                                     <button 
-                                        onclick="copyLicense('<?= e($item['license_key']) ?>', <?= $item['id'] ?>)"
+                                        onclick="copyLicense('<?= e($item['license_key']) ?>', <?= e($item['id']) ?>)"
                                         class="btn btn-ghost btn-sm"
                                         style="padding: var(--space-1) var(--space-2);"
                                         title="Copier"
@@ -120,7 +120,7 @@
                             <?php if ($order['payment_status'] === 'completed'): ?>
                                 
                                 <a 
-                                    href="/orders/<?= e($order['order_number']) ?>/download/<?= $item['id'] ?>" 
+                                    href="/orders/<?= e($order['order_number']) ?>/download/<?= e($item['id']) ?>" 
                                     class="btn btn-primary"
                                     style="margin-bottom: var(--space-3);"
                                 >
@@ -128,7 +128,7 @@
                                 </a>
 
                                 <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                    <?= $item['download_count'] ?>/<?= $item['download_limit'] ?> téléchargements
+                                    <?= e($item['download_count']) ?>/<?= e($item['download_limit']) ?> téléchargements
                                 </div>
 
                                 <!-- Laisser un avis -->
@@ -141,7 +141,7 @@
 
                                 <?php if (!$hasReview): ?>
                                 <button 
-                                    onclick="openReviewModal(<?= $item['id'] ?>, <?= $item['product_id'] ?>, '<?= e($item['product_title']) ?>')"
+                                    onclick="openReviewModal(<?= e($item['id']) ?>, <?= e($item['product_id']) ?>, '<?= e($item['product_title']) ?>')"
                                     class="btn btn-ghost btn-sm"
                                     style="margin-top: var(--space-2);"
                                 >
@@ -305,7 +305,7 @@ function openReviewModal(orderItemId, productId, productTitle) {
     
     const content = `
         <form method="POST" action="/orders/review" id="reviewForm">
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
             <input type="hidden" name="order_item_id" value="${orderItemId}">
             <input type="hidden" name="product_id" value="${productId}">
             
@@ -356,7 +356,7 @@ function openRefundModal() {
     
     const content = `
         <form method="POST" action="/orders/refund" id="refundForm">
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
             <input type="hidden" name="order_number" value="<?= e($order['order_number']) ?>">
             
             <div style="padding: var(--space-4); background: var(--warning-light); border-radius: var(--radius); margin-bottom: var(--space-6);">

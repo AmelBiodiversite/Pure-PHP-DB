@@ -98,7 +98,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                             <tr class="border-b border-gray-100 hover:bg-bg-secondary transition-all duration-200">
                                 <!-- Checkbox -->
                                 <td class="p-3">
-                                    <input type="checkbox" name="bulk[]" value="<?= $product['id'] ?>" aria-label="Sélectionner produit <?= $product['id'] ?>">
+                                    <input type="checkbox" name="bulk[]" value="<?= e($product['id']) ?>" aria-label="Sélectionner produit <?= e($product['id']) ?>">
                                 </td>
                                 
                                 <!-- Produit -->
@@ -119,7 +119,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                             <p class="font-semibold truncate" style="max-width: 220px;" title="<?= htmlspecialchars($product['title']) ?>">
                                                 <?= htmlspecialchars($product['title']) ?>
                                             </p>
-                                            <p class="text-text-secondary text-xs">ID: #<?= $product['id'] ?></p>
+                                            <p class="text-text-secondary text-xs">ID: #<?= e($product['id']) ?></p>
                                         </div>
                                     </div>
                                 </td>
@@ -175,14 +175,14 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                     $color = $statusColors[$product['status']] ?? 'secondary';
                                     $label = $statusLabels[$product['status']] ?? ucfirst($product['status']);
                                     ?>
-                                    <span class="badge badge-<?= $color ?> text-xs whitespace-nowrap"><?= $label ?></span>
+                                    <span class="badge badge-<?= e($color) ?> text-xs whitespace-nowrap"><?= e($label) ?></span>
                                 </td>
                                 
                                 <!-- Actions -->
                                 <td class="p-2">
                                     <div class="flex gap-1 justify-center flex-wrap">
                                         <!-- Voir détails -->
-                                        <button onclick="viewProduct(<?= $product['id'] ?>)" 
+                                        <button onclick="viewProduct(<?= e($product['id']) ?>)" 
                                                 class="btn btn-sm btn-ghost px-2 py-1" 
                                                 aria-label="Voir détails" 
                                                 title="Voir détails">
@@ -191,9 +191,9 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                         
                                         <!-- Si en attente -->
                                         <?php if ($product['status'] === 'pending'): ?>
-                                            <form method="POST" action="/admin/products/<?= $product['id'] ?>/approve" class="inline">
-                                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                            <form method="POST" action="/admin/products/<?= e($product['id']) ?>/approve" class="inline">
+                                                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+                                                <input type="hidden" name="product_id" value="<?= e($product['id']) ?>">
                                                 <button type="submit" 
                                                         class="btn btn-sm btn-success px-2 py-1" 
                                                         aria-label="Approuver" 
@@ -202,7 +202,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                                     ✓
                                                 </button>
                                             </form>
-                                            <button onclick="showRejectModal(<?= $product['id'] ?>)" 
+                                            <button onclick="showRejectModal(<?= e($product['id']) ?>)" 
                                                     class="btn btn-sm btn-error px-2 py-1" 
                                                     aria-label="Rejeter" 
                                                     title="Rejeter">
@@ -213,8 +213,8 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                         <!-- Si approuvé -->
                                         <?php if ($product['status'] === 'approved'): ?>
                                             <form method="POST" action="/admin/products/suspend" class="inline">
-                                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+                                                <input type="hidden" name="product_id" value="<?= e($product['id']) ?>">
                                                 <button type="submit" 
                                                         class="btn btn-sm btn-warning px-2 py-1" 
                                                         aria-label="Suspendre" 
@@ -228,8 +228,8 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                         <!-- Si suspendu -->
                                         <?php if ($product['status'] === 'suspended'): ?>
                                             <form method="POST" action="/admin/products/approve" class="inline">
-                                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+                                                <input type="hidden" name="product_id" value="<?= e($product['id']) ?>">
                                                 <button type="submit" 
                                                         class="btn btn-sm btn-success px-2 py-1" 
                                                         aria-label="Réactiver" 
@@ -242,8 +242,8 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                                         
                                         <!-- Supprimer -->
                                         <form method="POST" action="/admin/products/delete" class="inline">
-                                            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+                                            <input type="hidden" name="product_id" value="<?= e($product['id']) ?>">
                                             <button type="submit" 
                                                     class="btn btn-sm btn-error px-2 py-1" 
                                                     aria-label="Supprimer" 
@@ -266,7 +266,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
                    class="btn btn-ghost <?= $current_page <= 1 ? 'opacity-50 cursor-not-allowed' : '' ?>">
                     ← Précédent
                 </a>
-                <p class="text-text-secondary text-sm">Page <?= $current_page ?> sur <?= max(1, $total_pages) ?></p>
+                <p class="text-text-secondary text-sm">Page <?= e($current_page) ?> sur <?= max(1, $total_pages) ?></p>
                 <a href="?page=<?= min($total_pages, $current_page + 1) ?>&<?= http_build_query(array_diff_key($_GET, ['page' => ''])) ?>" 
                    class="btn btn-ghost <?= $current_page >= $total_pages ? 'opacity-50 cursor-not-allowed' : '' ?>">
                     Suivant →
@@ -307,7 +307,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
             <button onclick="closeRejectModal()" class="btn btn-ghost text-2xl" aria-label="Fermer">✕</button>
         </div>
         <form method="POST" action="/admin/products/reject" class="p-6">
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
             <input type="hidden" name="product_id" id="reject_product_id">
             
             <div class="mb-6">
@@ -563,7 +563,7 @@ async function applyBulkAction() {
             body: JSON.stringify({ 
                 action, 
                 product_ids: selected, 
-                csrf_token: '<?= $csrf_token ?>' 
+                csrf_token: '<?= e($csrf_token) ?>' 
             })
         });
         

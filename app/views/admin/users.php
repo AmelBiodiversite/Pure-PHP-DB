@@ -121,14 +121,14 @@ $stats = $data['stats'] ?? [];
                                 </td>
                                 <td style="padding: 1rem;">
                                     <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                       <!-- <button onclick="viewUser(<?= $user['id'] ?>)" 
+                                       <!-- <button onclick="viewUser(<?= e($user['id']) ?>)" 
                                                 class="btn btn-sm btn-secondary" 
                                                 title="Voir détails">
                                             👁️
                                         </button>-->
                                         
                                         <?php if ($user['is_active']): ?>
-    <form method="POST" action="/admin/users/<?= $user['id'] ?>/suspend" style="display: inline;">
+    <form method="POST" action="/admin/users/<?= e($user['id']) ?>/suspend" style="display: inline;">
         <button type="submit" 
                 class="btn btn-sm btn-warning" 
                 title="Suspendre"
@@ -137,7 +137,7 @@ $stats = $data['stats'] ?? [];
         </button>
     </form>
 <?php else: ?>
-    <form method="POST" action="/admin/users/<?= $user['id'] ?>/activate" style="display: inline;">
+    <form method="POST" action="/admin/users/<?= e($user['id']) ?>/activate" style="display: inline;">
         <button type="submit" 
                 class="btn btn-sm btn-success" 
                 title="Activer"
@@ -147,7 +147,7 @@ $stats = $data['stats'] ?? [];
     </form>
 <?php endif; ?>
 
-<form method="POST" action="/admin/users/<?= $user['id'] ?>/delete" style="display: inline;">
+<form method="POST" action="/admin/users/<?= e($user['id']) ?>/delete" style="display: inline;">
     <button type="submit" 
             class="btn btn-sm btn-danger" 
             title="Supprimer"

@@ -143,6 +143,14 @@ $router->get('/api/products/{slug}', 'ApiController@product');
 $router->get('/api/categories', 'ApiController@categories');
 
 // ================================================================
+// SÉCURITÉ (Auth admin)
+// ================================================================
+
+$router->get('/admin/security', 'SecurityController@index');
+$router->get('/admin/security/api/events', 'SecurityController@apiEvents');
+$router->get('/admin/security/download/{date}', 'SecurityController@downloadLog');
+
+// ================================================================
 // DISPATCHER - TOUJOURS EN DERNIER !
 // ================================================================
 

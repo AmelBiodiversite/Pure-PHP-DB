@@ -23,8 +23,8 @@
                     <p>Prix : <?= e($product['price']) ?>€</p>
                     <p>Statut : <span class="badge"><?= e($product['status']) ?></span></p>
                     <div class="flex gap-2 mt-4">
-                        <a href="/seller/products/<?= $product['id'] ?>/edit" class="btn btn-sm btn-ghost">Modifier</a>
-                        <a href="/products/<?= $product['slug'] ?>" class="btn btn-sm btn-outline">Voir</a>
+                        <a href="/seller/products/<?= e($product['id']) ?>/edit" class="btn btn-sm btn-ghost">Modifier</a>
+                        <a href="/products/<?= e($product['slug']) ?>" class="btn btn-sm btn-outline">Voir</a>
                     </div>
                 </div>
             <?php endforeach; ?>

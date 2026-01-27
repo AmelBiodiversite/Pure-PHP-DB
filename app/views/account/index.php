@@ -352,7 +352,7 @@ $isBuyer = $user['role'] === 'buyer';
                                             font-weight: 600;
                                             font-size: 0.875rem;
                                         ">
-                                            <?= $order['items_count'] ?>
+                                            <?= e($order['items_count']) ?>
                                         </span>
                                     </td>
                                     <td style="padding: var(--space-4); text-align: right; font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">

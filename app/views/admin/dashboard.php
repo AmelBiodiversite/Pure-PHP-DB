@@ -107,6 +107,92 @@ $recentOrders = $recent_orders ?? [];
                     </a>
                 </div>
             </div>
+
+
+<!-- Monitoring de Sécurité -->
+    <div class="card mb-8">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2 style="margin: 0 0 0.5rem 0;">🔒 Monitoring de Sécurité</h2>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                    Surveillez les événements de sécurité en temps réel
+                </p>
+            </div>
+            <?php
+            // Récupérer le nombre d'événements critiques des 24 dernières heures
+            // Utilise les helpers getSecurityStats() et getSecurityAlerts()
+            $todayStats = getSecurityStats(1);
+            $criticalToday = ($todayStats['LOGIN_BLOCKED'] ?? 0) + 
+                             ($todayStats['CSRF_VIOLATION'] ?? 0) + 
+                             ($todayStats['XSS_ATTEMPT'] ?? 0) + 
+                             ($todayStats['SQLI_ATTEMPT'] ?? 0);
+            ?>
+            <?php if ($criticalToday > 0): ?>
+                <span class="badge badge-danger" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    <?= $criticalToday ?> alerte<?= $criticalToday > 1 ? 's' : '' ?>
+                </span>
+            <?php else: ?>
+                <span class="badge" style="background: #43e97b; color: white; font-size: 1rem; padding: 0.5rem 1rem;">
+                    ✓ Aucune alerte
+                </span>
+            <?php endif; ?>
+        </div>
+
+        <!-- Stats rapides de sécurité -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 2rem;">📊</span>
+                    <div>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                            Événements (7j)
+                        </p>
+                        <h3 style="margin: 0; font-size: 1.5rem;">
+                            <?= array_sum(getSecurityStats(7)) ?>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 2rem;">⚠️</span>
+                    <div>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                            Tentatives échouées
+                        </p>
+                        <h3 style="margin: 0; font-size: 1.5rem;">
+                            <?= $todayStats['LOGIN_FAILED'] ?? 0 ?>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 2rem;">🚨</span>
+                    <div>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                            Alertes critiques
+                        </p>
+                        <h3 style="margin: 0; font-size: 1.5rem; color: #f5576c;">
+                            <?= $criticalToday ?>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton d'accès au dashboard sécurité -->
+        <a href="/admin/security" class="btn btn-primary hover-lift" style="display: inline-flex; align-items: center; gap: 0.75rem; font-size: 1rem; padding: 1rem 2rem;">
+            <span style="font-size: 1.5rem;">🔒</span>
+            <span>Accéder au Monitoring Complet</span>
+            <span style="margin-left: auto;">→</span>
+        </a>
+    </div>
+
+
+
             
 
             <?php if (empty($pendingProducts)): ?>
@@ -135,10 +221,10 @@ $recentOrders = $recent_orders ?? [];
                             </div>
 
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <a href="/admin/products/approve/<?= $product['id'] ?>" class="btn btn-success btn-sm">
+                                <a href="/admin/products/approve/<?= e($product['id']) ?>" class="btn btn-success btn-sm">
                                     ✓ Approuver
                                 </a>
-                                <a href="/admin/products/reject/<?= $product['id'] ?>" class="btn btn-danger btn-sm">
+                                <a href="/admin/products/reject/<?= e($product['id']) ?>" class="btn btn-danger btn-sm">
                                     ✗ Rejeter
                                 </a>
                             </div>
@@ -152,6 +238,93 @@ $recentOrders = $recent_orders ?? [];
             <?php endif; ?>
         </div>
 
+        
+
+        <!-- Monitoring de Sécurité -->
+        <div class="card mb-8">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="margin: 0 0 0.5rem 0;">🔒 Monitoring de Sécurité</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0;">
+                        Surveillez les événements de sécurité en temps réel
+                    </p>
+                </div>
+                <?php
+                // Récupérer le nombre d'événements critiques des 24 dernières heures
+                // Utilise les helpers getSecurityStats() et getSecurityAlerts()
+                $todayStats = getSecurityStats(1);
+                $criticalToday = ($todayStats['LOGIN_BLOCKED'] ?? 0) + 
+                                 ($todayStats['CSRF_VIOLATION'] ?? 0) + 
+                                 ($todayStats['XSS_ATTEMPT'] ?? 0) + 
+                                 ($todayStats['SQLI_ATTEMPT'] ?? 0);
+                ?>
+                <?php if ($criticalToday > 0): ?>
+                    <span class="badge badge-danger" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                        <?= $criticalToday ?> alerte<?= $criticalToday > 1 ? 's' : '' ?>
+                    </span>
+                <?php else: ?>
+                    <span class="badge badge-success" style="background: #43e97b; color: white; font-size: 1rem; padding: 0.5rem 1rem;">
+                        ✓ Aucune alerte
+                    </span>
+                <?php endif; ?>
+            </div>
+
+            <!-- Stats rapides de sécurité -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 2rem;">📊</span>
+                        <div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                                Événements (7j)
+                            </p>
+                            <h3 style="margin: 0; font-size: 1.5rem;">
+                                <?= array_sum(getSecurityStats(7)) ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 2rem;">⚠️</span>
+                        <div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                                Tentatives échouées
+                            </p>
+                            <h3 style="margin: 0; font-size: 1.5rem;">
+                                <?= $todayStats['LOGIN_FAILED'] ?? 0 ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 2rem;">🚨</span>
+                        <div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 0.25rem 0;">
+                                Alertes critiques
+                            </p>
+                            <h3 style="margin: 0; font-size: 1.5rem; color: #f5576c;">
+                                <?= $criticalToday ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton d'accès au dashboard sécurité -->
+            <a href="/admin/security" class="btn btn-primary hover-lift" style="display: inline-flex; align-items: center; gap: 0.75rem; font-size: 1rem; padding: 1rem 2rem;">
+                <span style="font-size: 1.5rem;">🔒</span>
+                <span>Accéder au Monitoring Complet</span>
+                <span style="margin-left: auto;">→</span>
+            </a>
+        </div>
+
+
+        
+        
         <!-- Utilisateurs récents -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -225,7 +398,7 @@ $recentOrders = $recent_orders ?? [];
                         <?php foreach ($recentOrders as $order): ?>
                             <tr style="border-bottom: 1px solid var(--border);" class="hover-lift">
                                 <td style="padding: 1rem;">
-                                    <a href="/admin/orders/<?= $order['order_number'] ?>" 
+                                    <a href="/admin/orders/<?= e($order['order_number']) ?>" 
                                        style="color: var(--primary); text-decoration: none; font-weight: 600;">
                                         #<?= htmlspecialchars($order['order_number']) ?>
                                     </a>

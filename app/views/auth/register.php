@@ -108,7 +108,7 @@
                             <form method="POST" action="/register" id="registerForm">
 
                                 <!-- CSRF Token -->
-                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
 
                                 <!-- Type de compte -->
                                 <div style="margin-bottom: var(--space-6);">

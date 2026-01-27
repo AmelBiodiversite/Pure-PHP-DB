@@ -10,14 +10,14 @@
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success mb-6">
-                <?= $_SESSION['success'] ?>
+                <?= e($_SESSION['success']) ?>
                 <?php unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
         <div class="card" style="padding: var(--space-8);">
             <form method="POST" action="/contact">
-                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
 
                 <div class="mb-6">
                     <label class="form-label">Nom complet</label>

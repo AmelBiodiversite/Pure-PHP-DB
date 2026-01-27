@@ -106,7 +106,7 @@
         <form method="POST" action="/login" id="loginForm">
             
             <!-- CSRF Token -->
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
 
             <!-- Email -->
             <div style="margin-bottom: var(--space-5);">

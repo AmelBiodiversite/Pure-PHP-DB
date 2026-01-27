@@ -44,7 +44,7 @@
                         Acheté le <?= date('d/m/Y', strtotime($product['purchased_at'])) ?>
                     </p>
                     
-                    <a href="/download/<?= $product['id'] ?>" class="btn btn-primary" style="width: 100%;">
+                    <a href="/download/<?= e($product['id']) ?>" class="btn btn-primary" style="width: 100%;">
                         📥 Télécharger
                     </a>
                 </div>

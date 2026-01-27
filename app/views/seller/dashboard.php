@@ -27,9 +27,9 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Produits</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= $stats['total_products'] ?></h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= e($stats['total_products']) ?></h3>
                     <p style="font-size: 0.75rem; color: var(--success); margin: 0;">
-                        <?= $stats['approved_products'] ?> approuvés
+                        <?= e($stats['approved_products']) ?> approuvés
                     </p>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">En attente</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= $stats['pending_products'] ?></h3>
+                    <h3 style="margin: 0; font-size: 1.75rem;"><?= e($stats['pending_products']) ?></h3>
                 </div>
             </div>
         </div>
@@ -159,7 +159,7 @@
                             </td>
                             <td style="padding: 1rem;">
                                 <span class="badge badge-<?= $product['status'] === 'approved' ? 'success' : 'warning' ?>">
-                                    <?= $product['status'] ?>
+                                    <?= e($product['status']) ?>
                                 </span>
                             </td>
                             <td style="padding: 1rem;">
@@ -169,7 +169,7 @@
                                 <?= date('d/m/Y', strtotime($product['created_at'])) ?>
                             </td>
                             <td style="padding: 1rem;">
-                                <a href="/seller/products/<?= $product['id'] ?>/edit" class="btn btn-sm btn-outline">
+                                <a href="/seller/products/<?= e($product['id']) ?>/edit" class="btn btn-sm btn-outline">
                                     ✏️ Modifier
                                 </a>
                             </td>
@@ -537,7 +537,7 @@ new Chart(topProductsCtx, {
                                 <?= e(truncate($product['title'], 30)) ?>
                             </div>
                             <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                <?= $product['sales_count'] ?> vente<?= $product['sales_count'] > 1 ? 's' : '' ?>
+                                <?= e($product['sales_count']) ?> vente<?= $product['sales_count'] > 1 ? 's' : '' ?>
                             </div>
                         </div>
                         

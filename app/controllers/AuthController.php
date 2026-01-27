@@ -1,182 +1,317 @@
 <?php
 /**
  * MARKETFLOW PRO - AUTH CONTROLLER
- * Gestion de l'authentification
+ * Gestion de l'authentification et des utilisateurs
+ * 
+ * Ce contrôleur gère :
+ * - La connexion (login)
+ * - L'inscription (register)
+ * - La déconnexion (logout)
+ * - La création de sessions utilisateur
+ * 
+ * SÉCURITÉ :
+ * - Protection CSRF sur tous les formulaires
+ * - Rate limiting sur les tentatives de connexion
+ * - Validation stricte des données
+ * - Sessions sécurisées
+ * 
  * Fichier : app/controllers/AuthController.php
  */
 
 namespace App\Controllers;
 
 use Core\Controller;
+use Core\SecurityLogger;
 use App\Models\User;
 
 class AuthController extends Controller {
     private $userModel;
 
+    /**
+     * Constructeur
+     * Initialise le modèle User et démarre la session si nécessaire
+     */
     public function __construct() {
         parent::__construct();
         $this->userModel = new User();
 
         // Démarrer la session si pas déjà démarrée
+        // La session est nécessaire pour stocker les infos de connexion
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
     /**
-     * Page de connexion
+     * Page de connexion (GET) ou traitement (POST)
+     * 
+     * SÉCURITÉ :
+     * - Génère un token CSRF pour protéger contre les attaques
+     * - Redirige automatiquement si déjà connecté
      */
     public function login() {
-        // Si déjà connecté, rediriger
+        // Si l'utilisateur est déjà connecté, pas besoin de se reconnecter
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/');
         }
 
+        // POST = soumission du formulaire → traiter la connexion
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleLogin();
-        } else {
+        } 
+        // GET = afficher le formulaire
+        else {
             $this->render('auth/login', [
-                'title' => 'Connexion'
+                'title' => 'Connexion',
+                'csrf_token' => \Core\CSRF::generateToken() // Token pour sécuriser le formulaire
             ]);
         }
     }
 
     /**
-     * Traiter la connexion
+     * Traiter la connexion (appelé en POST)
+     * 
+     * SÉCURITÉ :
+     * 0. Vérifie le rate limiting (max 5 tentatives / 15 min)
+     * 1. Vérifie le token CSRF (protection anti-attaque)
+     * 2. Valide les champs requis
+     * 3. Vérifie email + mot de passe en base
+     * 4. Crée une session sécurisée si OK
+     * 
+     * @return void
      */
     private function handleLogin() {
+        // 🔒 ÉTAPE 0 : VÉRIFIER LE RATE LIMITING
+        // Protection contre les attaques par force brute
         $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $remember = isset($_POST['remember']);
 
-        // Validation basique
-        if (empty($email) || empty($password)) {
+        // Vérifier si l'utilisateur n'est pas bloqué
+        if (!\Core\RateLimiter::check('login', $email)) {
+            $blockedFor = \Core\RateLimiter::blockedFor('login', $email);
+            SecurityLogger::logLoginBlocked($email, $blockedFor); 
             $this->render('auth/login', [
                 'title' => 'Connexion',
-                'error' => 'Veuillez remplir tous les champs',
-                'email' => $email
+                'error' => 'Trop de tentatives de connexion. Veuillez réessayer dans ' . 
+                          \Core\RateLimiter::formatBlockedTime($blockedFor) . '.',
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
             return;
         }
 
-        // Tenter la connexion
+        // 🔒 ÉTAPE 1 : VÉRIFIER LE TOKEN CSRF
+        // Si le token est invalide, c'est peut-être une attaque CSRF
+        if (!\Core\CSRF::validateToken($_POST['csrf_token'] ?? '')) {
+            SecurityLogger::logCSRFViolation('login', $_POST);
+            $this->render('auth/login', [
+                'title' => 'Connexion',
+                'error' => 'Token de sécurité invalide. Veuillez réessayer.',
+                'csrf_token' => \Core\CSRF::generateToken()
+            ]);
+            return;
+        }
+
+        // 📥 ÉTAPE 2 : RÉCUPÉRER LES DONNÉES DU FORMULAIRE
+        $password = $_POST['password'] ?? '';
+        $remember = isset($_POST['remember']); // Checkbox "Se souvenir de moi"
+
+        // ✅ ÉTAPE 3 : VALIDATION BASIQUE
+        // Vérifier que les champs ne sont pas vides
+        if (empty($email) || empty($password)) {
+            $this->render('auth/login', [
+                'title' => 'Connexion',
+                'error' => 'Veuillez remplir tous les champs',
+                'email' => $email, // Conserver l'email pour l'UX
+                'csrf_token' => \Core\CSRF::generateToken()
+            ]);
+            return;
+        }
+
+        // 🔐 ÉTAPE 4 : AUTHENTIFIER L'UTILISATEUR
+        // Le modèle User vérifie email + password hashé en base
         $user = $this->userModel->authenticate($email, $password);
 
         if ($user) {
-            // Connexion réussie
+            // ✅ CONNEXION RÉUSSIE
+
+            // Réinitialiser le rate limiting (connexion réussie)
+            \Core\RateLimiter::clear('login', $email);
+
+            SecurityLogger::logLoginSuccess($email, $user['id']); 
+
+            // Créer la session utilisateur (stocke user_id, role, etc.)
             $this->createUserSession($user, $remember);
 
-            // Rediriger selon le rôle
+            // 🚀 REDIRECTION SELON LE RÔLE
             if ($user['role'] === 'admin') {
-                $this->redirect('/admin');
+                $this->redirect('/admin'); // Tableau de bord admin
             } elseif ($user['role'] === 'seller') {
-                $this->redirect('/seller/dashboard');
+                $this->redirect('/seller/dashboard'); // Tableau de bord vendeur
             } else {
-                $this->redirect('/');
+                $this->redirect('/'); // Page d'accueil pour les buyers
             }
         } else {
-            // Échec de connexion
+            // ❌ ÉCHEC DE CONNEXION
+
+            SecurityLogger::logLoginFailed($email, 'invalid_credentials');
+
+            // Incrémenter le compteur de tentatives
+            // 5 tentatives max, blocage 15 minutes
+            \Core\RateLimiter::attempt('login', $email, 5, 15);
+
+            // Calculer les tentatives restantes
+            $remaining = \Core\RateLimiter::remaining('login', $email, 5);
+            $errorMsg = 'Email ou mot de passe incorrect';
+
+            // Avertir si proche du blocage
+            if ($remaining <= 2 && $remaining > 0) {
+                $errorMsg .= ' (' . $remaining . ' tentative' . ($remaining > 1 ? 's' : '') . ' restante' . ($remaining > 1 ? 's' : '') . ')';
+            }
+
+            // Email ou mot de passe incorrect
             $this->render('auth/login', [
                 'title' => 'Connexion',
-                'error' => 'Email ou mot de passe incorrect',
-                'email' => $email
+                'error' => $errorMsg,
+                'email' => $email,
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
         }
     }
 
     /**
-     * Page d'inscription
+     * Page d'inscription (GET) ou traitement (POST)
+     * 
+     * Permet de créer un nouveau compte (buyer ou seller)
      */
     public function register() {
-        // Si déjà connecté, rediriger
-            if (isset($_SESSION['user_id'])) {
+        // Si déjà connecté, pas besoin de s'inscrire
+        if (isset($_SESSION['user_id'])) {
             $this->redirect('/');
         }
 
+        // POST = traiter l'inscription
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleRegister();
-        } else {
+        } 
+        // GET = afficher le formulaire
+        else {
             $this->render('auth/register', [
-                'title' => 'Inscription'
+                'title' => 'Inscription',
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
         }
     }
 
     /**
-     * Traiter l'inscription
+     * Traiter l'inscription (appelé en POST)
+     * 
+     * VALIDATIONS :
+     * - Email valide et unique
+     * - Username unique (min 3 caractères)
+     * - Mot de passe min 6 caractères
+     * - Confirmation mot de passe
+     * - Nom de boutique requis pour les sellers
+     * 
+     * @return void
      */
     private function handleRegister() {
+        // 🔒 VÉRIFIER LE TOKEN CSRF
+        if (!\Core\CSRF::validateToken($_POST['csrf_token'] ?? '')) {
+            SecurityLogger::logCSRFViolation('register', $_POST); 
+            $this->render('auth/register', [
+                'title' => 'Inscription',
+                'errors' => ['Token de sécurité invalide. Veuillez réessayer.'],
+                'csrf_token' => \Core\CSRF::generateToken()
+            ]);
+            return;
+        }
+
+        // 📥 RÉCUPÉRER LES DONNÉES
         $data = [
             'email' => $_POST['email'] ?? '',
             'username' => $_POST['username'] ?? '',
             'password' => $_POST['password'] ?? '',
             'password_confirm' => $_POST['password_confirm'] ?? '',
             'full_name' => $_POST['full_name'] ?? '',
-            'role' => $_POST['role'] ?? 'buyer',
-            'shop_name' => $_POST['shop_name'] ?? null
+            'role' => $_POST['role'] ?? 'buyer', // Par défaut : acheteur
+            'shop_name' => $_POST['shop_name'] ?? null // Seulement pour sellers
         ];
 
-        // Validation basique
+        // ✅ VALIDATION DES DONNÉES
         $errors = [];
 
+        // Validation email
         if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Email invalide';
         }
 
+        // Validation username
         if (empty($data['username']) || strlen($data['username']) < 3) {
             $errors[] = 'Username doit faire au moins 3 caractères';
         }
 
+        // Validation mot de passe
         if (empty($data['password']) || strlen($data['password']) < 6) {
             $errors[] = 'Mot de passe doit faire au moins 6 caractères';
         }
 
+        // Confirmation mot de passe
         if ($data['password'] !== $data['password_confirm']) {
             $errors[] = 'Les mots de passe ne correspondent pas';
         }
 
+        // Nom de boutique requis pour vendeurs
         if ($data['role'] === 'seller' && empty($data['shop_name'])) {
             $errors[] = 'Nom de boutique requis pour les vendeurs';
         }
 
+        // S'il y a des erreurs, réafficher le formulaire
         if (!empty($errors)) {
             $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => $errors,
-                'old' => $data
+                'old' => $data, // Conserver les données pour l'UX
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
             return;
         }
 
-        // Vérifier si email existe
+        // 🔍 VÉRIFIER L'UNICITÉ
+
+        // Email déjà utilisé ?
         if ($this->userModel->emailExists($data['email'])) {
             $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Cet email est déjà utilisé'],
-                'old' => $data
+                'old' => $data,
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
             return;
         }
 
-        // Vérifier si username existe
+        // Username déjà pris ?
         if ($this->userModel->usernameExists($data['username'])) {
             $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Ce nom d\'utilisateur est déjà pris'],
-                'old' => $data
+                'old' => $data,
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
             return;
         }
 
-        // Créer l'utilisateur
-        unset($data['password_confirm']);
+        // 💾 CRÉER L'UTILISATEUR
+        unset($data['password_confirm']); // Ne pas stocker la confirmation
         $userId = $this->userModel->createUser($data);
 
         if ($userId) {
+            // ✅ INSCRIPTION RÉUSSIE
+
+            SecurityLogger::logRegister($data['email'], $userId);
+
             // Récupérer l'utilisateur créé
             $user = $this->userModel->find($userId);
 
-            // Créer la session
+            // Connecter automatiquement l'utilisateur
             $this->createUserSession($user);
 
             // Rediriger selon le rôle
@@ -186,49 +321,90 @@ class AuthController extends Controller {
                 $this->redirect('/');
             }
         } else {
+            // ❌ ERREUR LORS DE LA CRÉATION
             $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Erreur lors de l\'inscription'],
-                'old' => $data
+                'old' => $data,
+                'csrf_token' => \Core\CSRF::generateToken()
             ]);
         }
     }
 
     /**
      * Déconnexion
+     * 
+     * SÉCURITÉ :
+     * - Détruit complètement la session
+     * - Supprime le cookie de session
+     * - Empêche toute réutilisation de la session
      */
     public function logout() {
-        // Détruire la session
+        // Logger la déconnexion avant de détruire la session
+        if (isset($_SESSION['user_id'])) {
+            SecurityLogger::logLogout($_SESSION['user_id']);  
+        }
+        
+        // Vider toutes les variables de session
         session_unset();
+
+        // Détruire la session côté serveur
         session_destroy();
 
-        // Supprimer le cookie de session
+        // Supprimer le cookie de session côté navigateur
+        // (sinon l'ID de session reste stocké)
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time() - 3600, '/');
         }
 
+        // Rediriger vers la page d'accueil
         $this->redirect('/');
     }
 
     /**
-     * Créer une session utilisateur
+     * Créer une session utilisateur sécurisée
+     * 
+     * SÉCURITÉ :
+     * - Régénère l'ID de session (évite le session fixation)
+     * - Stocke les infos essentielles de l'utilisateur
+     * - Gère le "Remember me" avec cookie sécurisé
+     * 
+     * @param array $user Les données de l'utilisateur
+     * @param bool $remember Si true, crée un cookie "Remember me" (30 jours)
+     * @return void
      */
     private function createUserSession($user, $remember = false) {
-        // Régénérer l'ID de session pour sécurité
+        // 🔒 RÉGÉNÉRER L'ID DE SESSION
+        // Protection contre le "session fixation attack"
+        // (attaque où un pirate force l'utilisation d'un ID de session connu)
         session_regenerate_id(true);
 
+        // 💾 STOCKER LES INFOS ESSENTIELLES
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_name'] = $user['username'];
-        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_role'] = $user['role']; // admin, seller, buyer
         $_SESSION['logged_in'] = true;
-        $_SESSION['login_time'] = time();
+        $_SESSION['login_time'] = time(); // Timestamp de connexion
 
-        // Cookie "Remember me" (30 jours)
+        // 🍪 COOKIE "REMEMBER ME" (optionnel)
         if ($remember) {
-            $token = bin2hex(random_bytes(32));
+            // Générer un token unique et sécurisé
+            $token = bin2hex(random_bytes(32)); // 64 caractères hexadécimaux
+
+            // Stocker en session
             $_SESSION['remember_token'] = $token;
-            setcookie('remember_token', $token, time() + (86400 * 30), '/', '', true, true);
+
+            // Créer le cookie (valable 30 jours)
+            setcookie(
+                'remember_token',  // Nom du cookie
+                $token,            // Valeur (token)
+                time() + (86400 * 30), // Expiration : 30 jours
+                '/',               // Path : tout le site
+                '',                // Domain : automatique
+                true,              // Secure : HTTPS uniquement (en production)
+                true               // HttpOnly : pas accessible en JavaScript (sécurité XSS)
+            );
         }
     }
 }

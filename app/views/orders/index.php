@@ -168,7 +168,7 @@
                                 📅 <?= date('d/m/Y', strtotime($order['created_at'])) ?>
                             </div>
                             <div>
-                                📦 <?= $order['items_count'] ?> article<?= $order['items_count'] > 1 ? 's' : '' ?>
+                                📦 <?= e($order['items_count']) ?> article<?= $order['items_count'] > 1 ? 's' : '' ?>
                             </div>
                         </div>
                     </div>

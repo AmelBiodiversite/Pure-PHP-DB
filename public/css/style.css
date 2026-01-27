@@ -110,15 +110,15 @@
 
     /* Gradients Modernes */
     --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #8b5cf6 100%);
     --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-sunset: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --gradient-sunset: linear-gradient(135deg, #8b5cf6 0%, #fee140 100%);
     --gradient-ocean: linear-gradient(135deg, #2e3192 0%, #1bffff 100%);
     --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-mesh: radial-gradient(at 40% 20%, #667eea 0px, transparent 50%),
-        radial-gradient(at 80% 0%, #764ba2 0px, transparent 50%),
-        radial-gradient(at 0% 50%, #f093fb 0px, transparent 50%),
-        radial-gradient(at 80% 50%, #4facfe 0px, transparent 50%);
+    --gradient-mesh: radial-gradient(at 40% 20%, #667eea 0px, transparent 100%),
+        radial-gradient(at 40% 20%, rgba(102, 126, 234, 0.6), transparent 60%),
+        radial-gradient(at 80% 0%, rgba(199, 21, 133, 0.6), transparent 60%),
+        radial-gradient(at 0% 80%, rgba(123, 31, 162, 0.6), transparent 60%);
 }
 
 /* Mode Sombre (optionnel) */
@@ -832,7 +832,7 @@ nav a.active::before {
    HERO SECTION - Moderne avec Mesh Gradient
    ============================================================ */
 .hero {
-    background: var(--bg-primary);
+    background: var(----primary-300);
     position: relative;
     padding: var(--space-20) 0;
     text-align: center;

@@ -11,7 +11,7 @@
     <div class="mb-8">
         <h1>Mon Panier</h1>
         <p style="color: var(--text-secondary); margin-top: var(--space-2);">
-            <?= $cart['count'] ?> article<?= $cart['count'] > 1 ? 's' : '' ?> dans votre panier
+            <?= e($cart['count']) ?> article<?= $cart['count'] > 1 ? 's' : '' ?> dans votre panier
         </p>
     </div>
 
@@ -71,8 +71,8 @@
                         <!-- Actions -->
                         <div style="text-align: right;">
                             <form method="POST" action="/cart/remove" style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                <input type="hidden" name="product_id" value="<?= $item['product_id'] ?>">
+                                <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+                                <input type="hidden" name="product_id" value="<?= e($item['product_id']) ?>">
                                 <button 
                                     type="submit" 
                                     class="btn btn-ghost btn-sm"
@@ -92,7 +92,7 @@
                 <!-- Bouton vider le panier -->
                 <div style="margin-top: var(--space-6);">
                     <form method="POST" action="/cart/clear" style="display: inline;">
-                        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                        <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
                         <button 
                             type="submit" 
                             class="btn btn-ghost"
@@ -118,7 +118,7 @@
                     <?php if (!$promo): ?>
                     <div style="margin-bottom: var(--space-6);">
                         <form method="POST" action="/cart/apply-promo" id="promoForm">
-                            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
                             <label class="form-label" for="promo_code">Code promo</label>
                             <div style="display: flex; gap: var(--space-2);">
                                 <input 
@@ -153,7 +153,7 @@
                             <div style="font-size: 0.875rem; color: #065f46;">
                                 <?= e($promo['code']) ?>
                                 <?php if ($promo['type'] === 'percentage'): ?>
-                                    (-<?= $promo['value'] ?>%)
+                                    (-<?= e($promo['value']) ?>%)
                                 <?php else: ?>
                                     (-<?= formatPrice($promo['value']) ?>)
                                 <?php endif; ?>

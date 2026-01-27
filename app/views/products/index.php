@@ -50,11 +50,11 @@ function updateQueryParam($key, $value = null) {
                                class="category-link <?= ($active_filters['category_id'] ?? null) == $cat['id'] ? 'active' : '' ?>">
                                 <span>
                                     <?php if (!empty($cat['icon'])): ?>
-                                        <span class="category-icon"><?= $cat['icon'] ?></span>
+                                        <span class="category-icon"><?= e($cat['icon']) ?></span>
                                     <?php endif; ?>
                                     <?= e($cat['name']) ?>
                                 </span>
-                                <span class="badge badge-primary"><?= $cat['product_count'] ?></span>
+                                <span class="badge badge-primary"><?= e($cat['product_count']) ?></span>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -186,7 +186,7 @@ function updateQueryParam($key, $value = null) {
                                         <?= number_format($product['rating_average'], 1) ?>
                                     </span>
                                     <span class="rating-count">
-                                        (<?= $product['rating_count'] ?>)
+                                        (<?= e($product['rating_count']) ?>)
                                     </span>
                                 </div>
                                 <?php endif; ?>
@@ -222,7 +222,7 @@ function updateQueryParam($key, $value = null) {
                                     <button
                                         type="button"
                                         class="btn-wishlist <?= $isInWishlist ? 'in-wishlist' : '' ?>"
-                                        data-product-id="<?= $product['id'] ?>"
+                                        data-product-id="<?= e($product['id']) ?>"
                                         title="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
                                         aria-label="<?= $isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
                                         <span class="wishlist-icon">
@@ -262,7 +262,7 @@ function updateQueryParam($key, $value = null) {
                     <a href="<?= updateQueryParam('page', $i) ?>"
                        class="btn btn-sm <?= $i == $pagination['current'] ? 'btn-primary' : 'btn-secondary' ?>"
                        <?= $i == $pagination['current'] ? 'aria-current="page"' : '' ?>>
-                        <?= $i ?>
+                        <?= e($i) ?>
                     </a>
                     <?php endfor; ?>
                     <?php if ($pagination['current'] < $pagination['total_pages']): ?>

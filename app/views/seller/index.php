@@ -150,7 +150,7 @@
                 <?php endif; ?>
 
                 <span style="padding: 0 var(--space-4); color: var(--text-secondary);">
-                    Page <?= $pagination['current'] ?> sur <?= $pagination['total_pages'] ?>
+                    Page <?= e($pagination['current']) ?> sur <?= e($pagination['total_pages']) ?>
                 </span>
 
                 <?php if ($pagination['current'] < $pagination['total_pages']): ?>

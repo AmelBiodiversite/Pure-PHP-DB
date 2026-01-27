@@ -32,7 +32,7 @@
         </h1>
         <p style="color: #666; font-size: 1rem;">
             <?php if (count($wishlist_items ?? []) > 0): ?>
-                Vous avez <strong><?= $wishlistCount ?></strong> produit<?= $wishlistCount > 1 ? 's' : '' ?> en favoris
+                Vous avez <strong><?= e($wishlistCount) ?></strong> produit<?= $wishlistCount > 1 ? 's' : '' ?> en favoris
             <?php else: ?>
                 Vous n'avez pas encore de produits en favoris
             <?php endif; ?>
@@ -72,12 +72,12 @@
                      CARTE PRODUIT FAVORI
                      ======================================== -->
                 <div class="wishlist-product-card" 
-                     data-product-id="<?= $item['product_id'] ?>" 
+                     data-product-id="<?= e($item['product_id']) ?>" 
                      style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s; position: relative;">
                     
                     <!-- Bouton Supprimer (coin supérieur droit) -->
                     <button class="btn-remove-wishlist" 
-                            data-product-id="<?= $item['product_id'] ?>" 
+                            data-product-id="<?= e($item['product_id']) ?>" 
                             style="position: absolute; top: 12px; right: 12px; z-index: 10; background: rgba(255,255,255,0.95); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s;"
                             title="Retirer des favoris">
                         <span style="font-size: 1.25rem;">❤️</span>
@@ -126,13 +126,13 @@
                                 <div style="display: flex; align-items: center; gap: 0.25rem;">
                                     <span style="color: #fbbf24;">⭐</span>
                                     <strong style="color: #1a1a1a;"><?= number_format($item['rating_average'], 1) ?></strong>
-                                    <span>(<?= $item['rating_count'] ?>)</span>
+                                    <span>(<?= e($item['rating_count']) ?>)</span>
                                 </div>
                             <?php endif; ?>
                             
                             <?php if ($item['sales'] > 0): ?>
                                 <div>
-                                    <span>🛒</span> <?= $item['sales'] ?> vente<?= $item['sales'] > 1 ? 's' : '' ?>
+                                    <span>🛒</span> <?= e($item['sales']) ?> vente<?= $item['sales'] > 1 ? 's' : '' ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -152,7 +152,7 @@
 
                             <!-- Bouton Ajouter au panier -->
                             <form action="/cart/add" method="POST" style="margin: 0;">
-                                <input type="hidden" name="product_id" value="<?= $item['product_id'] ?>">
+                                <input type="hidden" name="product_id" value="<?= e($item['product_id']) ?>">
                                 <button type="submit" 
                                         style="padding: 0.5rem 1.25rem; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; white-space: nowrap;"
                                         onmouseover="this.style.background='#059669'"

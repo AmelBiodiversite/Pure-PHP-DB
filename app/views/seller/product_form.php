@@ -67,7 +67,7 @@ $old = $old ?? [];
             id="productForm"
         >
             
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
 
             <!-- Section 1 : Informations principales -->
             <div style="
@@ -184,7 +184,7 @@ $old = $old ?? [];
                         <option value="">Sélectionnez une catégorie</option>
                         <?php foreach ($categories as $cat): ?>
                         <option 
-                            value="<?= $cat['id'] ?>"
+                            value="<?= e($cat['id']) ?>"
                             <?= ($isEdit && $product['category_id'] == $cat['id']) || (!$isEdit && ($old['category_id'] ?? '') == $cat['id']) ? 'selected' : '' ?>
                         >
                             <?= e($cat['name']) ?>

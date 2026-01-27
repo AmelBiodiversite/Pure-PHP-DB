@@ -193,7 +193,7 @@
                 </h2>
 
                 <form id="payment-form">
-                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                    <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
                     
                     <!-- Element Stripe Card -->
                     <div id="card-element" style="
@@ -272,7 +272,7 @@
 <!-- JavaScript Stripe -->
 <script>
 // Initialiser Stripe
-const stripe = Stripe('<?= $stripe_public_key ?>');
+const stripe = Stripe('<?= e($stripe_public_key) ?>');
 const elements = stripe.elements();
 
 // Créer l'élément Card
@@ -327,7 +327,7 @@ form.addEventListener('submit', async function(e) {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-                csrf_token: '<?= $csrf_token ?>'
+                csrf_token: '<?= e($csrf_token) ?>'
             })
         });
 
