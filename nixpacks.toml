@@ -1,0 +1,9 @@
+[phases.setup]
+aptPkgs = ["postgresql-client", "libpq-dev"]
+
+[phases.install]
+cmds = ["echo 'Installing PHP extensions...'"]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t public"
+
