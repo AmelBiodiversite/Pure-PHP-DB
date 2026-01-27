@@ -1,4 +1,8 @@
-{
+[phases.setup]
+nixPkgs = ["php82", "php82Extensions.pdo_pgsql", "php82Extensions.pgsql"]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t public"{
     "require": {
         "stripe/stripe-php": "^19.2"
     }
