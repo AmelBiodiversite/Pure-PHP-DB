@@ -1,4 +1,4 @@
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public", "public/router.php"]# Image PHP avec PostgreSQL
+# Image PHP avec PostgreSQL
 FROM php:8.2-cli
 
 # Installer uniquement PostgreSQL
@@ -17,6 +17,5 @@ RUN mkdir -p public/uploads/products public/uploads/avatars public/uploads/shop-
 # Port
 EXPOSE 8080
 
-# Démarrer le serveur PHP intégré
+# Démarrer le serveur PHP intégré avec router
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "public", "public/router.php"]
-
