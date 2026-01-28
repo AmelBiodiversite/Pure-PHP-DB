@@ -16,7 +16,7 @@ class Database {
      * Constructeur privé (Singleton)
      */
     private function __construct() {
-        try {<
+        try {
             // Récupérer l'URL de connexion depuis Replit
             $databaseUrl = getenv('DATABASE_URL');
 
