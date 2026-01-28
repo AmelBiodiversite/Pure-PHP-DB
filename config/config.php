@@ -13,9 +13,9 @@ define('DATABASE_URL', getenv('DATABASE_URL'));
 // CONFIGURATION URLs
 // ================================================================
 define('APP_URL', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
-define('CSS_URL', APP_URL . '/public/css');
-define('JS_URL', APP_URL . '/public/js');
-define('IMG_URL', APP_URL . '/public/img');
+define('CSS_URL', APP_URL . '/css');
+define('JS_URL', APP_URL . '/js');
+define('IMG_URL', APP_URL . '/img');
 define('UPLOAD_URL', APP_URL . '/public/uploads');
 
 // ================================================================
