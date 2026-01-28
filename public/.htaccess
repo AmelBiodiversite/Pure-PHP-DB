@@ -1,0 +1,10 @@
+# Activer le rewriting
+RewriteEngine On
+
+# Si le fichier existe (CSS, JS, images), le servir directement
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Sinon, router vers index.php
+RewriteRule ^ index.php [L]
+
