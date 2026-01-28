@@ -322,8 +322,9 @@ Stripe gère 100% de la sécurité des paiements.
 - Client paie 100€ pour un produit
 - Stripe prend 1,4% + 0,25€ = 1,65€
 - Reste: 98,35€
-- Commission plateforme 10% = 9,84€ (va sur votre compte Stripe)
-- Vendeur reçoit: 88,51€ (88,35€ sur son compte Stripe)
+- Commission plateforme 10% (sur prix original) = 10€ (va sur votre compte Stripe)
+- Vendeur reçoit: 88,35€ sur son compte Stripe
+- Note: La commission peut être calculée sur le montant brut (100€) ou net (98,35€) selon configuration
 
 **Payouts vendeurs:**
 - Configuration par vendeur (compte Stripe connecté)

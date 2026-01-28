@@ -446,14 +446,16 @@ Réponse:
 ### 8. PROJECTIONS FINANCIÈRES
 
 #### Scénario Conservateur (Année 1)
-- **Mois 1-3:** 2 ventes/mois × 10k€ = 20k€/mois
-- **Mois 4-6:** 3 ventes/mois × 10k€ = 30k€/mois  
-- **Mois 7-9:** 4 ventes/mois × 11k€ = 44k€/mois
-- **Mois 10-12:** 5 ventes/mois × 11k€ = 55k€/mois
+- **Mois 1-3:** 2 ventes/mois × 10k€ = 60k€ (total 3 mois)
+- **Mois 4-6:** 3 ventes/mois × 10k€ = 90k€ (total 3 mois)
+- **Mois 7-9:** 4 ventes/mois × 11k€ = 132k€ (total 3 mois)
+- **Mois 10-12:** 5 ventes/mois × 11k€ = 165k€ (total 3 mois)
 
-**Total Année 1:** 432k€
-**Coûts:** Hosting démo (500€), Marketing (20k€), Support (30k€)
-**Net:** ~380k€
+**Total Licences Année 1:** 447k€
+**Revenus Récurrents:** 50k€ (support + add-ons)
+**Total Année 1:** 497k€
+**Coûts:** Hosting démo (500€), Marketing (25k€), Support (40k€), Ops (15k€) = 82k€
+**Net:** ~415k€ (marge 83%)
 
 #### Scénario Optimiste (Année 1)
 - **Mois 1-3:** 4 ventes/mois × 12k€ = 48k€/mois

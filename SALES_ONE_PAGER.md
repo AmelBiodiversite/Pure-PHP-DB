@@ -260,11 +260,13 @@
 🔥 **Offre limitée aux 10 premières licences**
 
 - Package Business: 12 000€ → **9 600€** (-20%)
-- Valable jusqu'au: 28 février 2026
+- Valable jusqu'au: 28 février 2026 OU 10 premières ventes
 
 Après 10 licences vendues:
-- Prix standard: +30%
-- Priorité aux early-adopters pour nouvelles features
+- Retour aux prix standards
+- Early-adopters conservent accès prioritaire aux nouvelles features
+
+Note: Cette offre est différente des remises startups/associations
 
 ---
 
