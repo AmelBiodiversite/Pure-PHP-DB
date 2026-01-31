@@ -74,30 +74,30 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    
+
     role VARCHAR(20) NOT NULL DEFAULT 'buyer',
     CONSTRAINT check_role CHECK (role IN ('buyer', 'seller', 'admin')),
-    
+
     avatar_url VARCHAR(500),
     bio TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     email_verified BOOLEAN DEFAULT FALSE,
-    
+
     remember_token VARCHAR(100),
     last_login TIMESTAMP,
-    
+
     shop_name VARCHAR(255),
     shop_slug VARCHAR(255) UNIQUE,
     shop_description TEXT,
     shop_logo VARCHAR(500),
     shop_banner VARCHAR(500),
-    
+
     total_sales DECIMAL(12,2) DEFAULT 0.00,
     total_earnings DECIMAL(12,2) DEFAULT 0.00,
     total_products INTEGER DEFAULT 0,
     rating_average DECIMAL(3,2) DEFAULT 0.00,
     rating_count INTEGER DEFAULT 0,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -118,12 +118,12 @@ CREATE TABLE IF NOT EXISTS categories (
     slug VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     icon VARCHAR(50),
-    
+
     parent_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     display_order INTEGER DEFAULT 0,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -152,12 +152,12 @@ CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
-    
+
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT NOT NULL,
     short_description TEXT,
-    
+
     price DECIMAL(10,2) NOT NULL,
     original_price DECIMAL(10,2),
     file_url VARCHAR(500) NOT NULL,
@@ -166,21 +166,21 @@ CREATE TABLE IF NOT EXISTS products (
     thumbnail_url VARCHAR(500),
     preview_url VARCHAR(500),
     demo_url VARCHAR(500),
-    
+
     license_type VARCHAR(50) DEFAULT 'single',
-    
+
     downloads INTEGER DEFAULT 0,
     views INTEGER DEFAULT 0,
     sales INTEGER DEFAULT 0,
     revenue DECIMAL(12,2) DEFAULT 0.00,
     rating_average DECIMAL(3,2) DEFAULT 0.00,
     rating_count INTEGER DEFAULT 0,
-    
+
     status VARCHAR(20) DEFAULT 'pending',
     CONSTRAINT check_status CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
     is_featured BOOLEAN DEFAULT FALSE,
     rejection_reason TEXT,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     approved_at TIMESTAMP
@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS product_tags (
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     UNIQUE(product_id, tag_id)
 );
 
@@ -245,16 +245,16 @@ COMMENT ON TABLE product_gallery IS 'Images supplémentaires des produits';
 CREATE TABLE IF NOT EXISTS promo_codes (
     id SERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
-    
+
     type VARCHAR(20) NOT NULL DEFAULT 'percentage',
     CONSTRAINT check_promo_type CHECK (type IN ('percentage', 'fixed')),
     value DECIMAL(10,2) NOT NULL,
-    
+
     min_purchase DECIMAL(10,2) DEFAULT 0.00,
     max_uses INTEGER,
     used_count INTEGER DEFAULT 0,
     expires_at TIMESTAMP,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -276,24 +276,24 @@ CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     order_number VARCHAR(50) NOT NULL UNIQUE,
     buyer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+
     subtotal DECIMAL(10,2) NOT NULL,
     discount DECIMAL(10,2) DEFAULT 0.00,
     total_amount DECIMAL(10,2) NOT NULL,
     platform_fee DECIMAL(10,2) DEFAULT 0.00,
-    
+
     payment_method VARCHAR(50) DEFAULT 'stripe',
     payment_status VARCHAR(20) DEFAULT 'pending',
     CONSTRAINT check_payment_status CHECK (payment_status IN ('pending', 'processing', 'completed', 'failed', 'refunded')),
     stripe_payment_id VARCHAR(255),
     stripe_session_id VARCHAR(255),
-    
+
     promo_code_id INTEGER REFERENCES promo_codes(id) ON DELETE SET NULL,
     promo_discount DECIMAL(10,2) DEFAULT 0.00,
-    
+
     status VARCHAR(20) DEFAULT 'pending',
     CONSTRAINT check_order_status CHECK (status IN ('pending', 'processing', 'completed', 'cancelled', 'refunded')),
-    
+
     paid_at TIMESTAMP,
     completed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -315,18 +315,18 @@ CREATE TABLE IF NOT EXISTS order_items (
     order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
     seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+
     product_title VARCHAR(255) NOT NULL,
     product_price DECIMAL(10,2) NOT NULL,
     quantity INTEGER DEFAULT 1,
-    
+
     seller_amount DECIMAL(10,2) NOT NULL,
     platform_fee DECIMAL(10,2) NOT NULL,
-    
+
     license_key VARCHAR(100) UNIQUE,
     download_count INTEGER DEFAULT 0,
     max_downloads INTEGER DEFAULT 3,
-    
+
     review_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -346,21 +346,21 @@ CREATE TABLE IF NOT EXISTS reviews (
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     buyer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     order_item_id INTEGER REFERENCES order_items(id) ON DELETE SET NULL,
-    
+
     rating INTEGER NOT NULL,
     CONSTRAINT check_rating CHECK (rating BETWEEN 1 AND 5),
     title VARCHAR(255),
     comment TEXT,
-    
+
     is_verified_purchase BOOLEAN DEFAULT FALSE,
     is_approved BOOLEAN DEFAULT TRUE,
-    
+
     seller_response TEXT,
     seller_responded_at TIMESTAMP,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     UNIQUE(product_id, buyer_id)
 );
 
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS wishlist (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     UNIQUE(user_id, product_id)
 );
 
@@ -393,17 +393,17 @@ COMMENT ON TABLE wishlist IS 'Produits favoris des utilisateurs';
 CREATE TABLE IF NOT EXISTS activity_logs (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    
+
     action VARCHAR(100) NOT NULL,
-    
+
     entity_type VARCHAR(50),
     entity_id INTEGER,
-    
+
     ip_address INET,
     user_agent TEXT,
-    
+
     metadata JSONB,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -457,7 +457,7 @@ BEGIN
             WHERE product_id = NEW.product_id AND is_approved = TRUE
         )
     WHERE id = NEW.product_id;
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

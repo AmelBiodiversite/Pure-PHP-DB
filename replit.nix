@@ -1,5 +1,6 @@
 { pkgs }: {
   deps = [
+    pkgs.vim
     pkgs.zip
     pkgs.rsync
     pkgs.php82Packages.composer-local-repo-plugin
