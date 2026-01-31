@@ -1,284 +1,284 @@
-# 🚀 MarketFlow Pro - Professional Marketplace Platform
+# 🚀 MarketFlow Pro - Plateforme Marketplace Professionnelle
 
-**Production-ready multi-vendor digital marketplace** | PHP/PostgreSQL | 40,000+ lines
+**Marketplace multi-vendeurs prête pour la production** | PHP/PostgreSQL | 40 000+ lignes
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.0%2B-777BB4?logo=php&logoColor=white)](https://php.net)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-336791?logo=postgresql&logoColor=white)](https://postgresql.org)
-[![Stripe](https://img.shields.io/badge/Stripe-Integrated-635BFF?logo=stripe&logoColor=white)](https://stripe.com)
-[![License](https://img.shields.io/badge/License-Commercial-success)](LICENSE.md)
+[![Stripe](https://img.shields.io/badge/Stripe-Intégré-635BFF?logo=stripe&logoColor=white)](https://stripe.com)
+[![License](https://img.shields.io/badge/Licence-Commerciale-success)](LICENSE.md)
 
 ---
 
-## 🎯 What is MarketFlow Pro?
+## 🎯 Qu'est-ce que MarketFlow Pro ?
 
-A **complete, secure, and scalable** marketplace platform for selling digital products (templates, ebooks, courses, etc.) with automatic commission system and Stripe payments integration.
+Une plateforme marketplace **complète, sécurisée et évolutive** pour la vente de produits digitaux (templates, ebooks, formations, etc.) avec système de commission automatique et paiements Stripe intégrés.
 
-**Perfect for:**
-- 🏢 **Web agencies** building marketplace solutions for clients
-- 💼 **Freelance developers** saving 3 months of development
-- 🚀 **Entrepreneurs** launching their marketplace quickly
-
----
-
-## ✨ Key Features
-
-### 🛍️ **For Buyers**
-- Secure authentication & user profiles
-- Advanced catalog with filters (categories, price, search)
-- Shopping cart with promo codes
-- Stripe checkout integration
-- Unlimited downloads (3x per product)
-- Order history & invoices
-- Product reviews & ratings
-- Wishlist system
-
-### 💰 **For Sellers**
-- Complete seller dashboard with analytics
-- Product upload (files + images + gallery)
-- Real-time sales statistics with Chart.js
-- Revenue/sales graphs
-- Automatic payout system
-- Transparent commission (configurable)
-- Review management
-
-### 👑 **For Administrators**
-- Global admin dashboard
-- Product approval/rejection workflow
-- User management
-- Review moderation
-- Platform-wide statistics
-- System settings & logs
-- **🔒 UNIQUE: Real-time security monitoring dashboard**
+**Parfait pour :**
+- 🏢 **Agences web** développant des solutions marketplace pour leurs clients
+- 💼 **Développeurs freelance** économisant 3 mois de développement
+- 🚀 **Entrepreneurs** lançant leur marketplace rapidement
 
 ---
 
-## 🔒 Advanced Security System (UNIQUE)
+## ✨ Fonctionnalités Principales
 
-MarketFlow Pro includes an **enterprise-grade security monitoring system** not found in any other PHP marketplace:
+### 🛍️ **Pour les Acheteurs**
+- Authentification sécurisée & profils utilisateurs
+- Catalogue avancé avec filtres (catégories, prix, recherche)
+- Panier avec codes promo
+- Paiement Stripe intégré
+- Téléchargements illimités (3x par produit)
+- Historique commandes & factures
+- Système d'avis et de notes
+- Liste de souhaits (wishlist)
 
-### **Live Security Dashboard**
-- 📊 Real-time event monitoring (login, CSRF, XSS, SQLi attempts)
-- 📈 7-day statistics with interactive charts
-- 🚨 Automatic suspicious IP detection
-- 📧 Email alerts when > 5 critical events/hour
-- 📝 30-day rotating logs
+### 💰 **Pour les Vendeurs**
+- Dashboard vendeur complet avec analytics
+- Upload produits (fichiers + images + galerie)
+- Statistiques de ventes en temps réel avec Chart.js
+- Graphiques revenus/ventes
+- Système de paiement automatique
+- Commission transparente (configurable)
+- Gestion des avis clients
 
-### **Multi-Layer Protection**
-- ✅ **CSRF**: 100% of forms protected with tokens
-- ✅ **SQL Injection**: 156 prepared statements (0 vulnerabilities)
-- ✅ **XSS**: Systematic sanitization
-- ✅ **Brute Force**: Rate limiting on 6 endpoints
-- ✅ **Session Hijacking**: Automatic detection
-
-**Security Components: 527 lines of battle-tested code**
-
-> ⚠️ **This feature alone is worth €2,000** and doesn't exist in ANY open-source PHP marketplace.
+### 👑 **Pour les Administrateurs**
+- Dashboard admin global
+- Workflow validation/rejet produits
+- Gestion utilisateurs
+- Modération des avis
+- Statistiques globales de la plateforme
+- Paramètres système & logs
+- **🔒 UNIQUE : Dashboard de monitoring de sécurité en temps réel**
 
 ---
 
-## 🛠️ Tech Stack
+## 🔒 Système de Sécurité Avancé (UNIQUE)
+
+MarketFlow Pro intègre un **système de monitoring de sécurité niveau entreprise** inexistant dans les autres marketplaces PHP :
+
+### **Dashboard de Sécurité Live**
+- 📊 Monitoring en temps réel (login, tentatives CSRF, XSS, SQLi)
+- 📈 Statistiques sur 7 jours avec graphiques interactifs
+- 🚨 Détection automatique des IPs suspectes
+- 📧 Alertes email si > 5 événements critiques/heure
+- 📝 Logs rotatifs sur 30 jours
+
+### **Protection Multi-Couches**
+- ✅ **CSRF** : 100% des formulaires protégés avec tokens
+- ✅ **Injection SQL** : 156 requêtes préparées (0 vulnérabilité)
+- ✅ **XSS** : Sanitisation systématique
+- ✅ **Brute Force** : Rate limiting sur 6 endpoints
+- ✅ **Session Hijacking** : Détection automatique
+
+**Composants sécurité : 527 lignes de code éprouvé**
+
+> ⚠️ **Cette fonctionnalité seule vaut 2 000€** et n'existe dans AUCUNE marketplace PHP open-source.
+
+---
+
+## 🛠️ Stack Technique
 
 ### **Backend**
-- **PHP 8.2** - Typed, attributes, readonly properties
-- **PostgreSQL 12+** - JSON support, transactions, performance
-- **Custom MVC Architecture** - No heavy framework bloat
-- **PSR-4 Autoloading** - PHP-FIG standards
-- **156 prepared statements** - Zero SQL injection vulnerabilities
+- **PHP 8.2** - Typage strict, attributes, propriétés readonly
+- **PostgreSQL 12+** - Support JSON, transactions, performance
+- **Architecture MVC sur mesure** - Pas de framework lourd
+- **PSR-4 Autoloading** - Standards PHP-FIG
+- **156 requêtes préparées** - Zéro vulnérabilité SQL injection
 
 ### **Frontend**
-- **HTML5 / CSS3** - Semantic markup
-- **Vanilla JavaScript** - No framework dependencies
-- **CSS Variables** - Easy theming (dark mode included)
-- **Grid / Flexbox** - Modern responsive layouts
+- **HTML5 / CSS3** - Balisage sémantique
+- **JavaScript Vanilla** - Aucune dépendance framework
+- **CSS Variables** - Théming facile (dark mode inclus)
+- **Grid / Flexbox** - Layouts responsive modernes
 
-### **Integrations**
-- **Stripe** - Complete payment system (checkout, webhooks, refunds)
-- **Chart.js** - Beautiful analytics dashboards
+### **Intégrations**
+- **Stripe** - Système de paiement complet (checkout, webhooks, remboursements)
+- **Chart.js** - Dashboards analytics élégants
 
-### **Security**
-- **BCrypt** - Password hashing
-- **CSRF Tokens** - Form protection
-- **Rate Limiting** - Brute force prevention
-- **XSS Protection** - Input sanitization
+### **Sécurité**
+- **BCrypt** - Hash des mots de passe
+- **Tokens CSRF** - Protection formulaires
+- **Rate Limiting** - Prévention brute force
+- **Protection XSS** - Sanitisation des entrées
 
 ---
 
-## 📦 Quick Installation
+## 📦 Installation Rapide
 
-### **Prerequisites**
+### **Prérequis**
 - PHP >= 8.0
 - PostgreSQL >= 12
-- Web server (Apache/Nginx)
-- Stripe account (free test mode)
+- Serveur web (Apache/Nginx)
+- Compte Stripe (mode test gratuit)
 
-### **Setup (< 10 minutes)**
+### **Installation (< 10 minutes)**
 ```bash
-# 1. Clone repository
+# 1. Cloner le dépôt
 git clone https://github.com/adevance/marketflow-pro.git
 cd marketflow-pro
 
-# 2. Create database
+# 2. Créer la base de données
 createdb marketflow_db
 
-# 3. Import schema
+# 3. Importer le schéma
 psql marketflow_db < database/schema.sql
 
-# 4. Configure
+# 4. Configuration
 cp config/config.example.php config/config.php
-nano config/config.php  # Edit with your settings
+nano config/config.php  # Éditer avec vos paramètres
 
-# 5. Set permissions
+# 5. Permissions
 mkdir -p public/uploads/{products,avatars}
 chmod -R 755 public/uploads
 
-# 6. Configure Stripe
-# Add your Stripe keys in config/config.php
+# 6. Configurer Stripe
+# Ajouter vos clés Stripe dans config/config.php
 
-# 7. Access application
-# http://your-domain.com
+# 7. Accéder à l'application
+# http://votre-domaine.com
 ```
 
 ---
 
-## 📊 Code Statistics
+## 📊 Statistiques du Code
 
-| Metric | Value |
-|--------|-------|
-| **Total Lines** | 40,000+ |
-| **PHP Files** | 87 |
-| **Controllers** | 14 |
-| **Models** | 12 |
-| **Views** | 45+ |
-| **Core Framework** | 2,258 lines |
-| **Security System** | 527 lines |
-| **Prepared Statements** | 156 |
-| **Test Coverage** | Production-ready |
+| Métrique | Valeur |
+|----------|--------|
+| **Lignes totales** | 40 000+ |
+| **Fichiers PHP** | 87 |
+| **Contrôleurs** | 14 |
+| **Modèles** | 12 |
+| **Vues** | 45+ |
+| **Framework Core** | 2 258 lignes |
+| **Système Sécurité** | 527 lignes |
+| **Requêtes préparées** | 156 |
+| **Couverture tests** | Prêt production |
 
 ---
 
-## 🎨 Screenshots
+## 🎨 Captures d'Écran
 
-### Homepage
+### Page d'accueil
 ![Homepage](docs/screenshots/homepage.png)
 
-### Seller Dashboard
+### Dashboard Vendeur
 ![Dashboard](docs/screenshots/seller-dashboard.png)
 
-### Admin Panel
+### Panel Admin
 ![Admin](docs/screenshots/admin-panel.png)
 
-### Security Dashboard (UNIQUE)
+### Dashboard Sécurité (UNIQUE)
 ![Security](docs/screenshots/security-dashboard.png)
 
 ---
 
 ## 📚 Documentation
 
-- 📖 **[Installation Guide](docs/INSTALLATION.md)**
+- 📖 **[Guide d'Installation](docs/INSTALLATION.md)**
 - 🔧 **[Configuration](docs/CONFIGURATION.md)**
 - 🏗️ **[Architecture](ARCHITECTURE.md)**
-- 🔐 **[Security](docs/SECURITY.md)**
-- 🚀 **[Deployment](docs/DEPLOYMENT.md)**
-- 📡 **[API Reference](docs/API.md)**
+- 🔐 **[Sécurité](docs/SECURITY.md)**
+- 🚀 **[Déploiement](docs/DEPLOYMENT.md)**
+- 📡 **[Référence API](docs/API.md)**
 
 ---
 
 ## ⚡ Performance
 
-**Optimizations Included:**
-- 🚀 Optimized queries with indexes
-- 💾 Lazy loading images
-- 🗄️ System cache
-- 📦 Minified CSS/JS
-- 🔄 AJAX partial loading
+**Optimisations incluses :**
+- 🚀 Requêtes optimisées avec index
+- 💾 Lazy loading des images
+- 🗄️ Cache système
+- 📦 CSS/JS minifiés
+- 🔄 Chargement AJAX partiel
 
-**Benchmarks (VPS 2CPU/4GB):**
-- Homepage: < 500ms
-- Product catalog: < 800ms
-- Checkout: < 1s
-
----
-
-## 💰 Commercial License
-
-**Included with purchase:**
-- ✅ Full source code access
-- ✅ Unlimited usage rights
-- ✅ Modification allowed
-- ✅ Commercial use allowed
-- ✅ 60-day support
-- ✅ 6-month updates
-
-**Not included:**
-- ❌ Code resale prohibited
-- ❌ Free distribution prohibited
-
-**Price:** €5,000 (Launch offer - 3 licenses only)
+**Benchmarks (VPS 2CPU/4GB) :**
+- Page d'accueil : < 500ms
+- Catalogue produits : < 800ms
+- Checkout : < 1s
 
 ---
 
-## 🎯 ROI Calculation
+## 💰 Licence Commerciale
 
-| Component | Dev Hours | Rate (€50/h) | Value |
-|-----------|-----------|--------------|-------|
-| Backend (40K lines) | 250h | €50 | €12,500 |
-| Security System | 30h | €50 | €1,500 |
-| Stripe Integration | 20h | €50 | €1,000 |
-| Admin Dashboard | 40h | €50 | €2,000 |
-| Frontend/UI | 80h | €50 | €4,000 |
-| **TOTAL** | **420h** | | **€21,000** |
+**Inclus avec l'achat :**
+- ✅ Accès code source complet
+- ✅ Droits d'utilisation illimités
+- ✅ Modifications autorisées
+- ✅ Usage commercial autorisé
+- ✅ Support 60 jours
+- ✅ Mises à jour 6 mois
 
-**Your price: €5,000 = 76% savings = €16,000 saved**
+**Non inclus :**
+- ❌ Revente du code interdite
+- ❌ Distribution gratuite interdite
+
+**Prix :** 5 000€ (Offre lancement - 3 licences seulement)
 
 ---
 
-## 🚀 Why MarketFlow Pro?
+## 🎯 Calcul du ROI
 
-### **vs Building from Scratch**
-- ⏰ **3 months saved** - Ready to deploy in < 1 hour
-- 💰 **€16,000 saved** - Professional code at fraction of cost
-- 🔒 **Battle-tested** - Security hardened, production-ready
-- 📚 **Documented** - Complete documentation included
+| Composant | Heures dev | Taux (50€/h) | Valeur |
+|-----------|------------|--------------|--------|
+| Backend (40K lignes) | 250h | 50€ | 12 500€ |
+| Système Sécurité | 30h | 50€ | 1 500€ |
+| Intégration Stripe | 20h | 50€ | 1 000€ |
+| Dashboard Admin | 40h | 50€ | 2 000€ |
+| Frontend/UI | 80h | 50€ | 4 000€ |
+| **TOTAL** | **420h** | | **21 000€** |
 
-### **vs Other Solutions**
-- ✅ **No monthly fees** - One-time purchase, yours forever
-- ✅ **Full source code** - Complete control & customization
-- ✅ **Modern stack** - PHP 8.2, PostgreSQL, latest practices
-- ✅ **Unique security** - Real-time monitoring dashboard
+**Votre prix : 5 000€ = 76% d'économie = 16 000€ économisés**
+
+---
+
+## 🚀 Pourquoi MarketFlow Pro ?
+
+### **vs Développement from scratch**
+- ⏰ **3 mois économisés** - Prêt à déployer en < 1 heure
+- 💰 **16 000€ économisés** - Code professionnel à fraction du coût
+- 🔒 **Éprouvé en production** - Sécurité renforcée, prêt production
+- 📚 **Documenté** - Documentation complète incluse
+
+### **vs Autres solutions**
+- ✅ **Pas de frais mensuels** - Achat unique, à vous pour toujours
+- ✅ **Code source complet** - Contrôle total & personnalisation
+- ✅ **Stack moderne** - PHP 8.2, PostgreSQL, dernières pratiques
+- ✅ **Sécurité unique** - Dashboard monitoring temps réel
 
 ---
 
 ## 📞 Contact & Support
 
-**Creator:** A. Devancé - Senior Full-Stack Developer
+**Créatrice :** A. Devancé - Développeuse Full-Stack Senior
 
-📧 **Email:** a.devance@proton.me  
-💼 **LinkedIn:** [linkedin.com/in/a-devance](https://linkedin.com/in/a-devance)  
-🔗 **Demo:** [View Live Demo](https://astonishing-nurturing-production.up.railway.app/)
-
----
-
-## 🙏 Built With
-
-- [PHP](https://php.net) - Backend language
-- [PostgreSQL](https://postgresql.org) - Database
-- [Stripe](https://stripe.com) - Payments
-- [Chart.js](https://chartjs.org) - Analytics graphs
+📧 **Email :** a.devance@proton.me  
+💼 **LinkedIn :** [linkedin.com/in/a-devance](https://linkedin.com/in/a-devance)  
+🔗 **Démo :** [Voir la démo live](https://astonishing-nurturing-production.up.railway.app/)
 
 ---
 
-## 📄 License
+## 🙏 Construit Avec
 
-**Commercial License** - See [LICENSE.md](LICENSE.md) for details
+- [PHP](https://php.net) - Langage backend
+- [PostgreSQL](https://postgresql.org) - Base de données
+- [Stripe](https://stripe.com) - Paiements
+- [Chart.js](https://chartjs.org) - Graphiques analytics
+
+---
+
+## 📄 Licence
+
+**Licence Commerciale** - Voir [LICENSE.md](LICENSE.md) pour détails
 
 ---
 
 <div align="center">
 
-**MarketFlow Pro v1.0.0** - January 2025
+**MarketFlow Pro v1.0.0** - Janvier 2025
 
-Made with ❤️ by [A. Devancé](https://linkedin.com/in/a-devance)
+Créé avec ❤️ par [A. Devancé](https://linkedin.com/in/a-devance)
 
-[Buy Now](mailto:a.devance@proton.me) • [View Demo](https://astonishing-nurturing-production.up.railway.app/) • [Documentation](docs/)
+[Acheter](mailto:a.devance@proton.me) • [Voir Démo](https://astonishing-nurturing-production.up.railway.app/) • [Documentation](docs/)
 
 </div>
