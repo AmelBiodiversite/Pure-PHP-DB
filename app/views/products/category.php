@@ -6,10 +6,20 @@
 ?>
 
 <!-- Fil d'Ariane pour navigation contextuelle -->
-<nav class="container mt-4" aria-label="Breadcrumb">
-    <ol style="display: flex; gap: 0.5rem; list-style: none; padding: 0; margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+<nav class="container" style="margin-top: 2rem; position: relative; z-index: 1;" aria-label="Breadcrumb">
+    <ol style="
+        display: flex; 
+        align-items: center;
+        gap: 0.5rem; 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+        font-size: 0.875rem; 
+        color: var(--text-secondary);
+        flex-wrap: wrap;
+    ">
         <!-- Lien vers accueil -->
-        <li>
+        <li style="display: flex; align-items: center;">
             <a href="/" style="color: var(--text-secondary); text-decoration: none; transition: color var(--transition-fast);" 
                onmouseover="this.style.color='var(--primary-600)'" 
                onmouseout="this.style.color='var(--text-secondary)'">
@@ -18,10 +28,12 @@
         </li>
         
         <!-- Séparateur -->
-        <li aria-hidden="true" style="color: var(--text-tertiary);">/</li>
+        <li aria-hidden="true" style="color: var(--text-tertiary); display: flex; align-items: center; user-select: none;">
+            /
+        </li>
         
         <!-- Lien vers toutes les catégories -->
-        <li>
+        <li style="display: flex; align-items: center;">
             <a href="/category" style="color: var(--text-secondary); text-decoration: none; transition: color var(--transition-fast);"
                onmouseover="this.style.color='var(--primary-600)'" 
                onmouseout="this.style.color='var(--text-secondary)'">
@@ -30,10 +42,12 @@
         </li>
         
         <!-- Séparateur -->
-        <li aria-hidden="true" style="color: var(--text-tertiary);">/</li>
+        <li aria-hidden="true" style="color: var(--text-tertiary); display: flex; align-items: center; user-select: none;">
+            /
+        </li>
         
         <!-- Catégorie actuelle -->
-        <li style="font-weight: 600; color: var(--primary-600);" aria-current="page">
+        <li style="font-weight: 600; color: var(--primary-600); display: flex; align-items: center;" aria-current="page">
             <?= e($category['name']) ?>
         </li>
     </ol>
@@ -41,32 +55,42 @@
 
 <!-- En-tête de catégorie avec description -->
 <section class="container mt-8">
-    <div class="flex flex-between flex-wrap gap-6 mb-8">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
         <!-- Titre et description -->
-        <div class="flex-1" style="min-width: 300px;">
-            <h1 class="mb-3"><?= e($category['name']) ?></h1>
+        <div style="flex: 1; min-width: 300px;">
+            <h1 style="margin-bottom: 0.75rem;"><?= e($category['name']) ?></h1>
             
             <?php if (!empty($category['description'])): ?>
                 <!-- Description de la catégorie -->
-                <p class="text-lg text-secondary" style="max-width: 600px; line-height: 1.7;">
+                <p style="font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; line-height: 1.7; margin-bottom: 0;">
                     <?= e($category['description']) ?>
                 </p>
             <?php endif; ?>
             
             <!-- Compteur de produits -->
-            <p class="mt-4 text-sm text-tertiary">
+            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-tertiary); margin-bottom: 0;">
                 <strong><?= count($products) ?></strong> produit<?= count($products) > 1 ? 's' : '' ?> disponible<?= count($products) > 1 ? 's' : '' ?>
             </p>
         </div>
 
         <!-- Filtres et tri (zone droite) -->
-        <div class="flex gap-3 items-center">
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
             <!-- Tri par prix -->
             <select 
                 id="sortFilter" 
-                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer"
-                style="min-width: 180px;"
+                style="
+                    min-width: 180px;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-300);
+                    border-radius: var(--radius-lg);
+                    font-size: 0.9375rem;
+                    cursor: pointer;
+                    transition: all var(--transition-base);
+                    background: white;
+                "
                 onchange="applySorting(this.value)"
+                onfocus="this.style.borderColor='var(--primary-500)'; this.style.outline='2px solid var(--primary-200)'; this.style.outlineOffset='0'"
+                onblur="this.style.borderColor='var(--gray-300)'; this.style.outline='none'"
             >
                 <option value="newest">Plus récents</option>
                 <option value="price_asc">Prix croissant</option>
@@ -81,6 +105,7 @@
                 onclick="switchView('grid')"
                 aria-label="Vue grille"
                 title="Vue grille"
+                style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
             >
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                     <!-- Icône grille (4 carrés) -->
@@ -102,16 +127,16 @@
             <!-- Icône illustrative -->
             <div style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;">📦</div>
             
-            <h3 class="mb-4" style="color: var(--text-secondary);">
+            <h3 style="margin-bottom: 1rem; color: var(--text-secondary);">
                 Aucun produit dans cette catégorie
             </h3>
             
-            <p class="text-secondary mb-6">
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
                 Soyez le premier à ajouter un produit dans <strong><?= e($category['name']) ?></strong> !
             </p>
             
             <!-- Boutons d'action -->
-            <div class="flex gap-4 justify-center flex-wrap">
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                 <a href="/category" class="btn btn-outline">
                     Voir toutes les catégories
                 </a>
@@ -218,7 +243,7 @@
                                 <?php endif; ?>
 
                                 <!-- Nom du vendeur -->
-                                <p style="font-size: 0.75rem; color: var(--text-tertiary);">
+                                <p style="font-size: 0.75rem; color: var(--text-tertiary); margin: 0;">
                                     par <strong><?= e($product['seller_name']) ?></strong>
                                 </p>
                             </div>
@@ -238,7 +263,7 @@
 <!-- Pagination si nécessaire -->
 <?php if (!empty($pagination) && $pagination['total_pages'] > 1): ?>
     <section class="container mb-16">
-        <nav aria-label="Pagination" class="flex justify-center gap-2">
+        <nav aria-label="Pagination" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
             <!-- Bouton précédent -->
             <?php if ($pagination['current'] > 1): ?>
                 <a 
