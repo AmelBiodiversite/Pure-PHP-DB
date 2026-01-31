@@ -1,17 +1,53 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz.env
+# === FICHIERS SENSIBLES ===
+.env
+config/config.php.backup_css
 
-# Backups
+# === BACKUPS & SQL ===
 *.backup*
 *.sql
 *_backup_*.sql
 *.csv
+marketflow_replit_export_*.sql
 
-# Fichiers de debug
+# === FICHIERS DEBUG ===
 phpinfo.php
 clear-*.php
 test-*.php
+public/clear-flash.php
+
+# === GROS FICHIERS / VENTE ===
+MARKETFLOW_V1_VENTE.zip
+*.tar.gz
+
+# === DOSSIER AUDIT (doublon) ===
+audit_repo/
+audit_marketflow_*.txt
+
+# === LOGS ===
+logs/*.log
+tmp/sessions/*
+
+# === DEPENDENCIES ===
+node_modules/
+vendor/
+.cache/
+
+# === IDE & OS ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# === REPLIT SPECIFIC ===
+.replit
+replit.nix
+replit.md
+.config/
+.local/
+.php.ini
+
+# === BUILD ===
+dist/
+build/
+server/public
+vite.config.ts.*
