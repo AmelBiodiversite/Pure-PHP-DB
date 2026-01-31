@@ -400,28 +400,43 @@ if (isset($_SESSION['user_id'])) {
             ]);
         }
 
-        public function category($slug) {
-            // Récupérer la catégorie
-            $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
-            $stmt->execute(['slug' => $slug]);
-            $category = $stmt->fetch();
-        
+            /**
+     * Affiche les produits d'une catégorie avec filtres et tri
+     */
+    public function category($slug) {
+        // Récupérer la catégorie depuis le slug
+        $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
+        $stmt->execute(['slug' => $slug]);
+        $category = $stmt->fetch();
+    
         if (!$category) {
             redirectWithMessage('/', 'Catégorie introuvable', 'error');
             return;
         }
 
-        // Produits de la catégorie
-        $filters = ['category_id' => $category['id']];
-        $result = $this->productModel->getProducts($filters, 1, 24);
+        // Récupération des paramètres de tri et pagination
+        $sort = $_GET['sort'] ?? 'newest';
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = 24;
 
+        // Filtres pour le modèle Product
+        $filters = [
+            'category_id' => $category['id'],
+            'sort' => $sort
+        ];
+
+        // Récupération des produits via le modèle
+        $result = $this->productModel->getProducts($filters, $page, $perPage);
+
+        // Rendu de la vue avec toutes les données
         $this->render('products/category', [
             'title' => $category['name'],
             'category' => $category,
             'products' => $result['products'],
             'pagination' => [
                 'current' => $result['page'],
-                'total_pages' => $result['total_pages']
+                'total_pages' => $result['total_pages'],
+                'total_items' => $result['total']
             ]
         ]);
     }
