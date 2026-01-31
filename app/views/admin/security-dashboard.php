@@ -367,6 +367,35 @@
                 📊 Statistiques par type d'événement (7 derniers jours)
             </div>
 
+        <!-- Section Graphiques -->
+        <div class="section">
+            <div class="section-title">
+                📊 Graphiques de visualisation
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Graphique Donut -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">
+                        🍩 Répartition par type d'événement
+                    </h3>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique IPs -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">
+                        📊 Top 5 IPs suspectes
+                    </h3>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="ipsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
             <table class="events-table">
                 <thead>
                     <tr>
@@ -520,4 +549,133 @@
         <?php endif; ?>
     </script>
 </body>
+
+    <!-- Chart.js Library -->
+    <script src="/public/js/libs/chart.min.js"></script>
+
+    <!-- Initialisation des graphiques -->
+    <script>
+        // Attendre que Chart.js soit chargé
+        if (typeof Chart !== 'undefined') {
+            console.log('✅ Chart.js chargé !');
+            
+            try {
+                // ============================================================
+                // GRAPHIQUE 1 : Donut - Répartition par type d'événement
+                // ============================================================
+                const statsLabels = <?= json_encode(array_keys($stats ?? [])) ?>;
+                const statsData = <?= json_encode(array_values($stats ?? [])) ?>;
+                
+                if (statsLabels.length > 0) {
+                    const donutCtx = document.getElementById('donutChart').getContext('2d');
+                    new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: statsLabels,
+                            datasets: [{
+                                data: statsData,
+                                backgroundColor: [
+                                    '#3498db', '#e74c3c', '#f39c12', '#2ecc71', 
+                                    '#9b59b6', '#1abc9c', '#34495e', '#e67e22'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 10,
+                                        font: { size: 11 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return label + ': ' + value + ' (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('✅ Graphique Donut créé');
+                }
+
+                // ============================================================
+                // GRAPHIQUE 2 : Barres - Top 5 IPs suspectes
+                // ============================================================
+                const suspiciousIPs = <?= json_encode($suspiciousIPs ?? []) ?>;
+                const top5IPs = suspiciousIPs.slice(0, 5);
+                const ipLabels = top5IPs.map(ip => ip.ip);
+                const ipScores = top5IPs.map(ip => ip.severity_score);
+
+                if (ipLabels.length > 0) {
+                    const ipsCtx = document.getElementById('ipsChart').getContext('2d');
+                    new Chart(ipsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ipLabels,
+                            datasets: [{
+                                label: 'Score de gravité',
+                                data: ipScores,
+                                backgroundColor: ipScores.map(score => {
+                                    if (score >= 50) return '#e74c3c';  // Rouge
+                                    if (score >= 20) return '#f39c12';  // Orange
+                                    return '#3498db';                    // Bleu
+                                }),
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',  // Barres horizontales
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const ip = top5IPs[context.dataIndex];
+                                            let details = 'Score: ' + context.parsed.x;
+                                            if (ip.failed_logins > 0) details += ' | Échecs: ' + ip.failed_logins;
+                                            if (ip.csrf_violations > 0) details += ' | CSRF: ' + ip.csrf_violations;
+                                            if (ip.xss_attempts > 0) details += ' | XSS: ' + ip.xss_attempts;
+                                            return details;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'Score de gravité' }
+                                }
+                            }
+                        }
+                    });
+                    console.log('✅ Graphique IPs créé');
+                } else {
+                    document.getElementById('ipsChart').parentElement.innerHTML = 
+                        '<p style="text-align: center; color: #7f8c8d; padding: 40px;">Aucune IP suspecte détectée</p>';
+                }
+
+                console.log('📊 Dashboard de sécurité avec graphiques chargé !');
+                
+            } catch (error) {
+                console.error('❌ Erreur lors de la création des graphiques:', error);
+            }
+        } else {
+            console.error('❌ Chart.js n\'est pas chargé');
+        }
+    </script>
 </html>
