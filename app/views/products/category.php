@@ -7,17 +7,35 @@
 
 <!-- Fil d'Ariane pour navigation contextuelle -->
 <nav class="container mt-4" aria-label="Breadcrumb">
-    <ol class="flex gap-2 text-sm text-gray-600">
+    <ol style="display: flex; gap: 0.5rem; list-style: none; padding: 0; margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
         <!-- Lien vers accueil -->
-        <li><a href="/" class="hover:text-primary-600 transition-colors">Accueil</a></li>
-        <li aria-hidden="true">/</li>
+        <li>
+            <a href="/" style="color: var(--text-secondary); text-decoration: none; transition: color var(--transition-fast);" 
+               onmouseover="this.style.color='var(--primary-600)'" 
+               onmouseout="this.style.color='var(--text-secondary)'">
+                Accueil
+            </a>
+        </li>
+        
+        <!-- Séparateur -->
+        <li aria-hidden="true" style="color: var(--text-tertiary);">/</li>
         
         <!-- Lien vers toutes les catégories -->
-        <li><a href="/products/categories" class="hover:text-primary-600 transition-colors">Catégories</a></li>
-        <li aria-hidden="true">/</li>
+        <li>
+            <a href="/category" style="color: var(--text-secondary); text-decoration: none; transition: color var(--transition-fast);"
+               onmouseover="this.style.color='var(--primary-600)'" 
+               onmouseout="this.style.color='var(--text-secondary)'">
+                Catégories
+            </a>
+        </li>
+        
+        <!-- Séparateur -->
+        <li aria-hidden="true" style="color: var(--text-tertiary);">/</li>
         
         <!-- Catégorie actuelle -->
-        <li class="font-semibold text-primary-600" aria-current="page"><?= e($category['name']) ?></li>
+        <li style="font-weight: 600; color: var(--primary-600);" aria-current="page">
+            <?= e($category['name']) ?>
+        </li>
     </ol>
 </nav>
 
@@ -94,7 +112,7 @@
             
             <!-- Boutons d'action -->
             <div class="flex gap-4 justify-center flex-wrap">
-                <a href="/products/categories" class="btn btn-outline">
+                <a href="/category" class="btn btn-outline">
                     Voir toutes les catégories
                 </a>
                 
