@@ -13,6 +13,10 @@ class SecurityLogger {
         $this->logFile = $logDir . '/security.log';
     }
     
+    public function getLogFile() {
+        return $this->logFile;
+    }
+    
     public function log($type, $data = []) {
         $entry = [
             'timestamp' => date('Y-m-d H:i:s'),
@@ -22,12 +26,7 @@ class SecurityLogger {
             'data' => $data
         ];
         
-        file_put_contents(
-            $this->logFile,
-            json_encode($entry) . PHP_EOL,
-            FILE_APPEND
-        );
-        
+        file_put_contents($this->logFile, json_encode($entry) . PHP_EOL, FILE_APPEND);
         return true;
     }
     
