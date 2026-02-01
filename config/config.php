@@ -12,7 +12,7 @@ define('DATABASE_URL', getenv('DATABASE_URL'));
 // ================================================================
 // CONFIGURATION URLs
 // ================================================================
-define('APP_URL', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+define('APP_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 // Détection automatique du chemin CSS selon l'environnement
 if (getenv('RAILWAY_ENVIRONMENT') || isset($_SERVER['RAILWAY_ENVIRONMENT'])) {
     // Sur Railway : pas de /public/ dans l'URL
@@ -20,8 +20,8 @@ if (getenv('RAILWAY_ENVIRONMENT') || isset($_SERVER['RAILWAY_ENVIRONMENT'])) {
     define('JS_URL', APP_URL . '/js');
 } else {
     // Sur Replit/Local : avec /public/ dans l'URL
-    define('CSS_URL', APP_URL . '/public/css');
-    define('JS_URL', APP_URL . '/public/js');
+    define('CSS_URL', APP_URL . '/css');
+    define('JS_URL', APP_URL . '/js');
 }
 define('IMG_URL', APP_URL . '/img');
 define('UPLOAD_URL', APP_URL . '/public/uploads');
