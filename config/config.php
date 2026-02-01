@@ -30,10 +30,10 @@ if ($isProduction) {
     // ============================================================
     // Sur Railway, le serveur pointe vers la racine du projet
     // Les fichiers statiques sont dans /public/css/, /public/js/
-    define('CSS_URL', APP_URL . '/public/css');
-    define('JS_URL', APP_URL . '/public/js');
-    define('IMG_URL', APP_URL . '/public/img');
-    define('UPLOAD_URL', APP_URL . '/public/uploads');
+    define('CSS_URL', APP_URL . '/css');
+    define('JS_URL', APP_URL . '/js');
+    define('IMG_URL', APP_URL . '/img');
+    define('UPLOAD_URL', APP_URL . '/uploads');
 } else {
     // ============================================================
     // LOCAL (Chromebook avec php -S depuis /public/)
