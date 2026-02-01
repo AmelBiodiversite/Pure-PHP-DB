@@ -551,7 +551,7 @@
 </body>
 
     <!-- Chart.js Library -->
-    <script src="/js/libs/chart.min.js"></script>
+    <script src="/js/vendor/chart.umd.js"></script>
 
     <!-- Initialisation des graphiques -->
     <script>
