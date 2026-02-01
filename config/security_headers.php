@@ -120,7 +120,7 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
  */
 header("Content-Security-Policy: " .
     "default-src 'self'; " .
-    "script-src 'self' 'unsafe-inline' https://js.stripe.com; " .
+       "script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net" .
     "style-src 'self' 'unsafe-inline'; " .
     "img-src 'self' data: https:; " .
     "font-src 'self' data:; " .
