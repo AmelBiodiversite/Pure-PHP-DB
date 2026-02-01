@@ -1,0 +1,772 @@
+/**
+ * ================================================================
+ * MARKETFLOW PRO - ANIMATIONS CSS COMPLÉMENTAIRES v1.0
+ * ================================================================
+ * 
+ * Fichier complémentaire au style.css existant
+ * Ajoute des animations et micro-interactions avancées
+ * 
+ * INTÉGRATION :
+ * À charger après style.css dans le header.php :
+ * <link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">
+ * 
+ * @author MarketFlow Team
+ * @version 1.0
+ * @date 2025-01-31
+ * ================================================================
+ */
+
+/* ================================================================
+   ANIMATIONS KEYFRAMES AVANCÉES
+   ================================================================ */
+
+/* Fade avec bounce */
+@keyframes fadeInBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Slide depuis le bas avec élasticité */
+@keyframes slideInUpElastic {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-10px);
+    }
+    80% {
+        transform: translateY(5px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Rotation entrante */
+@keyframes rotateIn {
+    0% {
+        opacity: 0;
+        transform: rotate(-200deg) scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: rotate(0) scale(1);
+    }
+}
+
+/* Shake (secousse) */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Shimmer effet brillant */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Heartbeat */
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    10%, 30% {
+        transform: scale(0.9);
+    }
+    20%, 40%, 60%, 80% {
+        transform: scale(1.1);
+    }
+    50%, 70% {
+        transform: scale(1.05);
+    }
+}
+
+/* Swing */
+@keyframes swing {
+    20% {
+        transform: rotate(15deg);
+    }
+    40% {
+        transform: rotate(-10deg);
+    }
+    60% {
+        transform: rotate(5deg);
+    }
+    80% {
+        transform: rotate(-5deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+/* Jello (effet gélatine) */
+@keyframes jello {
+    0%, 100% {
+        transform: skewX(0deg) skewY(0deg);
+    }
+    30% {
+        transform: skewX(25deg) skewY(25deg);
+    }
+    40% {
+        transform: skewX(-15deg) skewY(-15deg);
+    }
+    50% {
+        transform: skewX(15deg) skewY(15deg);
+    }
+    65% {
+        transform: skewX(-5deg) skewY(-5deg);
+    }
+    75% {
+        transform: skewX(5deg) skewY(5deg);
+    }
+}
+
+/* Bounce in */
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Flip in X */
+@keyframes flipInX {
+    0% {
+        opacity: 0;
+        transform: perspective(400px) rotateX(90deg);
+    }
+    40% {
+        transform: perspective(400px) rotateX(-10deg);
+    }
+    70% {
+        transform: perspective(400px) rotateX(10deg);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(400px) rotateX(0deg);
+    }
+}
+
+/* Zoom in */
+@keyframes zoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Glow pulse */
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.3),
+                    0 0 10px rgba(59, 130, 246, 0.2),
+                    0 0 15px rgba(59, 130, 246, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
+                    0 0 20px rgba(59, 130, 246, 0.3),
+                    0 0 30px rgba(59, 130, 246, 0.2);
+    }
+}
+
+/* ================================================================
+   CLASSES UTILITAIRES D'ANIMATION
+   ================================================================ */
+
+.animate-bounce-in {
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-slide-up-elastic {
+    animation: slideInUpElastic 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-rotate-in {
+    animation: rotateIn 0.6s ease-out;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.animate-shimmer {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+.animate-heartbeat {
+    animation: heartbeat 1.3s ease-in-out infinite;
+}
+
+.animate-swing {
+    transform-origin: top center;
+    animation: swing 1s ease-in-out;
+}
+
+.animate-jello {
+    animation: jello 0.9s;
+}
+
+.animate-flip-in {
+    animation: flipInX 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-zoom-in {
+    animation: zoomIn 0.5s ease-out;
+}
+
+.animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ================================================================
+   AMÉLIORATIONS DES PRODUCT CARDS
+   ================================================================ */
+
+.product-card {
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Badge New avec animation */
+.product-badge.badge-new {
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+/* Badge Sale avec animation */
+.product-badge.badge-sale {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Image produit - optimisation performance */
+.product-image-container img {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Quick actions - animation d'apparition améliorée */
+.product-actions {
+    will-change: opacity, bottom;
+}
+
+.product-card:hover .product-actions .action-btn {
+    animation: bounceIn 0.4s ease-out backwards;
+}
+
+.product-card:hover .product-actions .action-btn:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.product-card:hover .product-actions .action-btn:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.product-card:hover .product-actions .action-btn:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+/* ================================================================
+   BOUTONS - MICRO-INTERACTIONS AVANCÉES
+   ================================================================ */
+
+/* Bouton avec effet de loading */
+.btn.is-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn.is-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Bouton avec effet success */
+.btn.is-success {
+    background: var(--success) !important;
+    animation: bounceIn 0.5s ease-out;
+}
+
+.btn.is-success::before {
+    content: '✓';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* ================================================================
+   FORMS - ANIMATIONS AVANCÉES
+   ================================================================ */
+
+/* Label flottant */
+.form-floating {
+    position: relative;
+}
+
+.form-floating input,
+.form-floating textarea {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+}
+
+.form-floating label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: all 0.2s ease-out;
+    color: var(--text-tertiary);
+}
+
+.form-floating input:focus ~ label,
+.form-floating input:not(:placeholder-shown) ~ label,
+.form-floating textarea:focus ~ label,
+.form-floating textarea:not(:placeholder-shown) ~ label {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+/* Input avec validation */
+input.is-valid,
+textarea.is-valid {
+    border-color: var(--success) !important;
+    padding-right: 3rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+input.is-invalid,
+textarea.is-invalid {
+    border-color: var(--error) !important;
+    padding-right: 3rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ef4444' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+/* Checkbox et Radio personnalisés */
+.custom-checkbox,
+.custom-radio {
+    position: relative;
+    display: inline-block;
+    padding-left: 1.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox input,
+.custom-radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-checkbox .checkmark,
+.custom-radio .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    transition: all 0.2s ease-out;
+}
+
+.custom-radio .checkmark {
+    border-radius: 50%;
+}
+
+.custom-checkbox:hover input ~ .checkmark,
+.custom-radio:hover input ~ .checkmark {
+    border-color: var(--primary-500);
+    background-color: var(--primary-50);
+}
+
+.custom-checkbox input:checked ~ .checkmark,
+.custom-radio input:checked ~ .checkmark {
+    background-color: var(--primary-600);
+    border-color: var(--primary-600);
+    animation: bounceIn 0.3s ease-out;
+}
+
+.custom-checkbox .checkmark::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-radio .checkmark::after {
+    content: '';
+    position: absolute;
+    display: none;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.custom-checkbox input:checked ~ .checkmark::after,
+.custom-radio input:checked ~ .checkmark::after {
+    display: block;
+}
+
+/* ================================================================
+   TOASTS & NOTIFICATIONS - ANIMATIONS AMÉLIORÉES
+   ================================================================ */
+
+.notification-toast {
+    animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-toast.hide {
+    animation: slideOutRight 0.3s ease-in forwards;
+}
+
+@keyframes slideOutRight {
+    to {
+        opacity: 0;
+        transform: translateX(400px) scale(0.8);
+    }
+}
+
+/* ================================================================
+   MODALS - ANIMATIONS
+   ================================================================ */
+
+.modal {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: slideInUpElastic 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modal.closing {
+    animation: fadeOut 0.2s ease-in forwards;
+}
+
+.modal.closing .modal-content {
+    animation: slideOutDown 0.3s ease-in forwards;
+}
+
+@keyframes slideOutDown {
+    to {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+/* ================================================================
+   DROPDOWNS - ANIMATIONS AMÉLIORÉES
+   ================================================================ */
+
+.dropdown-menu {
+    animation: dropdownSlideIn 0.2s ease-out;
+    transform-origin: top;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scaleY(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}
+
+/* ================================================================
+   SKELETON LOADERS
+   ================================================================ */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--gray-200) 25%,
+        var(--gray-100) 50%,
+        var(--gray-200) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 60%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.skeleton-card {
+    width: 100%;
+    height: 200px;
+}
+
+/* ================================================================
+   PROGRESS BARS - ANIMATIONS
+   ================================================================ */
+
+.progress {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+/* Progress bar indéterminée */
+.progress-bar.is-indeterminate {
+    width: 100% !important;
+    background: var(--gray-200);
+}
+
+.progress-bar.is-indeterminate::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    height: 100%;
+    width: 50%;
+    background: var(--gradient-primary);
+    animation: indeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes indeterminate {
+    0% {
+        left: -50%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* ================================================================
+   BADGES - ANIMATIONS
+   ================================================================ */
+
+.badge.animate {
+    animation: bounceIn 0.5s ease-out;
+}
+
+.badge.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ================================================================
+   ACCESSIBILITY - RESPECT DU PREFERS-REDUCED-MOTION
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .skeleton {
+        animation: none !important;
+        background: var(--gray-200) !important;
+    }
+}
+
+/* ================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ================================================================ */
+
+/* Utiliser will-change pour les éléments fréquemment animés */
+.product-card,
+.btn,
+.notification-toast,
+.modal-content,
+.dropdown-menu {
+    will-change: transform, opacity;
+}
+
+/* GPU acceleration */
+.product-card,
+.btn,
+.card {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* ================================================================
+   DARK MODE SUPPORT
+   ================================================================ */
+
+@media (prefers-color-scheme: dark) {
+    .skeleton {
+        background: linear-gradient(
+            90deg,
+            var(--gray-700) 25%,
+            var(--gray-600) 50%,
+            var(--gray-700) 75%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .progress {
+        background: var(--gray-700);
+    }
+}

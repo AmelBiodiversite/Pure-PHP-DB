@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Monitoring Sécurité') ?> - MarketFlow Admin</title>
-    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
         .security-dashboard {
             max-width: 1400px;
@@ -551,7 +551,7 @@
 </body>
 
     <!-- Chart.js Library -->
-    <script src="/public/js/libs/chart.min.js"></script>
+    <script src="/js/libs/chart.min.js"></script>
 
     <!-- Initialisation des graphiques -->
     <script>

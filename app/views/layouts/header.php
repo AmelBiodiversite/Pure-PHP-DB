@@ -10,9 +10,13 @@
 
 <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
 <link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
+<link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">  
 
-<script src="<?= JS_URL ?>/app.js" defer></script>
-<script src="<?= JS_URL ?>/wishlist.js" defer></script>
+
+    <script src="<?= JS_URL ?>/app.js" defer></script>
+    <script src="<?= JS_URL ?>/notifications.js" defer></script>
+    <script src="<?= JS_URL ?>/wishlist.js" defer></script>
+    <script src="<?= JS_URL ?>/animations.js" defer></script>  
 
 <link rel="icon" href="<?= IMG_URL ?>/favicon.ico">
 
