@@ -120,15 +120,15 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
  */
 header("Content-Security-Policy: " .
     "default-src 'self'; " .
-       "script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net" .
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net; " . // Ajout du ; manquant
     "style-src 'self' 'unsafe-inline'; " .
     "img-src 'self' data: https:; " .
     "font-src 'self' data:; " .
     "connect-src 'self' https://api.stripe.com; " .
     "frame-src https://js.stripe.com; " .
-    "object-src 'none'; " . // Bloque Flash, Java, etc.
-    "base-uri 'self'; " .   // Empêche la modification de <base>
-    "form-action 'self';"   // Formulaires uniquement vers ton domaine
+    "object-src 'none'; " .
+    "base-uri 'self'; " .
+    "form-action 'self';"
 );
 
 /**
