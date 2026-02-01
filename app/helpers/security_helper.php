@@ -21,3 +21,23 @@ function getSecurityAlerts() {
         return 0;
     }
 }
+
+/**
+ * Récupérer les statistiques de sécurité détaillées
+ * @param int $days Nombre de jours à analyser
+ * @return array Statistiques par type d'événement
+ */
+function getSecurityStats($days = 7) {
+    try {
+        $logger = new SecurityLogger();
+        return $logger->getStats($days);
+    } catch (Exception $e) {
+        return [
+            'LOGIN_BLOCKED' => 0,
+            'CSRF_VIOLATION' => 0,
+            'XSS_ATTEMPT' => 0,
+            'SQLI_ATTEMPT' => 0,
+            'UNAUTHORIZED_ACCESS' => 0
+        ];
+    }
+}
