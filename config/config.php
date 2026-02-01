@@ -16,7 +16,8 @@ define('DATABASE_URL', getenv('DATABASE_URL'));
 // CONFIGURATION URLs
 // ================================================================
 // Détection automatique de l'URL de base selon l'environnement
-define('APP_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+$protocol = ($_SERVER['HTTPS'] === 'on' || getenv('RAILWAY_ENVIRONMENT')) ? 'https' : 'http';
+define('APP_URL', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
 // ================================================================
 // DÉTECTION AUTOMATIQUE DE L'ENVIRONNEMENT
@@ -30,6 +31,9 @@ if ($isProduction) {
     // ============================================================
     // Sur Railway, le serveur pointe vers la racine du projet
     // Les fichiers statiques sont dans /public/css/, /public/js/
+// Sur Railway, le Dockerfile démarre avec -t public
+// Donc /public/ EST la racine web, les fichiers sont à /css/ pas /public/css/
+
     define('CSS_URL', APP_URL . '/css');
     define('JS_URL', APP_URL . '/js');
     define('IMG_URL', APP_URL . '/img');
@@ -103,7 +107,7 @@ if (!function_exists('uploadUrl')) {
      * @return string URL complète vers le fichier uploadé
      */
     function uploadUrl($file = '') {
-        return APP_URL . '/public/uploads/' . ltrim($file, '/');
+        return UPLOAD_URL . '/' . ltrim($file, '/');
     }
 }
 
