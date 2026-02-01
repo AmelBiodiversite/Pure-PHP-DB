@@ -30,7 +30,6 @@ class SecurityLogger {
         return true;
     }
     
-    // Méthodes pour AuthController
     public function logLoginBlocked($email, $blockedFor) {
         $this->log('LOGIN_BLOCKED', ['email' => $email, 'blocked_for' => $blockedFor]);
     }
@@ -90,19 +89,28 @@ class SecurityLogger {
             if (!isset($ips[$ip])) {
                 $ips[$ip] = [
                     'ip' => $ip,
+                    'total' => 0,
                     'failed_logins' => 0,
+                    'blocks' => 0,
                     'csrf_violations' => 0,
                     'xss_attempts' => 0,
                     'sqli_attempts' => 0,
-                    'severity_score' => 0
+                    'severity_score' => 0,
+                    'last_event' => ''
                 ];
             }
             
+            $ips[$ip]['total']++;
+            $ips[$ip]['last_event'] = $entry['timestamp'];
+            
             switch ($entry['type']) {
                 case 'LOGIN_FAILED':
-                case 'LOGIN_BLOCKED':
                     $ips[$ip]['failed_logins']++;
                     $ips[$ip]['severity_score'] += 5;
+                    break;
+                case 'LOGIN_BLOCKED':
+                    $ips[$ip]['blocks']++;
+                    $ips[$ip]['severity_score'] += 10;
                     break;
                 case 'CSRF_VIOLATION':
                     $ips[$ip]['csrf_violations']++;

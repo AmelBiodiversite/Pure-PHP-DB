@@ -25,6 +25,7 @@ use Core\SecurityLogger;
 use App\Models\User;
 
 class AuthController extends Controller {
+    private $securityLogger;
     private $userModel;
 
     /**
