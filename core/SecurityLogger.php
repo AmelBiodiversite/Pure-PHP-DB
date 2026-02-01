@@ -30,6 +30,31 @@ class SecurityLogger {
         return true;
     }
     
+    // Méthodes pour AuthController
+    public function logLoginBlocked($email, $blockedFor) {
+        $this->log('LOGIN_BLOCKED', ['email' => $email, 'blocked_for' => $blockedFor]);
+    }
+    
+    public function logCSRFViolation($action, $data = []) {
+        $this->log('CSRF_VIOLATION', ['action' => $action, 'data' => $data]);
+    }
+    
+    public function logLoginSuccess($email, $userId) {
+        $this->log('LOGIN_SUCCESS', ['email' => $email, 'user_id' => $userId]);
+    }
+    
+    public function logLoginFailed($email, $reason) {
+        $this->log('LOGIN_FAILED', ['email' => $email, 'reason' => $reason]);
+    }
+    
+    public function logRegister($email, $userId) {
+        $this->log('REGISTER', ['email' => $email, 'user_id' => $userId]);
+    }
+    
+    public function logLogout($userId) {
+        $this->log('LOGOUT', ['user_id' => $userId]);
+    }
+    
     public function getStats() {
         if (!file_exists($this->logFile)) {
             return [];
@@ -75,6 +100,7 @@ class SecurityLogger {
             
             switch ($entry['type']) {
                 case 'LOGIN_FAILED':
+                case 'LOGIN_BLOCKED':
                     $ips[$ip]['failed_logins']++;
                     $ips[$ip]['severity_score'] += 5;
                     break;

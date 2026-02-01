@@ -34,11 +34,14 @@ class AuthController extends Controller {
     public function __construct() {
         parent::__construct();
         $this->userModel = new User();
+        $this->securityLogger = new SecurityLogger();
+
 
         // Démarrer la session si pas déjà démarrée
         // La session est nécessaire pour stocker les infos de connexion
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+            
         }
     }
 
@@ -88,7 +91,7 @@ class AuthController extends Controller {
         // Vérifier si l'utilisateur n'est pas bloqué
         if (!\Core\RateLimiter::check('login', $email)) {
             $blockedFor = \Core\RateLimiter::blockedFor('login', $email);
-            SecurityLogger::logLoginBlocked($email, $blockedFor); 
+            $this->securityLogger->logLoginBlocked($email, $blockedFor); 
             $this->render('auth/login', [
                 'title' => 'Connexion',
                 'error' => 'Trop de tentatives de connexion. Veuillez réessayer dans ' . 
@@ -101,7 +104,7 @@ class AuthController extends Controller {
         // 🔒 ÉTAPE 1 : VÉRIFIER LE TOKEN CSRF
         // Si le token est invalide, c'est peut-être une attaque CSRF
         if (!\Core\CSRF::validateToken($_POST['csrf_token'] ?? '')) {
-            SecurityLogger::logCSRFViolation('login', $_POST);
+            $this->securityLogger->logCSRFViolation('login', $_POST);
             $this->render('auth/login', [
                 'title' => 'Connexion',
                 'error' => 'Token de sécurité invalide. Veuillez réessayer.',
@@ -136,7 +139,7 @@ class AuthController extends Controller {
             // Réinitialiser le rate limiting (connexion réussie)
             \Core\RateLimiter::clear('login', $email);
 
-            SecurityLogger::logLoginSuccess($email, $user['id']); 
+            $this->securityLogger->logLoginSuccess($email, $user['id']); 
 
             // Créer la session utilisateur (stocke user_id, role, etc.)
             $this->createUserSession($user, $remember);
@@ -152,7 +155,7 @@ class AuthController extends Controller {
         } else {
             // ❌ ÉCHEC DE CONNEXION
 
-            SecurityLogger::logLoginFailed($email, 'invalid_credentials');
+            $this->securityLogger->logLoginFailed($email, 'invalid_credentials');
 
             // Incrémenter le compteur de tentatives
             // 5 tentatives max, blocage 15 minutes
@@ -216,7 +219,7 @@ class AuthController extends Controller {
     private function handleRegister() {
         // 🔒 VÉRIFIER LE TOKEN CSRF
         if (!\Core\CSRF::validateToken($_POST['csrf_token'] ?? '')) {
-            SecurityLogger::logCSRFViolation('register', $_POST); 
+            $this->securityLogger->logCSRFViolation('register', $_POST); 
             $this->render('auth/register', [
                 'title' => 'Inscription',
                 'errors' => ['Token de sécurité invalide. Veuillez réessayer.'],
@@ -306,7 +309,7 @@ class AuthController extends Controller {
         if ($userId) {
             // ✅ INSCRIPTION RÉUSSIE
 
-            SecurityLogger::logRegister($data['email'], $userId);
+            $this->securityLogger->logRegister($data['email'], $userId);
 
             // Récupérer l'utilisateur créé
             $user = $this->userModel->find($userId);
@@ -342,7 +345,7 @@ class AuthController extends Controller {
     public function logout() {
         // Logger la déconnexion avant de détruire la session
         if (isset($_SESSION['user_id'])) {
-            SecurityLogger::logLogout($_SESSION['user_id']);  
+            $this->securityLogger->logLogout($_SESSION['user_id']);  
         }
         
         // Vider toutes les variables de session
