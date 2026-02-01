@@ -153,8 +153,8 @@ class Controller {
      * @param string $type Type de message (success, error, warning, info)
      */
     protected function redirectWithMessage($url, $message, $type = 'info') {
-        $_SESSION['flash_message'] = $message;
-        $_SESSION['flash_type'] = $type;
+        // Centralise l'écriture via setFlashMessage pour éviter les doublons
+        setFlashMessage($type, $message);
         $this->redirect($url);
     }
 

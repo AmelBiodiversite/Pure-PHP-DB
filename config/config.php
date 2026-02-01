@@ -16,7 +16,7 @@ define('DATABASE_URL', getenv('DATABASE_URL'));
 // CONFIGURATION URLs
 // ================================================================
 // Détection automatique de l'URL de base selon l'environnement
-$protocol = ($_SERVER['HTTPS'] === 'on' || getenv('RAILWAY_ENVIRONMENT')) ? 'https' : 'http';
+$protocol = (($_SERVER['HTTPS'] ?? 'off') === 'on' || getenv('RAILWAY_ENVIRONMENT')) ? 'https' : 'http';
 define('APP_URL', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
 
 // ================================================================

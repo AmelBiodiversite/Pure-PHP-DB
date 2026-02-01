@@ -1,7 +1,6 @@
 <?php
 if (!function_exists('setFlashMessage')) {
     function setFlashMessage($type, $message) {
-        $_SESSION['flash'] = ['type' => $type, 'message' => $message];
         $_SESSION['flash_message'] = $message;
         $_SESSION['flash_type'] = $type;
     }
@@ -9,15 +8,15 @@ if (!function_exists('setFlashMessage')) {
 if (!function_exists('getFlashMessage')) {
     function getFlashMessage() {
         if (isset($_SESSION['flash'])) {
-            $flash = $_SESSION['flash'];
-            unset($_SESSION['flash'], $_SESSION['flash_message'], $_SESSION['flash_type']);
-            return $flash;
+            unset($_SESSION['flash']);
         }
         if (isset($_SESSION['flash_message'])) {
-            $message = $_SESSION['flash_message'];
-            $type = $_SESSION['flash_type'] ?? 'info';
+            $flash = [
+                'message' => $_SESSION['flash_message'],
+                'type'    => $_SESSION['flash_type'] ?? 'info'
+            ];
             unset($_SESSION['flash_message'], $_SESSION['flash_type']);
-            return ['message' => $message, 'type' => $type];
+            return $flash;
         }
         return null;
     }
