@@ -89,9 +89,13 @@ class ProductController extends Controller {
      * Page détail d'un produit
      */
     public function show($slug) {
+        // DEBUG : Log le slug reçu pour identifier les appels parasites
+        error_log("[DEBUG ProductController::show] URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A') . " | slug: '" . $slug . "'");
+        
         $product = $this->productModel->getProductBySlug($slug);
 
         if (!$product) {
+            error_log("[DEBUG ProductController::show] Produit NON TROUVÉ pour slug: '" . $slug . "'");
             redirectWithMessage('/', 'Produit introuvable', 'error');
             return;
         }
@@ -404,12 +408,16 @@ if (isset($_SESSION['user_id'])) {
      * Affiche les produits d'une catégorie avec filtres et tri
      */
     public function category($slug) {
+        // DEBUG : Log le slug reçu pour identifier les appels parasites
+        error_log("[DEBUG ProductController::category] URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A') . " | slug: '" . $slug . "'");
+        
         // Récupérer la catégorie depuis le slug
         $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
         $stmt->execute(['slug' => $slug]);
         $category = $stmt->fetch();
     
         if (!$category) {
+            error_log("[DEBUG ProductController::category] Catégorie NON TROUVÉE pour slug: '" . $slug . "'");
             redirectWithMessage('/', 'Catégorie introuvable', 'error');
             return;
         }
