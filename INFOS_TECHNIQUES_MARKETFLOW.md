@@ -90,7 +90,7 @@ Role: buyer
 
 ---
 
-## 🐛 PROBLÈMES RÉSOLUS AUJOURD'HUI
+## 🐛 PROBLÈMES RÉSOLUS (ajouter les suivants au fur et à mesure)
 
 ### 1. Erreur `getSecurityStats()` 
 **Symptôme :** `Fatal error: Call to undefined function getSecurityStats()`  
@@ -198,6 +198,3 @@ tail -f data/logs/security.log
 - **Documentation PostgreSQL :** https://www.postgresql.org/docs/
 - **Railway Docs :** https://docs.railway.app/
 
----
-
-**Dernière mise à jour :** 1er février 2026, 13:50
