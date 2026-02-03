@@ -89,13 +89,15 @@ class ProductController extends Controller {
      * Page détail d'un produit
      */
     public function show($slug) {
-        // DEBUG : Log le slug reçu pour identifier les appels parasites
-        error_log("[DEBUG ProductController::show] URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A') . " | slug: '" . $slug . "'");
+        // Ignorer les requêtes WebSocket parasites
+        if ($slug === 'ws' || $slug === 'wss') {
+            http_response_code(404);
+            exit;
+        }
         
         $product = $this->productModel->getProductBySlug($slug);
 
         if (!$product) {
-            error_log("[DEBUG ProductController::show] Produit NON TROUVÉ pour slug: '" . $slug . "'");
             redirectWithMessage('/', 'Produit introuvable', 'error');
             return;
         }
@@ -408,8 +410,11 @@ if (isset($_SESSION['user_id'])) {
      * Affiche les produits d'une catégorie avec filtres et tri
      */
     public function category($slug) {
-        // DEBUG : Log le slug reçu pour identifier les appels parasites
-        error_log("[DEBUG ProductController::category] URI: " . ($_SERVER['REQUEST_URI'] ?? 'N/A') . " | slug: '" . $slug . "'");
+        // Ignorer les requêtes WebSocket parasites
+        if ($slug === 'ws' || $slug === 'wss') {
+            http_response_code(404);
+            exit;
+        }
         
         // Récupérer la catégorie depuis le slug
         $stmt = $this->db->prepare("SELECT * FROM categories WHERE slug = :slug");
@@ -417,7 +422,6 @@ if (isset($_SESSION['user_id'])) {
         $category = $stmt->fetch();
     
         if (!$category) {
-            error_log("[DEBUG ProductController::category] Catégorie NON TROUVÉE pour slug: '" . $slug . "'");
             redirectWithMessage('/', 'Catégorie introuvable', 'error');
             return;
         }
