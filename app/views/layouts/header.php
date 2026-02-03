@@ -6,6 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="MarketFlow Pro - La marketplace pour créateurs digitaux">
 
+<!-- Meta Keywords -->
+    <meta name="keywords" content="marketplace php, plateforme ecommerce, vente produits numériques, templates, ui kits, code source marketplace, stripe multi-vendeurs, marketplace digitale, vendre en ligne">
+
+    <!-- Meta Author -->
+    <meta name="author" content="A. Devancé - MarketFlow Pro">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= APP_URL ?>">
+    <meta property="og:title" content="<?= isset($title) ? e($title) . ' - MarketFlow Pro' : 'MarketFlow Pro - Marketplace pour créateurs digitaux' ?>">
+    <meta property="og:description" content="Vendez et achetez des templates, designs, codes et ressources premium. Rejoignez des milliers de créateurs qui génèrent des revenus passifs.">
+    <meta property="og:image" content="<?= APP_URL ?>/img/og-image.jpg">
+    <meta property="og:site_name" content="MarketFlow Pro">
+    <meta property="og:locale" content="fr_FR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="<?= APP_URL ?>">
+    <meta name="twitter:title" content="<?= isset($title) ? e($title) . ' - MarketFlow Pro' : 'MarketFlow Pro - Marketplace pour créateurs digitaux' ?>">
+    <meta name="twitter:description" content="Vendez et achetez des templates, designs, codes et ressources premium. Rejoignez des milliers de créateurs.">
+    <meta name="twitter:image" content="<?= APP_URL ?>/img/twitter-card.jpg">
+
+    <!-- Canonical URL (pour éviter duplicate content) -->
+    <link rel="canonical" href="<?= APP_URL . $_SERVER['REQUEST_URI'] ?>">
+
+    <!-- Robots Meta -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
 <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
 
 <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">

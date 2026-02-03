@@ -1,0 +1,31 @@
+# MARKETFLOW PRO - Configuration SEO
+# Fichier : public/robots.txt
+# Création : 3 février 2026
+
+# Autoriser tous les robots
+User-agent: *
+Allow: /
+
+# Bloquer les dossiers privés
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /account/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /orders/
+
+# Bloquer les fichiers techniques
+Disallow: /config/
+Disallow: /core/
+Disallow: /data/
+Disallow: /database/
+
+# Autoriser spécifiquement
+Allow: /products/
+Allow: /category/
+Allow: /css/
+Allow: /js/
+Allow: /uploads/products/
+
+# Sitemap XML
+Sitemap: https://marketflow.fr/sitemap.xml
