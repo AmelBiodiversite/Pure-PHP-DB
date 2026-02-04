@@ -1,13 +1,18 @@
 <?php
 namespace App\Models;
 use \Core\Database;
-/**
- * MARKETFLOW PRO - CART MODEL
- * Gestion du panier en session
- * Fichier : app/models/Cart.php
- */
 
-namespace App\Models;
+/**
+ * MARKETFLOW PRO - CART MODEL (VERSION SÉCURISÉE)
+ * Gestion du panier en session avec validation prix temps réel
+ * 
+ * SÉCURITÉ: Les prix sont TOUJOURS vérifiés depuis la BDD avant checkout
+ * pour éviter toute manipulation via session
+ * 
+ * Fichier : app/models/Cart.php
+ * Version : 2.0 - Sécurisée
+ * Date : 2026-02-04
+ */
 
 class Cart {
     private $sessionKey = 'cart';
@@ -39,7 +44,7 @@ class Cart {
         }
 
         // Vérifier que le produit est disponible
-            if ($product['status'] !== 'approved') {
+        if ($product['status'] !== 'approved') {
             return ['success' => false, 'error' => 'Produit non disponible'];
         }
 
@@ -54,10 +59,9 @@ class Cart {
             'title' => $product['title'],
             'slug' => $product['slug'],
             'thumbnail' => $product['thumbnail_url'] ?? '/public/img/placeholder.png',
-            'price' => $product['price'],
+            'price' => $product['price'], // Prix initial (sera re-vérifié au checkout)
             'seller_id' => $product['seller_id'],
             'seller_name' => $product['seller_name'],
-            
             'quantity' => $quantity,
             'added_at' => time()
         ];
@@ -91,7 +95,7 @@ class Cart {
     }
 
     /**
-     * Mettre à jour la quantité (pas utilisé pour produits digitaux, mais gardé pour flexibilité)
+     * Mettre à jour la quantité
      */
     public function updateQuantity($productId, $quantity) {
         if (!isset($_SESSION[$this->sessionKey]['items'][$productId])) {
@@ -124,51 +128,30 @@ class Cart {
         return ['success' => true, 'message' => 'Panier vidé'];
     }
 
-    /**
-     * Récupérer le contenu du panier
-     */
     public function get() {
         return $_SESSION[$this->sessionKey];
     }
 
-    /**
-     * Récupérer le nombre d'articles
-     */
     public function count() {
         return $_SESSION[$this->sessionKey]['count'];
     }
 
-    /**
-     * Récupérer le total
-     */
     public function total() {
         return $_SESSION[$this->sessionKey]['total'];
     }
 
-    /**
-     * Vérifier si le panier est vide
-     */
     public function isEmpty() {
         return empty($_SESSION[$this->sessionKey]['items']);
     }
 
-    /**
-     * Vérifier si un produit est dans le panier
-     */
     public function has($productId) {
         return isset($_SESSION[$this->sessionKey]['items'][$productId]);
     }
 
-    /**
-     * Récupérer les articles du panier
-     */
     public function items() {
         return $_SESSION[$this->sessionKey]['items'];
     }
 
-    /**
-     * Mettre à jour les totaux
-     */
     private function updateTotals() {
         $total = 0;
         $count = 0;
@@ -182,9 +165,6 @@ class Cart {
         $_SESSION[$this->sessionKey]['count'] = $count;
     }
 
-    /**
-     * Récupérer les infos d'un produit
-     */
     private function getProductInfo($productId) {
         $db = \Core\Database::getInstance();
 
@@ -201,50 +181,202 @@ class Cart {
     }
 
     /**
-     * Calculer les commissions pour checkout
+     * ✅ MÉTHODE SÉCURISÉE: Calculer les données de checkout avec PRIX BDD ACTUELS
+     * 
+     * SÉCURITÉ CRITIQUE:
+     * - Re-récupère les prix depuis la BDD (ignore les prix session)
+     * - Vérifie la disponibilité de chaque produit
+     * - Log les différences de prix pour détecter fraudes
      */
     public function getCheckoutData() {
-        $items = $this->items();
+        $sessionItems = $this->items();
+        $secureItems = [];
         $subtotal = 0;
-        $checkoutItems = [];
+        $errors = [];
+        $warnings = [];
 
-        foreach ($items as $item) {
-            
-            
-            // Commission par défaut
-            $commissionRate = PLATFORM_COMMISSION; // 10%
-            $commissionAmount = ($item['price'] * $commissionRate) / 100;
-            $sellerAmount = $item['price'] - $commissionAmount;
+        $db = \Core\Database::getInstance();
 
-            $checkoutItems[] = [
-                'product_id' => $item['product_id'],
-                'title' => $item['title'],
-                'slug' => $item['slug'],
-                'thumbnail' => $item['thumbnail'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'seller_id' => $item['seller_id'],
-                'seller_name' => $item['seller_name'],
+        foreach ($sessionItems as $productId => $item) {
+            // ✅ CORRECTION: Re-récupérer le produit depuis la BDD
+            $stmt = $db->prepare("
+                SELECT p.id, p.title, p.slug, p.thumbnail_url, p.price, 
+                       p.status, p.seller_id, u.username as seller_name
+                FROM products p
+                JOIN users u ON p.seller_id = u.id
+                WHERE p.id = :product_id
+            ");
+            $stmt->execute(['product_id' => $productId]);
+            $currentProduct = $stmt->fetch();
+
+            if (!$currentProduct) {
+                $errors[] = "Le produit \"{$item['title']}\" n'est plus disponible";
+                continue;
+            }
+
+            if ($currentProduct['status'] !== 'approved') {
+                $errors[] = "Le produit \"{$currentProduct['title']}\" n'est plus disponible à la vente";
+                continue;
+            }
+
+            // ✅ SÉCURITÉ: Utiliser le prix ACTUEL de la BDD
+            $actualPrice = (float)$currentProduct['price'];
+            $sessionPrice = (float)$item['price'];
+
+            // Détecter différences de prix
+            if (abs($actualPrice - $sessionPrice) > 0.01) {
+                $priceDiff = $actualPrice - $sessionPrice;
+                $percentDiff = (($priceDiff / $sessionPrice) * 100);
                 
+                error_log(sprintf(
+                    "PRICE_MISMATCH: Product #%d '%s' | Session: %.2f € | Current: %.2f € | Diff: %.2f € (%.1f%%) | User: %s",
+                    $productId,
+                    $currentProduct['title'],
+                    $sessionPrice,
+                    $actualPrice,
+                    $priceDiff,
+                    $percentDiff,
+                    $_SESSION['user_id'] ?? 'guest'
+                ));
+
+                if ($priceDiff > 0) {
+                    $warnings[] = "Le prix de \"{$currentProduct['title']}\" a augmenté de " . 
+                                  number_format($priceDiff, 2) . " €";
+                } else {
+                    $warnings[] = "Le prix de \"{$currentProduct['title']}\" a baissé de " . 
+                                  number_format(abs($priceDiff), 2) . " €";
+                }
+            }
+
+            $commissionRate = defined('PLATFORM_COMMISSION') ? PLATFORM_COMMISSION : 10;
+            $commissionAmount = ($actualPrice * $commissionRate) / 100;
+            $sellerAmount = $actualPrice - $commissionAmount;
+
+            $secureItems[] = [
+                'product_id' => $currentProduct['id'],
+                'title' => $currentProduct['title'],
+                'slug' => $currentProduct['slug'],
+                'thumbnail' => $currentProduct['thumbnail_url'] ?? '/public/img/placeholder.png',
+                'price' => $actualPrice,  // ✅ Prix actuel BDD
+                'quantity' => $item['quantity'],
+                'seller_id' => $currentProduct['seller_id'],
+                'seller_name' => $currentProduct['seller_name'],
                 'commission_rate' => $commissionRate,
                 'commission_amount' => $commissionAmount,
                 'seller_amount' => $sellerAmount
             ];
 
-            $subtotal += $item['price'] * $item['quantity'];
+            $subtotal += $actualPrice * $item['quantity'];
         }
 
+        $promo = $this->getPromoCode();
+        $discount = 0;
+
+        if ($promo && !empty($secureItems)) {
+            if ($promo['type'] === 'percentage') {
+                $discount = ($subtotal * $promo['value']) / 100;
+            } else {
+                $discount = $promo['value'];
+            }
+            $discount = min($discount, $subtotal);
+        }
+
+        $total = max(0, $subtotal - $discount);
+
         return [
-            'items' => $checkoutItems,
+            'items' => $secureItems,
             'subtotal' => $subtotal,
-            'total' => $subtotal,
-            'count' => $this->count()
+            'discount' => $discount,
+            'promo_code' => $promo['code'] ?? null,
+            'total' => $total,
+            'count' => count($secureItems),
+            'errors' => $errors,
+            'warnings' => $warnings,
+            'needs_revalidation' => !empty($errors)
         ];
     }
 
     /**
-     * Valider le panier avant checkout
+     * ✅ NOUVELLE: Valider le panier AVANT paiement
      */
+    public function validateForCheckout() {
+        if ($this->isEmpty()) {
+            return [
+                'valid' => false,
+                'data' => null,
+                'errors' => ['Votre panier est vide'],
+                'warnings' => []
+            ];
+        }
+
+        $checkoutData = $this->getCheckoutData();
+
+        if (!empty($checkoutData['errors'])) {
+            return [
+                'valid' => false,
+                'data' => null,
+                'errors' => $checkoutData['errors'],
+                'warnings' => $checkoutData['warnings']
+            ];
+        }
+
+        if (empty($checkoutData['items'])) {
+            return [
+                'valid' => false,
+                'data' => null,
+                'errors' => ['Aucun produit valide dans le panier'],
+                'warnings' => []
+            ];
+        }
+
+        return [
+            'valid' => true,
+            'data' => $checkoutData,
+            'errors' => [],
+            'warnings' => $checkoutData['warnings']
+        ];
+    }
+
+    /**
+     * ✅ NOUVELLE: Rafraîchir les prix depuis la BDD
+     */
+    public function refreshPrices() {
+        $cart = $_SESSION[$this->sessionKey]['items'] ?? [];
+        $db = \Core\Database::getInstance();
+        $updatedCount = 0;
+
+        foreach ($cart as $productId => $item) {
+            $stmt = $db->prepare("
+                SELECT price, status 
+                FROM products 
+                WHERE id = :product_id
+            ");
+            $stmt->execute(['product_id' => $productId]);
+            $product = $stmt->fetch();
+
+            if ($product && $product['status'] === 'approved') {
+                if (abs((float)$product['price'] - (float)$item['price']) > 0.01) {
+                    $_SESSION[$this->sessionKey]['items'][$productId]['price'] = $product['price'];
+                    $updatedCount++;
+                }
+            } else {
+                unset($_SESSION[$this->sessionKey]['items'][$productId]);
+                $updatedCount++;
+            }
+        }
+
+        if ($updatedCount > 0) {
+            $this->updateTotals();
+        }
+
+        return [
+            'updated' => $updatedCount,
+            'message' => $updatedCount > 0 ? 
+                "Les prix de {$updatedCount} produit(s) ont été mis à jour" : 
+                "Tous les prix sont à jour"
+        ];
+    }
+
     public function validate() {
         $errors = [];
         
@@ -252,15 +384,10 @@ class Cart {
             $errors[] = 'Votre panier est vide';
         }
 
-        // Vérifier que tous les produits sont toujours disponibles
         $db = \Core\Database::getInstance()->getPdo();
         
         foreach ($this->items() as $productId => $item) {
-            $stmt = $db->prepare("
-                SELECT status 
-                FROM products 
-                WHERE id = ?
-            ");
+            $stmt = $db->prepare("SELECT status FROM products WHERE id = ?");
             $stmt->execute([$productId]);
             $product = $stmt->fetch();
 
@@ -276,9 +403,6 @@ class Cart {
         ];
     }
 
-    /**
-     * Appliquer un code promo
-     */
     public function applyPromoCode($code) {
         $db = \Core\Database::getInstance()->getPdo();
         
@@ -296,7 +420,6 @@ class Cart {
             return ['success' => false, 'error' => 'Code promo invalide ou expiré'];
         }
 
-        // Vérifier le montant minimum
         if ($this->total() < $promo['min_purchase']) {
             return [
                 'success' => false,
@@ -304,14 +427,12 @@ class Cart {
             ];
         }
 
-        // Calculer la réduction
         if ($promo['type'] === 'percentage') {
             $discount = ($this->total() * $promo['value']) / 100;
         } else {
             $discount = $promo['value'];
         }
 
-        // Ne pas dépasser le total
         $discount = min($discount, $this->total());
 
         $_SESSION[$this->sessionKey]['promo'] = [
@@ -329,24 +450,15 @@ class Cart {
         ];
     }
 
-    /**
-     * Retirer le code promo
-     */
     public function removePromoCode() {
         unset($_SESSION[$this->sessionKey]['promo']);
         return ['success' => true];
     }
 
-    /**
-     * Récupérer le code promo actif
-     */
     public function getPromoCode() {
         return $_SESSION[$this->sessionKey]['promo'] ?? null;
     }
 
-    /**
-     * Récupérer le total avec promo
-     */
     public function getTotalWithPromo() {
         $total = $this->total();
         $promo = $this->getPromoCode();
