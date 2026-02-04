@@ -1,0 +1,145 @@
+.
+├── app
+│   ├── controllers
+│   │   ├── AccountController.php
+│   │   ├── AdminController.php
+│   │   ├── ApiController.php
+│   │   ├── AuthController.php
+│   │   ├── CartController.php
+│   │   ├── ExportController.php
+│   │   ├── HomeController.php
+│   │   ├── OrderController.php
+│   │   ├── PaymentController.php
+│   │   ├── ProductController.php
+│   │   ├── ReviewController.php
+│   │   ├── SecurityController.php
+│   │   ├── SellerController.php
+│   │   ├── StripeController.php
+│   │   └── WishlistController.php
+│   ├── helpers
+│   │   ├── auth_helper.php
+│   │   ├── functions.php
+│   │   ├── security_helper.php
+│   │   └── SecurityHelper.php
+│   ├── models
+│   │   ├── Cart.php
+│   │   ├── Order.php
+│   │   ├── Product.php
+│   │   ├── User.php
+│   │   └── Wishlist.php
+│   └── views
+│       ├── account
+│       ├── admin
+│       ├── auth
+│       ├── cart
+│       ├── checkout
+│       ├── home
+│       ├── layouts
+│       ├── orders
+│       ├── payment
+│       ├── products
+│       ├── seller
+│       └── wishlist
+├── assets
+│   └── css
+│       └── main.css
+├── config
+│   ├── config.php
+│   ├── config.php.backup_css
+│   ├── config.php.backup_manual
+│   ├── currency.php
+│   ├── routes.php
+│   ├── security_headers.php
+│   └── session.php
+├── core
+│   ├── Controller.php
+│   ├── CSRF.php
+│   ├── Database.php
+│   ├── Database.php.backup
+│   ├── EmailAlertService.php
+│   ├── Env.php
+│   ├── Helpers.php
+│   ├── Model.php
+│   ├── RateLimiter.php
+│   ├── Router.php
+│   └── SecurityLogger.php
+├── data
+│   ├── logs
+│   │   └── security.log
+│   └── marketflow.db
+├── database
+│   ├── export_replit_products.sql
+│   ├── FULL_IMPORT.sql
+│   ├── marketflow_production.sql
+│   ├── marketflow.sql
+│   ├── promo_codes.sql
+│   └── schema.sql
+├── public
+│   ├── css
+│   │   ├── animations.css
+│   │   ├── notifications.css
+│   │   └── style.css
+│   ├── js
+│   │   ├── libs
+│   │   ├── animations.js
+│   │   ├── app.js
+│   │   ├── notifications.js
+│   │   └── wishlist.js
+│   ├── uploads
+│   │   └── products
+│   ├── clear-flash.php
+│   ├── h pour admin123
+│   ├── index.php
+│   ├── robots.txt
+│   ├── router.php
+│   └── sitemap.xml
+├── vendor
+│   ├── composer
+│   │   ├── autoload_classmap.php
+│   │   ├── autoload_namespaces.php
+│   │   ├── autoload_psr4.php
+│   │   ├── autoload_real.php
+│   │   ├── autoload_static.php
+│   │   ├── ClassLoader.php
+│   │   ├── installed.json
+│   │   ├── installed.php
+│   │   ├── InstalledVersions.php
+│   │   ├── LICENSE
+│   │   └── platform_check.php
+│   ├── stripe
+│   │   └── stripe-php
+│   └── autoload.php
+├── arbo
+├── ARCHITECTURE.md
+├── audit_code_sample.txt
+├── audit_dependances.txt
+├── audit_fichiers_php.txt
+├── audit_logs_acces.txt
+├── audit_logs_erreurs.txt
+├── audit_marketflow_20260123_134429.txt
+├── audit_performance.txt
+├── audit_requetes_lentes.txt
+├── audit_schema_sql.txt
+├── audit_structure.txt
+├── audit_tables_size.txt
+├── catégories
+├── Changelog.md
+├── composer.lock
+├── CONTRAT_LICENCE_TEMPLATE.md
+├── Dockerfile
+├── FEATURES_OVERVIEW.md
+├── generate-security-data.php
+├── index.php
+├── INFOS_TECHNIQUES_MARKETFLOW.md
+├── package.json
+├── package-lock.json
+├── README_CLIENT_CLEAN.md
+├── README.md
+├── replit.md
+├── replit.nix
+├── SALES_PITCH.md
+├── SECURITY_AUDIT_REPORT.md
+├── structure.txt
+└── test_login.php
+
+35 directories, 108 files

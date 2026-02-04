@@ -1,0 +1,105 @@
+=== ./app/controllers/AccountController.php ===
+<?php
+namespace App\Controllers;
+
+use Core\Controller;
+
+class AccountController extends Controller {
+    
+    /**
+     * Dashboard compte utilisateur
+     */
+    public function index() {
+        $this->requireLogin();
+        
+        $user = $this->getCurrentUser();
+        
+        // Statistiques utilisateur
+        if ($user['role'] === 'buyer') {
+            // Achats de l'acheteur
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) as total_orders,
+=== ./app/controllers/AdminController.php ===
+<?php
+/**
+ * MARKETFLOW PRO - ADMIN CONTROLLER
+ * Gestion de l'administration
+ * Fichier : app/controllers/AdminController.php
+ */
+
+namespace App\Controllers;
+
+use Core\Controller;
+use App\Models\User;
+use App\Models\Product;
+use App\Models\Order;
+
+class AdminController extends Controller {
+
+    public function __construct() {
+        parent::__construct();
+        $this->requireAdmin();
+    }
+=== ./app/controllers/ApiController.php ===
+<?php
+namespace App\Controllers;
+
+use Core\Controller;
+use App\Models\Product;
+
+class ApiController extends Controller {
+    
+    /**
+     * Liste des produits
+     * GET /api/products
+     */
+    public function products() {
+        $page = $_GET['page'] ?? 1;
+        $perPage = $_GET['per_page'] ?? 20;
+        $category = $_GET['category'] ?? null;
+        $search = $_GET['search'] ?? null;
+        
+        $filters = [];
+        if ($category) $filters['category_id'] = $category;
+=== ./app/controllers/AuthController.php ===
+<?php
+/**
+ * MARKETFLOW PRO - AUTH CONTROLLER
+ * Gestion de l'authentification et des utilisateurs
+ * 
+ * Ce contrôleur gère :
+ * - La connexion (login)
+ * - L'inscription (register)
+ * - La déconnexion (logout)
+ * - La création de sessions utilisateur
+ * 
+ * SÉCURITÉ :
+ * - Protection CSRF sur tous les formulaires
+ * - Rate limiting sur les tentatives de connexion
+ * - Validation stricte des données
+ * - Sessions sécurisées
+ * 
+ * Fichier : app/controllers/AuthController.php
+ */
+
+=== ./app/controllers/CartController.php ===
+<?php
+/**
+ * ============================================================================
+ * MARKETFLOW PRO - CART CONTROLLER (VERSION SÉCURISÉE)
+ * ============================================================================
+ * Gestion complète du panier avec protection CSRF sur TOUTES les actions
+ * 
+ * SÉCURITÉ IMPLÉMENTÉE :
+ * - Protection CSRF sur tous les POST
+ * - Validation des méthodes HTTP
+ * - Vérification de l'authentification
+ * - Validation des données entrantes
+ * - Gestion des erreurs avec try/catch
+ * 
+ * Fichier : app/controllers/CartController.php
+ * ============================================================================
+ */
+
+namespace App\Controllers;
+

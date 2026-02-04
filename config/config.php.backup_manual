@@ -2,9 +2,6 @@
 /**
  * MARKETFLOW PRO - CONFIGURATION
  * Configuration principale de l'application
- * 
- * Ce fichier détecte automatiquement l'environnement (local vs production)
- * et adapte les chemins CSS/JS en conséquence
  */
 
 // ================================================================
@@ -15,40 +12,19 @@ define('DATABASE_URL', getenv('DATABASE_URL'));
 // ================================================================
 // CONFIGURATION URLs
 // ================================================================
-// Détection automatique de l'URL de base selon l'environnement
-$protocol = (($_SERVER['HTTPS'] ?? 'off') === 'on' || getenv('RAILWAY_ENVIRONMENT')) ? 'https' : 'http';
-define('APP_URL', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
-
-// ================================================================
-// DÉTECTION AUTOMATIQUE DE L'ENVIRONNEMENT
-// ================================================================
-// Railway définit RAILWAY_ENVIRONMENT en production
-$isProduction = getenv('RAILWAY_ENVIRONMENT') || isset($_SERVER['RAILWAY_ENVIRONMENT']);
-
-if ($isProduction) {
-    // ============================================================
-    // PRODUCTION (Railway)
-    // ============================================================
-    // Sur Railway, le serveur pointe vers la racine du projet
-    // Les fichiers statiques sont dans /public/css/, /public/js/
-// Sur Railway, le Dockerfile démarre avec -t public
-// Donc /public/ EST la racine web, les fichiers sont à /css/ pas /public/css/
-
+define('APP_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+// Détection automatique du chemin CSS selon l'environnement
+if (getenv('RAILWAY_ENVIRONMENT') || isset($_SERVER['RAILWAY_ENVIRONMENT'])) {
+    // Sur Railway : pas de /public/ dans l'URL
     define('CSS_URL', APP_URL . '/css');
     define('JS_URL', APP_URL . '/js');
-    define('IMG_URL', APP_URL . '/img');
-    define('UPLOAD_URL', APP_URL . '/uploads');
 } else {
-    // ============================================================
-    // LOCAL (Chromebook avec php -S depuis /public/)
-    // ============================================================
-    // En local, le serveur PHP intégré démarre depuis /public/
-    // Donc les fichiers sont accessibles directement à /css/, /js/
+    // Sur Replit/Local : avec /public/ dans l'URL
     define('CSS_URL', APP_URL . '/css');
     define('JS_URL', APP_URL . '/js');
-    define('IMG_URL', APP_URL . '/img');
-    define('UPLOAD_URL', APP_URL . '/uploads');
 }
+define('IMG_URL', APP_URL . '/img');
+define('UPLOAD_URL', APP_URL . '/public/uploads');
 
 // ================================================================
 // CONFIGURATION CURRENCY
@@ -73,7 +49,7 @@ define('STRIPE_WEBHOOK_SECRET', getenv('STRIPE_WEBHOOK_SECRET') ?: 'whsec_YOUR_W
 // ================================================================
 // CONFIGURATION MAIL
 // ================================================================
-define('MAIL_FROM', 'noreply@marketflow.com');
+define('MAIL_FROM', 'noreply@marketflowpro.com');
 
 // ================================================================
 // CONFIGURATION UPLOADS
@@ -90,24 +66,14 @@ define('PLATFORM_COMMISSION', 10); // 10% de commission
 // HELPER FUNCTIONS
 // ================================================================
 if (!function_exists('url')) {
-    /**
-     * Génère une URL complète à partir d'un chemin
-     * @param string $path Chemin relatif (ex: 'products/123')
-     * @return string URL complète
-     */
     function url($path = '') {
         return APP_URL . '/' . ltrim($path, '/');
     }
 }
 
 if (!function_exists('uploadUrl')) {
-    /**
-     * Génère une URL vers un fichier uploadé
-     * @param string $file Nom du fichier (ex: 'products/image.jpg')
-     * @return string URL complète vers le fichier uploadé
-     */
     function uploadUrl($file = '') {
-        return UPLOAD_URL . '/' . ltrim($file, '/');
+        return APP_URL . '/public/uploads/' . ltrim($file, '/');
     }
 }
 
@@ -118,17 +84,11 @@ if (file_exists(__DIR__ . '/../.env')) {
     $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         $line = trim($line);
-        // Ignorer les commentaires et lignes vides
         if (empty($line) || strpos($line, '#') === 0) continue;
-        // Ignorer les lignes sans '='
         if (strpos($line, '=') === false) continue;
-        
-        // Séparer la clé et la valeur
         list($name, $value) = explode('=', $line, 2);
         $name = trim($name);
         $value = trim($value);
-        
-        // Définir la variable d'environnement si nom et valeur non vides
         if (!empty($name) && !empty($value)) {
             putenv($name . '=' . $value);
         }

@@ -1,0 +1,70 @@
+{
+    "name": "marketflow/pro",
+    "description": "Marketplace digitale professionnelle avec multi-vendeurs, paiement Stripe et s\u00e9curit\u00e9 avanc\u00e9e",
+    "type": "project",
+    "keywords": [
+        "marketplace",
+        "e-commerce",
+        "multi-vendor",
+        "stripe",
+        "postgresql"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Amel Ben Maamar",
+            "email": "amel@marketflow.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-pdo": "*",
+        "ext-pgsql": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "stripe/stripe-php": "^19.2",
+        "vlucas/phpdotenv": "^5.5",
+        "symfony/var-dumper": "^6.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Core\\": "core/",
+            "App\\Controllers\\": "app/controllers/",
+            "App\\Models\\": "app/models/"
+        },
+        "files": [
+            "app/helpers/auth_helper.php",
+            "app/helpers/functions.php",
+            "app/helpers/security_helper.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "analyse": "phpstan analyse app core --level=5",
+        "lint": "phpcs --standard=PSR12 app core",
+        "lint-fix": "phpcbf --standard=PSR12 app core",
+        "dev": "php -d upload_max_filesize=50M -d post_max_size=50M -d memory_limit=256M -S 0.0.0.0:5000 -t public"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
