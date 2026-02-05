@@ -1,19 +1,42 @@
 <?php
-// -----------------------------------------------------------------
-// DEBUG IMMEDIAT - LIGNE 1 : on affiche ça AVANT tout le reste
-// Si tu vois ce message → le fichier est exécuté et PHP tourne
-// -----------------------------------------------------------------
-echo "<!DOCTYPE html><html><head><title>Debug Test Brevo</title></head><body>";
-echo "<h1 style='color: blue; text-align: center; margin: 50px;'>";
-echo "SCRIPT TEST_BREVO_FINAL.PHP → EXÉCUTÉ AVEC SUCCÈS (étape 1/3)";
+// ----------------------------------------------------------------------
+// DEBUG ULTRA-PRÉCOCE - LIGNE 1 : on affiche ÇA AVANT TOUT LE RESTE
+// Si tu vois ce bloc → PHP s'exécute et le fichier est bien servi
+// ----------------------------------------------------------------------
+header('Content-Type: text/html; charset=utf-8');
+echo "<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"utf-8\"><title>Debug Brevo - Étape 0</title></head><body style=\"font-family: sans-serif;\">";
+echo "<h1 style=\"color: darkblue; text-align: center; margin: 40px 0;\">";
+echo "PHASE 0 : SCRIPT DÉMARRÉ - PHP FONCTIONNE";
 echo "</h1>";
-echo "<p style='font-size: 1.3em; color: #444;'>";
-echo "Si tu vois cette page bleue → le problème n'est PAS l'autoload ni le chemin du fichier.<br>";
-echo "On va maintenant tester les variables d'environnement et PHPMailer.";
+echo "<p style=\"font-size: 1.4em; color: #333; text-align: center;\">";
+echo "Tu vois cette page → le problème de page blanche n'est PAS l'exécution PHP ni le chemin du fichier.";
+echo "<br><strong>Maintenant on va tester les variables d'environnement.</strong>";
 echo "</p>";
-echo "<hr style='border: 2px solid blue;'>";
+echo "<hr style=\"border: 3px solid darkblue;\">";
 
-// Le reste du code original suit ici (require, PHPMailer, etc.)
+// Test immédiat des variables (getenv + $_ENV)
+echo "<h2>Variables d'environnement (getenv + \$_ENV)</h2>";
+echo "<pre style=\"background:#f8f8f8; padding:15px; border:1px solid #ccc; font-size:1.1em;\">";
+
+// Liste des variables qu'on cherche
+$vars = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_FROM', 'SMTP_FROM_NAME'];
+
+foreach ($vars as $v) {
+    $val_getenv = getenv($v);
+    $val_env    = $_ENV[$v] ?? '(non défini dans \$_ENV)';
+    $val_server = $_SERVER[$v] ?? '(non défini dans \$_SERVER)';
+
+    echo "<strong>$v</strong>:\n";
+    echo "  getenv()     → " . ($val_getenv !== false ? htmlspecialchars($val_getenv) : '(vide ou absent)') . "\n";
+    echo "  \$_ENV        → " . htmlspecialchars($val_env) . "\n";
+    echo "  \$_SERVER     → " . htmlspecialchars($val_server) . "\n\n";
+}
+
+echo "</pre>";
+
+// On continue seulement si on veut (le reste du code PHPMailer arrive après)
+echo "<h2>Si tu vois ça → les variables sont affichées. On continue ?</h2>";
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -23,49 +46,11 @@ use PHPMailer\PHPMailer\Exception;
 $mail = new PHPMailer(true);
 
 try {
-    $mail->SMTPDebug = 2;
-    $mail->Debugoutput = 'html';
-
-    $mail->isSMTP();
-    $mail->Host       = getenv('SMTP_HOST')     ?: die('SMTP_HOST absent');
-    $mail->SMTPAuth   = true;
-    $mail->Username   = getenv('SMTP_USER')     ?: die('SMTP_USER absent');
-    $mail->Password   = getenv('SMTP_PASSWORD') ?: die('SMTP_PASSWORD absent');
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = (int)(getenv('SMTP_PORT') ?: 587);
-
-    $mail->setFrom(
-        getenv('SMTP_FROM') ?: 'contact@marketflow.fr',
-        getenv('SMTP_FROM_NAME') ?: 'MarketFlow Pro'
-    );
-
-    $mail->addAddress('a.devance@proton.me', 'Test MarketFlow');
-
-    if (getenv('SMTP_REPLY_TO')) {
-        $mail->addReplyTo(getenv('SMTP_REPLY_TO'));
-    }
-
-    $mail->isHTML(true);
-    $mail->Subject = 'Test SMTP Brevo – MarketFlow – ' . date('Y-m-d H:i:s');
-    $mail->Body    = '
-        <h2>Test réussi ? ✅</h2>
-        <p>Ceci est un email de test envoyé depuis MarketFlow via Brevo SMTP.</p>
-        <p>Date/heure : ' . date('Y-m-d H:i:s') . '</p>
-        <p>Si tu reçois ce message → la configuration fonctionne !</p>
-        <br><small>Debug activé pour ce test — à désactiver après.</small>
-    ';
-    $mail->AltBody = strip_tags($mail->Body);
-
-    $mail->send();
-    echo '<h3 style="color: green;">Email envoyé avec succès !</h3>';
-    echo '<p>Vérifie ta boîte (spam/promotions inclus).</p>';
-
+    echo "<p style='color:green'>PHPMailer chargé avec succès</p>";
+    // ... (le reste du code original ici, on le remettra après)
+    echo "<p>Fin du try (temporaire)</p>";
 } catch (Exception $e) {
-    echo '<h3 style="color: red;">Échec de l\'envoi</h3>';
-    echo '<p>Erreur : ' . htmlspecialchars($mail->ErrorInfo) . '</p>';
-    echo '<pre style="background:#fee;padding:15px;border:1px solid red;">';
-    echo nl2br(htmlspecialchars($mail->SMTPDebugOutput ?? 'Aucun détail disponible'));
-    echo '</pre>';
+    echo "<p style='color:red'>Exception : " . htmlspecialchars($e->getMessage()) . "</p>";
 }
 
 echo "</body></html>";
