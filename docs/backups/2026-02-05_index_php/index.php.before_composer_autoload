@@ -23,9 +23,9 @@ session_start();
 require_once __DIR__ . '/config/security_headers.php';
 
 // Charger les helpers
-// require_once __DIR__ . '/app/helpers/auth_helper.php'; // Chargé par Composer
-// require_once __DIR__ . '/app/helpers/functions.php'; // Chargé par Composer
-// require_once __DIR__ . '/app/helpers/security_helper.php'; // Chargé par Composer
+require_once __DIR__ . '/app/helpers/auth_helper.php';
+require_once __DIR__ . '/app/helpers/functions.php';
+require_once __DIR__ . '/app/helpers/security_helper.php';
 
 // Charger Composer (pour Stripe, etc.)
 require_once __DIR__ . '/vendor/autoload.php';
