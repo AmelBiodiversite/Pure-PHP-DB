@@ -1,4 +1,11 @@
 <?php
+// Activer l'affichage des erreurs pour le debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+echo "Début du script de test Brevo...<br>";
+
 // test_brevo_final.php - Test SMTP Brevo 2026 (exécuté depuis la racine)
 
 require_once __DIR__ . '/vendor/autoload.php';
