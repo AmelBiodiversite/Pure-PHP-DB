@@ -153,3 +153,55 @@ function formatFileSize($bytes, $precision = 2) {
     
     return round($bytes, $precision) . ' ' . $units[$pow];
 }
+
+// ----------------------------------------------------------------------
+// ENVOI EMAIL VIA API BREVO v3 (HTTP - recommandé sur Railway)
+// Retourne true si succès, string erreur sinon
+// Usage : sendMailApi('dest@email.com', 'Sujet', '<p>Message</p>');
+// ----------------------------------------------------------------------
+function sendMailApi(string $toEmail, string $subject, string $htmlContent, string $plainText = null): bool|string {
+    $apiKey = getenv('BREVO_API_KEY');
+    if (!$apiKey) {
+        error_log('sendMailApi: BREVO_API_KEY manquante');
+        return 'Erreur : clé API Brevo manquante';
+    }
+
+    $data = [
+        'sender' => [
+            'name'  => getenv('SMTP_FROM_NAME') ?: 'Market Flow',
+            'email' => getenv('SMTP_FROM') ?: 'contact@marketflow.fr'
+        ],
+        'to' => [
+            ['email' => $toEmail]
+        ],
+        'subject' => $subject,
+        'htmlContent' => $htmlContent
+    ];
+
+    if ($plainText) {
+        $data['textContent'] = $plainText;
+    }
+
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'accept: application/json',
+        'api-key: ' . $apiKey,
+        'content-type: application/json'
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($httpCode === 201) {
+        return true;
+    }
+
+    $errMsg = "API Brevo erreur HTTP $httpCode - " . ($error ?: $response);
+    error_log('sendMailApi: ' . $errMsg);
+    return $errMsg;
+}
