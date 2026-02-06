@@ -126,7 +126,7 @@ class HomeController extends Controller {
      * @return void
      */
     public function contactSubmit() {
-        // Validation basique
+        // Validation des champs obligatoires
         if (empty($_POST['name']) || empty($_POST['email']) || empty($_POST['message'])) {
             setFlashMessage('Veuillez remplir tous les champs obligatoires', 'error');
             return $this->redirect('/contact');
@@ -138,7 +138,7 @@ class HomeController extends Controller {
             return $this->redirect('/contact');
         }
 
-        // Préparer les données
+        // Préparer les données (sécurisation XSS)
         $name = htmlspecialchars($_POST['name']);
         $email = htmlspecialchars($_POST['email']);
         $subject = htmlspecialchars($_POST['subject'] ?? 'Contact depuis MarketFlow Pro');
@@ -154,77 +154,51 @@ class HomeController extends Controller {
             <hr>
             <small>Envoyé depuis le formulaire de contact MarketFlow le " . date('d/m/Y à H:i') . "</small>
         ";
-        
+
         $result = sendMailApi(
             'contact@marketflow.fr',
             "Nouveau contact MarketFlow : $subject",
             $emailBody
         );
-        
+
         if ($result === true) {
-            // Log succès dans emails.log
+            // Log succès
             $logLine = date('Y-m-d H:i:s') . " | SUCCESS | To: contact@marketflow.fr | Sujet: $subject | From: $email\n";
             @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
-            
-            // Email de confirmation à l'utilisateur
+
+            // Email de confirmation à l utilisateur
             $confirmBody = "
                 <h2>Merci pour votre message !</h2>
                 <p>Bonjour $name,</p>
-                <p>Nous avons bien reçu votre demande concernant « $subject ».</p>
+                <p>Nous avons bien reçu votre demande concernant &laquo; $subject &raquo;.</p>
                 <p>Nous vous répondrons dans les plus brefs délais.</p>
                 <hr>
                 <p><strong>Votre message :</strong><br>" . nl2br($message) . "</p>
                 <hr>
                 <small>MarketFlow Pro - " . date('d/m/Y') . "</small>
             ";
-            
+
             $confirmResult = sendMailApi(
                 $email,
                 "Confirmation de réception - MarketFlow",
                 $confirmBody
             );
-            
+
             if ($confirmResult !== true) {
                 error_log('[Contact Confirmation] Erreur : ' . $confirmResult);
             }
-            
+
             setFlashMessage('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.', 'success');
         } else {
             // Log erreur
             $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
             @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
-            setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
+            setFlashMessage('Une erreur est survenue. Veuillez réessayer.', 'error');
         }
-        } else {
-            // Log erreur
-            $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
-            @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
-            setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
-        }
-        } else {
-            // Log erreur
-            $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
-            file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
-            setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
-        }
-        } else {
-            // Log l'erreur mais ne pas montrer les détails techniques à l'utilisateur
-            error_log('[Contact] Erreur envoi email : ' . $result);
-            setFlashMessage('Une erreur est survenue lors de l\'envoi. Veuillez réessayer.', 'error');
-        }
+
         return $this->redirect('/contact');
     }
 
-    /**
-     * Liste des vendeurs de la plateforme
-     * 
-     * Affiche :
-     * - Top vendeurs (mieux notés)
-     * - Statistiques par vendeur (nombre de produits, notes)
-     * - Lien vers leurs boutiques
-     * 
-     * @return void
-     */
     public function sellers() {
         $userModel = new User();
         
