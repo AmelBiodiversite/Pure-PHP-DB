@@ -147,22 +147,24 @@ class HomeController extends Controller {
         // Envoi email via API HTTP Brevo (SMTP bloqué par Railway)
         $emailBody = "
             <h2>Nouveau message de contact - MarketFlow</h2>
-            <p><strong>Nom :</strong> '$name'</p>
-            <p><strong>Email :</strong> '$email'</p>
-            <p><strong>Sujet :</strong> '$subject'</p>
+            <p><strong>Nom :</strong> $name</p>
+            <p><strong>Email :</strong> $email</p>
+            <p><strong>Sujet :</strong> $subject</p>
             <p><strong>Message :</strong><br>" . nl2br($message) . "</p>
             <hr>
             <small>Envoyé depuis le formulaire de contact MarketFlow le " . date('d/m/Y à H:i') . "</small>
         ";
+        
         $result = sendMailApi(
             'contact@marketflow.fr',
             "Nouveau contact MarketFlow : $subject",
             $emailBody
         );
+        
         if ($result === true) {
-            // Log succès
+            // Log succès dans emails.log
             $logLine = date('Y-m-d H:i:s') . " | SUCCESS | To: contact@marketflow.fr | Sujet: $subject | From: $email\n";
-            file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
+            @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
             
             // Email de confirmation à l'utilisateur
             $confirmBody = "
@@ -175,6 +177,7 @@ class HomeController extends Controller {
                 <hr>
                 <small>MarketFlow Pro - " . date('d/m/Y') . "</small>
             ";
+            
             $confirmResult = sendMailApi(
                 $email,
                 "Confirmation de réception - MarketFlow",
@@ -186,6 +189,12 @@ class HomeController extends Controller {
             }
             
             setFlashMessage('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.', 'success');
+        } else {
+            // Log erreur
+            $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
+            @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
+            setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
+        }
         } else {
             // Log erreur
             $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
