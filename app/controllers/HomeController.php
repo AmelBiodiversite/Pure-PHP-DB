@@ -198,6 +198,12 @@ class HomeController extends Controller {
         } else {
             // Log erreur
             $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
+            @file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
+            setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
+        }
+        } else {
+            // Log erreur
+            $logLine = date('Y-m-d H:i:s') . " | ERROR | To: contact@marketflow.fr | Sujet: $subject | From: $email | Msg: $result\n";
             file_put_contents(__DIR__ . '/../../data/logs/emails.log', $logLine, FILE_APPEND);
             setFlashMessage('Une erreur est survenue lors de l'envoi. Veuillez réessayer.', 'error');
         }
