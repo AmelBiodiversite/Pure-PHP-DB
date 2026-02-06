@@ -144,31 +144,30 @@ class HomeController extends Controller {
         $subject = htmlspecialchars($_POST['subject'] ?? 'Contact depuis MarketFlow Pro');
         $message = htmlspecialchars($_POST['message']);
 
-        // TODO : Implémenter l'envoi d'email
-        // Pour l'instant, on simule l'envoi
-        // Dans une version production, utilisez PHPMailer ou Symfony Mailer
-        
-        // Exemple avec mail() natif PHP (ne fonctionne pas toujours)
-        /*
-        $to = MAIL_FROM;
-        $headers = "From: $email\r\n";
-        $headers .= "Reply-To: $email\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        
+        // Envoi email via API HTTP Brevo (SMTP bloqué par Railway)
         $emailBody = "
-            <h2>Nouveau message de contact</h2>
+            <h2>Nouveau message de contact - MarketFlow</h2>
             <p><strong>Nom :</strong> $name</p>
             <p><strong>Email :</strong> $email</p>
             <p><strong>Sujet :</strong> $subject</p>
-            <p><strong>Message :</strong></p>
-            <p>$message</p>
+            <p><strong>Message :</strong><br>" . nl2br($message) . "</p>
+            <hr>
+            <small>Envoyé depuis le formulaire de contact MarketFlow le " . date('d/m/Y à H:i') . "</small>
         ";
-        
-        mail($to, $subject, $emailBody, $headers);
-        */
 
-        // Message de succès
-        setFlashMessage('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.', 'success');
+        $result = sendMailApi(
+            'contact@marketflow.fr',
+            "Nouveau contact MarketFlow : $subject",
+            $emailBody
+        );
+
+        if ($result === true) {
+            setFlashMessage('Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.', 'success');
+        } else {
+            // Log l'erreur mais ne pas montrer les détails techniques à l'utilisateur
+            error_log('[Contact] Erreur envoi email : ' . $result);
+            setFlashMessage('Une erreur est survenue lors de l\'envoi. Veuillez réessayer.', 'error');
+        }
         return $this->redirect('/contact');
     }
 
