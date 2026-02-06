@@ -1,88 +1,75 @@
 <?php
-/**
- * Test envoi email via API HTTP Brevo (pas SMTP)
- * Utilise curl — fonctionne même si Railway bloque les ports SMTP
- */
+// test_brevo_api.php - ENVOI VIA API BREVO v3 (HTTP/HTTPS - port 443)
+
 header('Content-Type: text/html; charset=utf-8');
 
-echo "<!DOCTYPE html><html lang='fr'><head><meta charset='utf-8'><title>Test API Brevo</title></head>";
-echo "<body style='font-family:sans-serif; padding:40px; background:#f8f8f8;'>";
-echo "<h1 style='color:#006400;'>TEST ENVOI EMAIL - API HTTP BREVO</h1>";
+echo "<!DOCTYPE html><html lang='fr'><head><meta charset='utf-8'><title>Test API Brevo v3</title></head><body style='font-family:sans-serif; padding:40px; background:#f0f8ff;'>";
+echo "<h1 style='color:#006400; text-align:center;'>TEST ENVOI VIA API BREVO v3</h1>";
+echo "<p style='font-size:1.3em; text-align:center;'>Méthode HTTP (port 443) → pas de blocage port SMTP sur Railway.</p><hr>";
 
-// Récupérer la clé API depuis les variables d'environnement
-$apiKey   = getenv('BREVO_API_KEY') ?: getenv('SMTP_PASSWORD');
-$from     = getenv('SMTP_FROM')     ?: 'contact@marketflow.fr';
-$fromName = getenv('SMTP_FROM_NAME') ?: 'MarketFlow';
+// Récup clé API
+$apiKey = getenv('BREVO_API_KEY');
 
-echo "<h3>Configuration</h3><pre>";
-echo "API Key  : " . ($apiKey ? '[présente - ' . strlen($apiKey) . ' chars]' : 'ABSENTE') . "\n";
-echo "From     : $from ($fromName)\n";
-echo "</pre>";
-
-// Préparer la requête API Brevo
-$data = [
-    'sender'  => ['name' => $fromName, 'email' => $from],
-    'to'      => [['email' => 'a.devance@proton.me', 'name' => 'Test MarketFlow']],
-    'subject' => 'Test API Brevo depuis MarketFlow - ' . date('Y-m-d H:i:s'),
-    'htmlContent' => '<h2>Email envoyé via API HTTP Brevo</h2>
-        <p>Ceci prouve que l\'envoi fonctionne depuis Railway.</p>
-        <p>Date : ' . date('Y-m-d H:i:s') . '</p>
-        <p>Si tu reçois ça → tout est OK ✅</p>'
-];
-
-echo "<h3>Tentative d'envoi via API HTTP...</h3>";
-
-// Appel API Brevo via curl
-$ch = curl_init();
-curl_setopt_array($ch, [
-    CURLOPT_URL            => 'https://api.brevo.com/v3/smtp/email',
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => json_encode($data),
-    CURLOPT_HTTPHEADER     => [
-        'accept: application/json',
-        'api-key: ' . $apiKey,
-        'content-type: application/json'
-    ],
-    CURLOPT_TIMEOUT        => 30,
-    CURLOPT_VERBOSE        => true
-]);
-
-// Capturer le debug curl
-$verbose = fopen('php://temp', 'w+');
-curl_setopt($ch, CURLOPT_STDERR, $verbose);
-
-$response   = curl_exec($ch);
-$httpCode   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError  = curl_error($ch);
-curl_close($ch);
-
-// Afficher le debug curl
-rewind($verbose);
-$verboseLog = stream_get_contents($verbose);
-fclose($verbose);
-
-echo "<h3>Résultat</h3>";
-echo "<p>Code HTTP : <strong>$httpCode</strong></p>";
-
-if ($httpCode === 201) {
-    echo "<h2 style='color:green;'>✅ EMAIL ENVOYÉ AVEC SUCCÈS !</h2>";
-    echo "<p>Vérifie ta boîte Proton (y compris spam/promotions).</p>";
-} else {
-    echo "<h2 style='color:red;'>❌ ÉCHEC ENVOI</h2>";
-    if ($curlError) {
-        echo "<p><strong>Erreur curl :</strong> " . htmlspecialchars($curlError) . "</p>";
-    }
+if (!$apiKey) {
+    die("<h2 style='color:red;'>BREVO_API_KEY manquante dans les variables Railway</h2>");
 }
 
-echo "<h3>Réponse Brevo</h3>";
-echo "<pre style='background:#eee; padding:15px; border:1px solid #ccc; overflow:auto;'>";
-echo htmlspecialchars($response);
+if (strpos($apiKey, 'xkeysib-') !== 0) {
+    die("<h2 style='color:red;'>Clé invalide : doit commencer par xkeysib-</h2>");
+}
+
+echo "<p>Clé API détectée (longueur : " . strlen($apiKey) . " caractères)</p>";
+
+// Payload API Brevo v3
+$data = [
+    'sender' => [
+        'name'  => getenv('SMTP_FROM_NAME') ?: 'Market Flow',
+        'email' => getenv('SMTP_FROM') ?: 'contact@marketflow.fr'
+    ],
+    'to' => [
+        ['email' => 'a.devance@proton.me', 'name' => 'Test MarketFlow']
+    ],
+    'subject' => 'Test API Brevo v3 depuis Railway - ' . date('Y-m-d H:i:s'),
+    'htmlContent' => '
+        <html>
+        <body>
+            <h2>Ça marche via l\'API ! ✅</h2>
+            <p>Ceci est un email envoyé en production depuis Railway via l\'API Brevo (sans SMTP).</p>
+            <p>Date : ' . date('Y-m-d H:i:s') . '</p>
+            <p>Vérifie ta boîte (y compris spam/promotions).</p>
+        </body>
+        </html>'
+];
+
+$ch = curl_init('https://api.brevo.com/v3/smtp/email');
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'accept: application/json',
+    'api-key: ' . $apiKey,
+    'content-type: application/json'
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error    = curl_error($ch);
+curl_close($ch);
+
+echo "<h3>Résultat de l'appel API</h3>";
+echo "<pre style='background:#f8f8f8; padding:15px; border:1px solid #ccc; overflow:auto; font-size:1.1em;'>";
+echo "HTTP Code : $httpCode\n";
+echo "Erreur cURL : " . ($error ?: 'Aucune') . "\n";
+echo "Réponse Brevo : " . htmlspecialchars($response) . "\n";
 echo "</pre>";
 
-echo "<h3>Debug curl</h3>";
-echo "<pre style='background:#eee; padding:15px; border:1px solid #ccc; overflow:auto;'>";
-echo htmlspecialchars($verboseLog);
-echo "</pre>";
+if ($httpCode === 201) {
+    echo "<h2 style='color:green; text-align:center;'>EMAIL ENVOYÉ AVEC SUCCÈS VIA API !</h2>";
+    echo "<p style='text-align:center;'>Vérifie immédiatement ta boîte Proton.</p>";
+} else {
+    echo "<h2 style='color:red; text-align:center;'>ÉCHEC ENVOI API</h2>";
+    echo "<p>Vérifie que ton domaine expéditeur (marketflow.fr) est vérifié dans Brevo → Senders → Domains.</p>";
+}
 
-echo "<hr><small>Fin du test API</small></body></html>";
+echo "<hr><small>Fin du test - Recharge pour réessayer</small></body></html>";
