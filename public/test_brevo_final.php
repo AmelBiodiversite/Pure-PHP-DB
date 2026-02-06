@@ -45,7 +45,7 @@ try {
     $mail->SMTPAuth   = true;
     $mail->Username   = $user;
     $mail->Password   = $pass;
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port       = $port;
 
     // Expéditeur
