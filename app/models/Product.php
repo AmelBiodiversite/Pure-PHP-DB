@@ -162,7 +162,7 @@ class Product extends Model {
      * Retourne le chemin public stocké en base.
      */
     private function uploadThumbnail($file) {
-        $uploadDir = UPLOAD_DIR . 'products/thumbnails/';
+        $uploadDir = __DIR__ . '/../../public/uploads/products/thumbnails/';
         $filename  = uniqid() . '_' . basename($file['name']);
         $filepath  = $uploadDir . $filename;
 
@@ -178,7 +178,7 @@ class Product extends Model {
      * Upload du fichier numérique vendu (zip, pdf, etc.)
      */
     private function uploadProductFile($file) {
-        $uploadDir = UPLOAD_DIR . 'products/files/';
+        $uploadDir = __DIR__ . '/../../public/uploads/products/files/';
         $filename  = uniqid() . '_' . basename($file['name']);
         $filepath  = $uploadDir . $filename;
 
