@@ -1,10 +1,14 @@
-# Image PHP 8.3 avec CLI
-FROM php:8.3-cli
+# ============================================================================
+# MARKETFLOW PRO - Dockerfile Production (Apache)
+# ============================================================================
 
-# Installer les dépendances système et les extensions PHP en une seule couche
+FROM php:8.3-apache
+
+# Installer les dépendances système et extensions PHP
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libonig-dev \
+    libcurl4-openssl-dev \
     git \
     unzip \
     && docker-php-ext-install -j$(nproc) \
@@ -12,19 +16,33 @@ RUN apt-get update && apt-get install -y \
         pdo_pgsql \
         pgsql \
         mbstring \
+        curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer Composer depuis l'image officielle
+# Activer mod_rewrite pour les URLs propres
+RUN a2enmod rewrite
+
+# Configurer Apache : DocumentRoot = /app/public, port 8080
+RUN sed -i 's|/var/www/html|/app/public|g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's|/var/www/html|/app/public|g' /etc/apache2/apache2.conf \
+    && sed -i 's|Listen 80|Listen 8080|g' /etc/apache2/ports.conf \
+    && sed -i 's|:80>|:8080>|g' /etc/apache2/sites-available/000-default.conf
+
+# Autoriser .htaccess (AllowOverride All)
+RUN echo '<Directory /app/public>\n\
+    Options -Indexes +FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
+
+# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de dépendances (optimisation du cache Docker)
+# Installer dépendances PHP
 COPY composer.json composer.lock ./
-
-# Installer les dépendances PHP sans interaction
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
@@ -32,10 +50,10 @@ RUN composer install \
     --prefer-dist \
     --no-scripts
 
-# Copier tout le code source
+# Copier le code source
 COPY . .
 
-# Exécuter les scripts post-install si nécessaire
+# Optimiser autoloader
 RUN composer dump-autoload --optimize --no-dev
 
 # Créer les dossiers avec permissions
@@ -44,10 +62,9 @@ RUN mkdir -p \
     public/uploads/avatars \
     public/uploads/shop-logos \
     tmp/sessions \
-    && chmod -R 777 public/uploads tmp/sessions
+    data/logs \
+    && chmod -R 777 public/uploads tmp/sessions data/logs
 
-# Exposer le port
 EXPOSE 8080
 
-# Commande de démarrage
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public", "public/router.php"]
+CMD ["apache2-foreground"]

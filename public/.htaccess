@@ -1,10 +1,15 @@
-# Activer le rewriting
+# ============================================================================
+# MARKETFLOW PRO - Routing Apache
+# ============================================================================
+# Les fichiers existants (CSS, JS, images, PHP, HTML) sont servis directement
+# Tout le reste passe par index.php (routing MarketFlow)
+# ============================================================================
+
 RewriteEngine On
 
-# Si le fichier existe (CSS, JS, images), le servir directement
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
+# Si le fichier ou dossier existe, le servir directement
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 
-# Sinon, router vers index.php
+# Sinon, envoyer vers index.php
 RewriteRule ^ index.php [L]
-
