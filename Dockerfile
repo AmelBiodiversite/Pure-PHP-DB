@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
 
 # Activer mod_rewrite pour les URLs propres
 RUN a2enmod rewrite
+ # Fix MPM conflict: disable all except prefork (required for mod_php) RUN a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork
 
 # Configurer Apache : DocumentRoot = /app/public, port 8080
 RUN sed -i 's|/var/www/html|/app/public|g' /etc/apache2/sites-available/000-default.conf \
@@ -34,6 +35,11 @@ RUN echo '<Directory /app/public>\n\
     Options -Indexes +FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
+ # Directory parent pour securite RUN echo '<Directory /app>
+    Options -Indexes +FollowSymLinks
+    AllowOverride None
+    Require all granted
 </Directory>' >> /etc/apache2/apache2.conf
 
 # Installer Composer
@@ -67,4 +73,6 @@ RUN mkdir -p \
 
 EXPOSE 8080
 
+ # ENV prod (desactive debug en prod) ENV APP_ENV=production ENV APP_DEBUG=false  # Chown pour Apache (user www-data) RUN chown -R www-data:www-data /app &&  chown -R www-data:www-data public/uploads tmp/sessions data/logs
+ # Logs verbose pour debug RUN sed -i 's/LogLevel info/LogLevel warn/' /etc/apache2/apache2.conf
 CMD ["apache2-foreground"]

@@ -2,7 +2,7 @@
 # MARKETFLOW PRO - Routing Apache
 # ============================================================================
 # Les fichiers existants (CSS, JS, images, PHP, HTML) sont servis directement
-# Tout le reste passe par index.php (routing MarketFlow)
+# Tout le reste passe par router.php (routing MarketFlow)
 # ============================================================================
 
 RewriteEngine On
@@ -11,5 +11,5 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Sinon, envoyer vers index.php
-RewriteRule ^ index.php [L]
+# Sinon, envoyer vers router.php
+RewriteRule ^ router.php [L]

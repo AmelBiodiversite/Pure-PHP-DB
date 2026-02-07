@@ -26,6 +26,7 @@ try {
     echo "<p>✅ Étape 5 : REQUEST_URI = " . ($_SERVER['REQUEST_URI'] ?? 'N/A') . "</p>";
     
     echo "<h2>🎉 Test réussi !</h2>";
+    echo "<p>✅ Étape 6 : APP_ENV = " . (getenv('APP_ENV') ?? 'N/A') . "</p>";     echo "<p>✅ Étape 7 : APP_DEBUG = " . (getenv('APP_DEBUG') ?? 'N/A') . "</p>";
     echo "<p><a href='/'>Retour à l'accueil</a></p>";
     echo "</body></html>";
     
