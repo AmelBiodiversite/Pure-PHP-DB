@@ -2,7 +2,6 @@
 $title = 'Licence Fondateur MarketFlow - Lancez votre marketplace en semaines';
 $description = 'Moteur marketplace prêt à l\'emploi. Code source commenté en français. Limité à 3 licences à 2 490€.';
 ?>
-<?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <div style="max-width: 1200px; margin: 80px auto; padding: 0 20px;">
     
@@ -184,4 +183,3 @@ $description = 'Moteur marketplace prêt à l\'emploi. Code source commenté en 
     
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
