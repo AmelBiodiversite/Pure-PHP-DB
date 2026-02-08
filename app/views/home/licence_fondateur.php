@@ -47,7 +47,7 @@ $description = 'Moteur marketplace prêt à l\'emploi. Code source commenté en 
         </div>
         
         <!-- CTA -->
-        <a href="mailto:licence@marketflow.fr?subject=Licence Fondateur - 2490€&body=Bonjour, je suis intéressé(e) par la Licence Fondateur. Mon projet : [Décrivez brièvement votre marketplace]" 
+        <a href="mailto:contact@marketflow.fr?subject=Licence Fondateur - 2490€&body=Bonjour, je suis intéressé(e) par la Licence Fondateur. Mon projet : [Décrivez brièvement votre marketplace]" 
            style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
                   color: #1f2937; 
                   padding: 22px 45px; 
@@ -168,7 +168,7 @@ $description = 'Moteur marketplace prêt à l\'emploi. Code source commenté en 
         <p style="font-size: 1.1rem; color: #666; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
             Postulez pour la Licence Fondateur. Si votre projet est validé, vous recevrez les accès dans les 24h.
         </p>
-        <a href="mailto:licence@marketflow.fr?subject=Licence Fondateur - 2490€&body=Bonjour, je souhaite postuler pour la Licence Fondateur. %0D%0A%0D%0AMon projet : %0D%0A%0D%0AUsage prévu (agence/startup) : %0D%0A%0D%0ADate de lancement souhaitée :" 
+        <a href="mailto:contact@marketflow.fr?subject=Licence Fondateur - 2490€&body=Bonjour, je souhaite postuler pour la Licence Fondateur. %0D%0A%0D%0AMon projet : %0D%0A%0D%0AUsage prévu (agence/startup) : %0D%0A%0D%0ADate de lancement souhaitée :" 
            style="background: linear-gradient(135deg, #059669 0%, #047857 100%); 
                   color: white; 
                   padding: 25px 50px; 

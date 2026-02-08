@@ -154,4 +154,5 @@ $router->get('/admin/security/download/{date}', 'SecurityController@downloadLog'
 // DISPATCHER - TOUJOURS EN DERNIER !
 // ================================================================
 
-$router->dispatch();
+$router->dispatch();\n// Page Licence Fondateur
+$router->get('/licence-fondateur', 'HomeController@licenceFondateur');

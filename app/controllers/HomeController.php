@@ -256,5 +256,10 @@ class HomeController extends Controller {
             'title' => 'Centre d\'aide - MarketFlow Pro'
         ]);
     }
-
+public function licenceFondateur() {
+    return $this->render('home/licence_fondateur', [
+        'title' => 'Licence Fondateur MarketFlow - 2 490€',
+        'description' => 'Moteur marketplace prêt à l\'emploi. Code source commenté en français. Limité à 3 licences.'
+    ]);
+}
 }
