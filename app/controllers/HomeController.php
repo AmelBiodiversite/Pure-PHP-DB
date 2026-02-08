@@ -256,4 +256,10 @@ class HomeController extends Controller {
             'title' => 'Centre d\'aide - MarketFlow Pro'
         ]);
     }
+public function licenceFondateur() {
+        return $this->render('home/licence_fondateur', [
+            'title' => 'Licence Fondateur'
+        ]);
+    }
+
 }
