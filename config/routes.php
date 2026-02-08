@@ -149,10 +149,11 @@ $router->get('/api/categories', 'ApiController@categories');
 $router->get('/admin/security', 'SecurityController@index');
 $router->get('/admin/security/api/events', 'SecurityController@apiEvents');
 $router->get('/admin/security/download/{date}', 'SecurityController@downloadLog');
+$router->get('/licence-fondateur', 'HomeController@licenceFondateur');
 
 // ================================================================
 // DISPATCHER - TOUJOURS EN DERNIER !
 // ================================================================
 
-$router->dispatch();\n// Page Licence Fondateur
-$router->get('/licence-fondateur', 'HomeController@licenceFondateur');
+$router->dispatch();
+
