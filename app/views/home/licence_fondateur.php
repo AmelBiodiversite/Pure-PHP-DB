@@ -184,4 +184,4 @@ $description = 'Moteur marketplace prêt à l\'emploi. Code source commenté en 
     
 </div>
 
-<?php include 'app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>
