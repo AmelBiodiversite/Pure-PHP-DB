@@ -86,13 +86,6 @@
          SCRIPTS JAVASCRIPT
          ===================================================== -->
     
-    <!-- Script principal avec composants (Dropdown, utilitaires, etc.) -->
-    <script src="<?= JS_URL ?>/app.js"></script>
-    
-    <!-- Système de notifications toast modernes -->
-    <!-- Convertit automatiquement les messages flash PHP en toast -->
-    <script src="<?= JS_URL ?>/notifications.js"></script>
-    
   <!-- Chart.js Library v4.4.0 - Graphiques modernes pour dashboard vendeur -->
 <!-- Utilisé dans : app/views/seller/dashboard.php -->
 <!-- Documentation : https://www.chartjs.org/docs/latest/ -->
