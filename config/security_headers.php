@@ -124,7 +124,7 @@ header("Content-Security-Policy: " .
     "style-src 'self' 'unsafe-inline'; " .
     "img-src 'self' data: https:; " .
     "font-src 'self' data:; " .
-    "connect-src 'self' https://api.stripe.com; " .
+    "connect-src 'self' https://api.stripe.com https://cdn.jsdelivr.net; " . ; " .
     "frame-src https://js.stripe.com; " .
     "object-src 'none'; " .
     "base-uri 'self'; " .
