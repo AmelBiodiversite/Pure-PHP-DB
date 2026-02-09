@@ -89,7 +89,7 @@
             <div style="
     width:42px;height:42px;
     border-radius:12px;
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -205,14 +205,14 @@
             width:40px;
             height:40px;
             border-radius:50%;
-            background:<?= $currentUser['role']==='admin' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'var(--gradient-primary)' ?>;
+            background:<?= $currentUser['role']==='admin' ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)' ?>;
             display:flex;
             align-items:center;
             justify-content:center;
             color:white;
             font-weight:800;
             font-size: 1.1rem;
-            box-shadow: 0 4px 12px <?= $currentUser['role']==='admin' ? 'rgba(102, 126, 234, 0.4)' : 'rgba(59, 130, 246, 0.3)' ?>;
+            box-shadow: 0 4px 12px <?= $currentUser['role']==='admin' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)' ?>;
             position: relative;
         ">
             <?= strtoupper(substr($currentUser['username'],0,1)) ?>
@@ -241,7 +241,7 @@
                 <span style="
                     font-size: 0.7rem;
                     color: white;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
                     padding: 0.1rem 0.5rem;
                     border-radius: 6px;
                     font-weight: 600;
@@ -322,14 +322,14 @@
         display: block;
         padding: 0.75rem 1rem;
         border-radius: 8px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
         color: white;
         text-decoration: none;
         transition: all 0.2s;
         font-weight: 600;
         font-size: 0.95rem;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-    " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(59, 130, 246, 0.3)'">
         👑 Administration
     </a>
     

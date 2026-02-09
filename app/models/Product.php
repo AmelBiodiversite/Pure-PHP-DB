@@ -490,4 +490,69 @@ class Product extends Model {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * ================================================================
+     * COMPTE LE NOMBRE DE PRODUITS DANS UNE CATÉGORIE
+     * ================================================================
+     * 
+     * Cette méthode permet d'afficher dynamiquement le nombre de produits
+     * par catégorie sur la page d'accueil (ex: "2,847 produits").
+     * 
+     * PARAMÈTRES :
+     * @param string $categorySlug - Le slug de la catégorie (ex: 'courses', 'design', 'templates')
+     * 
+     * RETOUR :
+     * @return int - Nombre de produits actifs dans cette catégorie
+     * 
+     * EXEMPLE D'UTILISATION :
+     * $productModel = new Product();
+     * $count = $productModel->countByCategory('courses'); // Retourne 127 (par exemple)
+     * 
+     * FONCTIONNEMENT :
+     * 1. Fait une jointure (JOIN) entre la table 'products' et la table 'categories'
+     * 2. Filtre par le slug de catégorie fourni (ex: WHERE slug = 'courses')
+     * 3. Ne compte QUE les produits avec status = 'approved' ou 'active'
+     * 4. Retourne le nombre total sous forme d'entier
+     * 
+     * POURQUOI CETTE MÉTHODE ?
+     * - Affichage dynamique : les chiffres se mettent à jour automatiquement
+     * - Performance : une seule requête SQL optimisée avec COUNT()
+     * - Maintenabilité : si on ajoute des produits, les stats sont à jour
+     * 
+     * SÉCURITÉ :
+     * - Utilise une requête préparée (PDO) pour éviter les injections SQL
+     * - Le slug est échappé automatiquement par PDO
+     * 
+     * ================================================================
+     */
+    public function countByCategory($categorySlug) {
+        // Construction de la requête SQL
+        // COUNT(*) : compte le nombre de lignes retournées
+        // JOIN categories : permet d'accéder au slug de la catégorie
+        // WHERE c.slug = ? : filtre par le slug fourni
+        // AND p.status IN (...) : ne compte que les produits visibles publiquement
+        $sql = "SELECT COUNT(*) 
+                FROM products p
+                JOIN categories c ON p.category_id = c.id
+                WHERE c.slug = :slug 
+                AND p.status IN ('approved', 'active')";
+
+        // Préparation de la requête (sécurité contre les injections SQL)
+        $stmt = $this->db->prepare($sql);
+
+        // Binding du paramètre slug
+        // Exemple : si $categorySlug = 'courses', la requête devient :
+        // SELECT COUNT(*) FROM products ... WHERE c.slug = 'courses'
+        $stmt->bindValue(':slug', $categorySlug, PDO::PARAM_STR);
+
+        // Exécution de la requête
+        $stmt->execute();
+
+        // Récupération du résultat (une seule colonne : le COUNT)
+        // fetchColumn() retourne directement la valeur de la première colonne
+        // (int) : conversion en entier pour garantir un nombre
+        // Exemple de retour : 127, 2847, 0, etc.
+        return (int) $stmt->fetchColumn();
+    }
 }

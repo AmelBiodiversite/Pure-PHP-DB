@@ -55,21 +55,25 @@ class HomeController extends Controller {
         $productModel = new Product();
 
         // Récupérer les 4 produits les mieux notés et les plus récents
-        // Méthode getPopular() retourne :
-        // - products avec rating_average
-        // - Informations vendeur (shop_name)
-        // - Catégorie (category_name)
         $products = $productModel->getPopular(4);
 
+        // 🆕 Récupérer le nombre RÉEL de produits par catégorie (dynamique)
+        // Appelle la méthode countByCategory() qui compte en base de données
+        // Les chiffres se mettent à jour automatiquement quand on ajoute des produits
+        $categoryCounts = [
+            'courses' => $productModel->countByCategory('courses'),
+            'design' => $productModel->countByCategory('design'),
+            'templates' => $productModel->countByCategory('templates'),
+            'code' => $productModel->countByCategory('code'),
+            'audio' => $productModel->countByCategory('audio'),
+            'visual' => $productModel->countByCategory('visual'),
+        ];
+
         // Transmettre les données à la vue
-        // La méthode render() de Core\Controller va :
-        // 1. Extraire les variables ($products devient accessible dans la vue)
-        // 2. Inclure app/views/layouts/header.php
-        // 3. Inclure app/views/home/index.php
-        // 4. Inclure app/views/layouts/footer.php
         return $this->render('home/index', [
             'title' => 'Accueil - MarketFlow Pro',
-            'products' => $products
+            'products' => $products,
+            'categoryCounts' => $categoryCounts // Compteurs dynamiques transmis à la vue
         ]);
     }
 

@@ -1338,3 +1338,784 @@ section {
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.2);
     }
 }
+/* ================================================================
+   ================================================================
+   ================================================================
+   
+   🎨 NOUVEAU DESIGN SOFT BLUE MINIMAL LUXE - Ajouté le $(date +%d/%m/%Y)
+   
+   SECTIONS AJOUTÉES :
+   - Variables CSS camaïeu de bleus
+   - Hero Section harmonisée
+   - Catégories Minimal Luxe (6 catégories)
+   - Produits avec wishlist
+   - Features améliorées
+   - CTA final
+   
+   DESIGN : Camaïeu de bleus (pas de violet)
+   STYLE : Soft Blue background + Glassmorphism
+   
+   ================================================================
+   ================================================================
+   ================================================================ */
+
+/**
+ * ================================================================
+ * MARKETFLOW PRO - CSS PAGE D'ACCUEIL SOFT BLUE
+ * ================================================================
+ * 
+ * Fichier : public/css/homepage-softblue.css
+ * Version : 3.0 - Camaïeu de bleus
+ * 
+ * INSTRUCTIONS :
+ * Copier ce code à la fin de public/css/style.css
+ * OU créer ce fichier et l'inclure dans header.php
+ * 
+ * PALETTE : Camaïeu de bleus (pas de violet)
+ * DESIGN : Soft Blue Minimal Luxe
+ * 
+ * ================================================================
+ */
+
+/* ================================================================
+   VARIABLES CSS - Palette camaïeu de bleus
+   ================================================================ */
+:root {
+    /* Couleurs principales - Camaïeu de bleus */
+    --blue-primary: #3b82f6;     /* Bleu primaire */
+    --blue-sky: #0ea5e9;         /* Bleu ciel */
+    --blue-cyan: #06b6d4;        /* Cyan */
+    --blue-teal: #14b8a6;        /* Teal */
+    --blue-indigo: #6366f1;      /* Indigo (bleu profond) */
+    --blue-light: #60a5fa;       /* Bleu clair */
+    
+    /* Dégradé signature (bleus seulement) */
+    --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+    
+    /* Fond Soft Blue */
+    --bg-soft-blue: linear-gradient(135deg, #f0f4f8 0%, #e8eef4 100%);
+    --bg-card: rgba(255, 255, 255, 0.6);
+    --bg-card-hover: rgba(255, 255, 255, 0.9);
+    
+    /* Textes */
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-tertiary: #64748b;
+    
+    /* Bordures */
+    --border-light: rgba(30, 41, 59, 0.12);
+    --border-hover: rgba(59, 130, 246, 0.25);
+    --border-meta: rgba(30, 41, 59, 0.1);
+    
+    /* Ombres */
+    --shadow-card: 0 16px 48px rgba(59, 130, 246, 0.12);
+    --shadow-hover: 0 20px 60px rgba(59, 130, 246, 0.15);
+    
+    /* Espacements */
+    --space-section: 100px;
+    --space-gap: 28px;
+}
+
+/* ================================================================
+   FOND DE LA PAGE - Soft Blue
+   ================================================================ */
+body {
+    background: var(--bg-soft-blue);
+}
+
+/* ================================================================
+   HERO SECTION - Section d'accueil
+   ================================================================ */
+.hero-section {
+    /* Espacement vertical */
+    padding: 120px 0 80px;
+    
+    /* Centrage du texte */
+    text-align: center;
+    
+    /* Position relative pour les décorations */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cercle décoratif en arrière-plan */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Container du contenu hero */
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Titre principal */
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+/* Partie du titre avec gradient bleu */
+.hero-title .gradient-text {
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
+/* Sous-titre */
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    line-height: 1.7;
+}
+
+/* Container des boutons CTA */
+.hero-cta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Bouton CTA primaire (avec gradient) */
+.btn-hero-primary {
+    padding: 16px 36px;
+    background: var(--gradient-blue);
+    border: none;
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+}
+
+.btn-hero-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.35);
+}
+
+/* Bouton CTA secondaire (outline) */
+.btn-hero-secondary {
+    padding: 16px 36px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-hero-secondary:hover {
+    background: #ffffff;
+    border-color: var(--blue-primary);
+    color: var(--blue-primary);
+    transform: translateY(-2px);
+}
+
+/* ================================================================
+   TITRES ET SOUS-TITRES DE SECTIONS
+   ================================================================ */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 60px;
+    line-height: 1.6;
+}
+
+/* ================================================================
+   SECTION CATÉGORIES - Minimal Luxe
+   ================================================================ */
+.categories-section {
+    padding: var(--space-section) 0;
+    position: relative;
+}
+
+/* Grille de catégories */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: var(--space-gap);
+}
+
+/* Carte de catégorie */
+.category-card {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Ligne décorative en haut de la carte */
+.category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
+    z-index: 2;
+}
+
+.category-card:hover::before {
+    width: 100%;
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+}
+
+/* Contenu de la carte */
+.category-content {
+    padding: 40px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card:hover .category-content {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-card);
+}
+
+/* Numéro de la catégorie */
+.category-number {
+    font-size: 4rem;
+    font-weight: 200;
+    color: rgba(30, 41, 59, 0.08);
+    line-height: 1;
+    margin-bottom: 20px;
+    letter-spacing: -0.04em;
+    transition: all 0.4s ease;
+}
+
+.category-card:hover .category-number {
+    color: var(--accent);
+    transform: translateX(4px);
+}
+
+/* Icône de la catégorie */
+.category-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: var(--accent);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-card:hover .category-icon {
+    transform: translateX(8px) scale(1.05);
+}
+
+/* Titre de la catégorie */
+.category-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+/* Description */
+.category-description {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    flex-grow: 1;
+}
+
+/* Métadonnées en bas */
+.category-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-meta);
+}
+
+.category-stats {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+/* Flèche de navigation */
+.category-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover .category-arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: translateX(6px);
+}
+
+/* Couleurs par catégorie - Camaïeu de bleus */
+.cat-1 { --accent: var(--blue-primary); }
+.cat-2 { --accent: var(--blue-sky); }
+.cat-3 { --accent: var(--blue-cyan); }
+.cat-4 { --accent: var(--blue-teal); }
+.cat-5 { --accent: var(--blue-indigo); }
+.cat-6 { --accent: var(--blue-light); }
+
+/* ================================================================
+   SECTION PRODUITS
+   ================================================================ */
+.products-section {
+    padding: var(--space-section) 0;
+}
+
+/* En-tête avec lien "Voir tout" */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Lien "Voir tout" */
+.view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blue-primary);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 10px 20px;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.view-all-link:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateX(4px);
+}
+
+/* Grille de produits */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-gap);
+}
+
+/* Carte produit */
+.product-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Container de l'image */
+.product-image-container {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e8eef4 0%, #d9e2ec 100%);
+}
+
+/* Image du produit */
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.08);
+}
+
+/* Bouton wishlist (cœur) */
+.wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wishlist-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.2);
+    background: rgba(255, 255, 255, 1);
+}
+
+.wishlist-btn .heart-icon {
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+    filter: grayscale(1);
+}
+
+.wishlist-btn.active .heart-icon,
+.wishlist-btn:hover .heart-icon {
+    filter: grayscale(0);
+}
+
+/* Badge catégorie */
+.product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--blue-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenu de la carte */
+.product-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+/* Titre du produit */
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s ease;
+}
+
+.product-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.product-card:hover .product-title {
+    color: var(--blue-primary);
+}
+
+/* Footer de la carte */
+.product-footer {
+    border-top: 1px solid rgba(30, 41, 59, 0.08);
+    padding-top: 16px;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Prix avec gradient bleu */
+.product-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.01em;
+}
+
+/* Bouton "Voir" */
+.product-btn {
+    padding: 10px 20px;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 10px;
+    color: var(--blue-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.product-btn:hover {
+    background: var(--gradient-blue);
+    border-color: var(--blue-primary);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Message si aucun produit */
+.no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-tertiary);
+    font-size: 1.1rem;
+}
+
+/* ================================================================
+   SECTION FEATURES (Pourquoi MarketFlow)
+   ================================================================ */
+.features-section {
+    padding: var(--space-section) 0;
+}
+
+/* Grille de features */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: var(--space-gap);
+    margin-top: 60px;
+}
+
+/* Carte feature */
+.feature-card {
+    padding: 40px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.4s ease;
+}
+
+.feature-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card);
+}
+
+/* Icône de la feature (avec gradient) */
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    border-radius: 20px;
+    background: var(--gradient-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    transition: transform 0.4s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Titre de la feature */
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+/* Description */
+.feature-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ================================================================
+   CTA FINAL (Call-to-action vendeur)
+   ================================================================ */
+.cta-section {
+    padding: var(--space-section) 0;
+}
+
+/* Carte CTA avec gradient bleu */
+.cta-card {
+    padding: 80px 60px;
+    background: var(--gradient-blue);
+    border-radius: 28px;
+    text-align: center;
+    color: #ffffff;
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+}
+
+/* Titre du CTA */
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+/* Description */
+.cta-description {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* Bouton CTA (blanc sur gradient) */
+.cta-button {
+    padding: 18px 40px;
+    background: #ffffff;
+    border: none;
+    border-radius: 14px;
+    color: var(--blue-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* ================================================================
+   RESPONSIVE - Mobile
+   ================================================================ */
+@media (max-width: 768px) {
+    /* Hero */
+    .hero-section {
+        padding: 80px 0 60px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    /* Titres de sections */
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    /* Sections - Espacements réduits */
+    .categories-section,
+    .products-section,
+    .features-section,
+    .cta-section {
+        padding: 60px 0;
+    }
+
+    /* Grilles - Espacements réduits */
+    .categories-grid,
+    .products-grid,
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* CTA */
+    .cta-card {
+        padding: 60px 30px;
+    }
+
+    .cta-title {
+        font-size: 2rem;
+    }
+
+    .cta-description {
+        font-size: 1.1rem;
+    }
+}
+
+/* ================================================================
+   FIN DU FICHIER CSS
+   ================================================================ */
