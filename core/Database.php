@@ -39,7 +39,7 @@ class Database {
                 $pass = $parts['pass'] ?? '';
                 
                 // Construction du DSN avec SSL requis pour Railway
-                $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
+                $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
                 
                 // Options PDO définies dès la création de la connexion
                 $options = [
@@ -61,7 +61,7 @@ class Database {
                 $pass = Env::get('DB_PASSWORD', '');
                 
                 // Construction du DSN avec SSL pour connexion sécurisée
-                $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
+                $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
                 
                 // Options PDO définies dès la création de la connexion
                 $options = [
