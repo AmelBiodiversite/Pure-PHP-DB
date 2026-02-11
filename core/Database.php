@@ -17,7 +17,7 @@ class Database {
      * Charge automatiquement les variables depuis .env ou variables d'environnement
      */
     private function __construct() {
-     die("TEST: Database désactivée temporairement"); 
+     
   try {
             // Charger le fichier .env
             Env::load();
