@@ -146,10 +146,28 @@ $router->get('/api/categories', 'ApiController@categories');
 // SÉCURITÉ (Auth admin)
 // ================================================================
 
+// Dashboard principal
 $router->get('/admin/security', 'SecurityController@index');
+
+// API AJAX - événements
 $router->get('/admin/security/api/events', 'SecurityController@apiEvents');
+
+// Téléchargement par date
 $router->get('/admin/security/download/{date}', 'SecurityController@downloadLog');
-$router->get('/licence-fondateur', 'HomeController@licenceFondateur');
+
+// Export CSV et JSON
+$router->get('/admin/security/export/csv',  'SecurityController@exportCSV');
+$router->get('/admin/security/export/json', 'SecurityController@exportJSON');
+
+// Actions sur les IPs (AJAX POST)
+$router->post('/admin/security/block-ip',     'SecurityController@blockIP');
+$router->post('/admin/security/unblock-ip',   'SecurityController@unblockIP');
+$router->post('/admin/security/whitelist-ip', 'SecurityController@whitelistIP');
+
+// API AJAX supplémentaires
+$router->get('/admin/security/api/stats',         'SecurityController@apiStats');
+$router->get('/admin/security/api/suspicious-ips','SecurityController@apiSuspiciousIPs');
+
 
 // ================================================================
 // DISPATCHER - TOUJOURS EN DERNIER !
