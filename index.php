@@ -1,26 +1,4 @@
 <?php
-die('
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Maintenance - MarketFlow</title>
-<style>
-body{margin:0;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0c0f;color:#fff}
-.box{text-align:center;padding:40px}
-h1{font-size:48px;margin:0 0 20px}
-p{font-size:18px;color:#8494b0}
-</style>
-</head>
-<body>
-<div class="box">
-<h1>🔧 Maintenance en cours</h1>
-<p>Nous revenons très bientôt.<br>Merci de votre patience.</p>
-</div>
-</body>
-</html>
-');
-
 
 /**
  * ============================================================================
