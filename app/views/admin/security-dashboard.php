@@ -523,7 +523,7 @@ $timelineInfo     = validateAndSanitize($timelineInfo ?? [], 'array', []);
 </script>
 
 <!-- Charger le fichier JS externe -->
-<script src="/public/js/security-dashboard.js"></script>
+<script src="/js/security-dashboard.js"></script>
 
 <!-- Initialiser le graphique Chart.js -->
 <script>
