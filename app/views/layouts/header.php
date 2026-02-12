@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -40,7 +39,6 @@
 <link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
 <link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">  
 
-
     <script src="<?= JS_URL ?>/app.js" defer></script>
     <script src="<?= JS_URL ?>/notifications.js" defer></script>
     <script src="<?= JS_URL ?>/wishlist.js" defer></script>
@@ -49,6 +47,7 @@
 <link rel="icon" href="<?= IMG_URL ?>/favicon.ico">
 
 <style>
+    /* Animation wishlist badge */
     .wishlist-count {
         animation: pulse-badge 2s infinite;
     }
@@ -57,6 +56,7 @@
         50% { box-shadow:0 0 0 6px rgba(239,68,68,0); }
     }
 
+    /* Animation dropdown */
    .dropdown-menu {
     opacity:0;
     transform: translateY(10px);
@@ -74,7 +74,59 @@
 }
 
 [data-dropdown]:not(:hover) .dropdown-menu:not(:hover) {
-    transition-delay: 150ms; /* Délai avant de disparaître */
+    transition-delay: 150ms;
+}
+
+/* NOUVEAU : Bouton Licence Fondateur animé */
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.btn-licence-fondateur {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.2rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+    background-size: 200% auto;
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+    transition: all 0.3s ease;
+    animation: shimmer 3s linear infinite;
+}
+
+.btn-licence-fondateur:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+}
+
+.btn-licence-fondateur .rocket {
+    font-size: 1.1rem;
+    animation: rocket-shake 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes rocket-shake {
+    0% { transform: rotate(-5deg); }
+    100% { transform: rotate(5deg); }
+}
+
+.btn-licence-fondateur .badge-urgent {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.15rem 0.4rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
 </style>
 </head>
@@ -109,6 +161,13 @@
             <a href="/">Accueil</a>
             <a href="/products">Produits</a>
             <a href="/category">Catégories</a>
+            
+            <!-- 🔥 NOUVEAU : Bouton Licence Fondateur -->
+            <a href="/licence-fondateur" class="btn-licence-fondateur">
+                <span class="rocket">🚀</span>
+                Licence Fondateur
+                <span class="badge-urgent">3</span>
+            </a>
         </div>
 
         <!-- SEARCH -->
@@ -317,7 +376,6 @@
                     <?php if ($currentUser['role']==='admin'): ?>
     <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
     
-    <!-- Lien Administration -->
     <a href="/admin" style="
         display: block;
         padding: 0.75rem 1rem;
@@ -333,7 +391,6 @@
         👑 Administration
     </a>
     
-    <!-- Lien Monitoring Sécurité -->
     <?php $criticalCount = getSecurityAlerts(); ?>
     
     <a href="/admin/security" style="
@@ -393,9 +450,7 @@
 </nav>
 
 <!-- Flash message -->
-
 <?php if ($flash = getFlashMessage()): ?>
-
 <div data-flash-message="<?= e($flash['message']) ?>"
      data-flash-type="<?= e($flash['type']) ?>" style="display:none;"></div>
 <?php endif; ?>
