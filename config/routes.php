@@ -28,6 +28,8 @@ $router->post('/contact', 'HomeController@contactSubmit');
 $router->get('/terms', 'HomeController@terms');
 $router->get('/privacy', 'HomeController@privacy');
 $router->get('/help', 'HomeController@help');
+$router->get('/licence-fondateur', 'HomeController@licenceFondateur');
+
 
 // ================================================================
 // ROUTES UTILISATEURS (Auth requise)
