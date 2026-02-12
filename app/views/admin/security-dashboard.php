@@ -1,29 +1,17 @@
 <?php
 /**
- * ================================================
- * MARKETFLOW PRO - SECURITY MONITORING DASHBOARD
- * ================================================
- * 
- * Fichier : app/views/admin/security-dashboard.php
- * Version : 4.0 (2026) - Enhanced Features
- * 
- * Nouvelles fonctionnalités ajoutées :
- * - 🔍 Recherche avancée multi-critères
- * - 📊 Graphique de timeline temporelle
- * - 💾 Export CSV/JSON/PDF
- * - 🔔 Notifications temps réel
- * - 📄 Pagination intelligente
- * - ✅ Actions en masse
- * - 🔍 Modal de détails événements
- * - 📈 Statistiques comparatives
- * - ⚡ Mode sombre
- * - 🎯 Gestion Whitelist/Blacklist
- * - 📝 Système de notes
- * - ⌨️ Raccourcis clavier
- * - 🔊 Alertes sonores
- * - 📱 Responsive amélioré
- * 
- * ================================================
+ * MARKETFLOW PRO - SECURITY DASHBOARD VIEW v2.0
+ *
+ * Vue principale du monitoring de sécurité admin
+ * Thème : sombre industriel - adapté à un contexte de surveillance
+ *
+ * Données attendues depuis SecurityController::index() :
+ *   $title, $stats, $totalEvents, $criticalEvents, $warningEvents, $infoEvents,
+ *   $suspiciousIPs, $recentEvents, $pagination, $filters, $eventTypes,
+ *   $chartLabels, $chartData, $chartColors,
+ *   $timelineLabels, $timelineCritical, $timelineWarning, $timelineInfo
+ *
+ * @file app/views/admin/security-dashboard.php
  */
 ?>
 
@@ -32,2769 +20,1623 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title ?? 'Monitoring Sécurité') ?> - MarketFlow Admin</title>
-    
+    <title><?= htmlspecialchars($title ?? 'Monitoring Sécurité') ?> — MarketFlow Admin</title>
+
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Police Geist Mono + JetBrains Mono pour les données techniques -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* ================================================
-           VARIABLES CSS - DESIGN SYSTEM SÉCURITÉ
-           ================================================ */
+        /* ====================================================================
+           VARIABLES CSS & RESET
+           ==================================================================== */
         :root {
-            /* Couleurs sécurité */
-            --critical: #dc2626;
-            --critical-light: #fee2e2;
-            --critical-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            
-            --success: #10b981;
-            --success-light: #d1fae5;
-            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            
-            --info: #3b82f6;
-            --info-light: #dbeafe;
-            --info-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            
-            /* Couleurs de base */
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            
-            /* Ombres */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-            
-            /* Espacements */
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
+            --bg-base:        #0a0c0f;
+            --bg-panel:       #0f1318;
+            --bg-card:        #141920;
+            --bg-hover:       #1c2330;
+            --border:         #1e2840;
+            --border-light:   #252f42;
+
+            --text-primary:   #e8edf5;
+            --text-secondary: #8494b0;
+            --text-muted:     #4a5568;
+
+            --red:            #ff3b3b;
+            --red-dim:        rgba(255,59,59,.12);
+            --orange:         #ff8c42;
+            --orange-dim:     rgba(255,140,66,.12);
+            --green:          #2ecc71;
+            --green-dim:      rgba(46,204,113,.12);
+            --blue:           #4a9eff;
+            --blue-dim:       rgba(74,158,255,.12);
+            --purple:         #a78bfa;
+
+            --font-ui:        'Syne', sans-serif;
+            --font-mono:      'JetBrains Mono', monospace;
+
+            --radius:         8px;
+            --radius-sm:      4px;
+            --transition:     0.2s ease;
         }
 
-        /* Mode sombre */
-        [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-        }
-
-        /* ================================================
-           RESET & BASE
-           ================================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: var(--bg-primary);
+            background: var(--bg-base);
             color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 14px;
             line-height: 1.6;
-            transition: background 0.3s, color 0.3s;
+            /* Texture subtile pour l'ambiance industrielle */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23ffffff04' stroke-width='1'/%3E%3C/svg%3E");
         }
 
-        /* ================================================
-           CONTAINER PRINCIPAL
-           ================================================ */
-        .security-dashboard {
-            max-width: 1600px;
+        /* ====================================================================
+           LAYOUT PRINCIPAL
+           ==================================================================== */
+        .sec-wrap {
+            max-width: 1440px;
             margin: 0 auto;
-            padding: var(--space-2xl);
+            padding: 32px 24px 80px;
         }
 
-        /* ================================================
-           HEADER - En-tête avec statut global
-           ================================================ */
-        .dashboard-header {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
-            box-shadow: var(--shadow-md);
+        /* ====================================================================
+           HEADER
+           ==================================================================== */
+        .sec-header {
             display: flex;
+            align-items: flex-end;
             justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid var(--info);
+            margin-bottom: 36px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .header-left h1 {
-            font-size: 2rem;
+        .sec-header-left h1 {
+            font-size: 26px;
             font-weight: 800;
-            margin-bottom: var(--space-sm);
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: var(--space-md);
+            gap: 10px;
         }
 
-        .header-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .header-right {
-            display: flex;
-            gap: var(--space-md);
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        /* Statut global en direct */
-        .live-status {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);
-            background: var(--success-light);
-            border-radius: 24px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--success);
-        }
-
-        .live-pulse {
+        /* Point clignotant "live" */
+        .live-dot {
+            display: inline-block;
             width: 8px;
             height: 8px;
-            background: var(--success);
             border-radius: 50%;
+            background: var(--green);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,204,113,.4); }
+            50%       { opacity: .7; box-shadow: 0 0 0 6px rgba(46,204,113,0); }
         }
 
-        /* Toggle mode sombre */
-        .theme-toggle {
+        .sec-header-left p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 4px;
+            font-family: var(--font-mono);
+        }
+
+        /* Bouton retour admin */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 14px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+        }
+
+        .btn-back:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+            border-color: var(--blue);
+        }
+
+        /* ====================================================================
+           ALERTES CRITIQUES (si events critiques détectés)
+           ==================================================================== */
+        .alert-critical {
+            background: var(--red-dim);
+            border: 1px solid rgba(255,59,59,.3);
+            border-left: 3px solid var(--red);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            font-size: 0.875rem;
+            gap: 12px;
+            font-size: 13px;
+            color: #ffaaaa;
+            animation: fadeIn .4s ease;
         }
 
-        .theme-toggle:hover {
-            border-color: var(--info);
-            transform: translateY(-2px);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
-        /* Bouton refresh */
-        .refresh-btn {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .refresh-btn:hover {
-            border-color: var(--info);
-            color: var(--info);
-            transform: translateY(-2px);
-        }
-
-        .refresh-btn.loading {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .refresh-btn.loading .icon {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* ================================================
-           STATS CARDS - Cartes de statistiques
-           ================================================ */
+        /* ====================================================================
+           GRILLE STATS (4 cartes)
+           ==================================================================== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: var(--space-lg);
-            margin-bottom: var(--space-2xl);
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
         }
 
         .stat-card {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
             position: relative;
             overflow: hidden;
+            transition: border-color var(--transition);
         }
 
-        /* Barre de couleur en haut */
+        /* Ligne colorée en haut */
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--info-gradient);
+            top: 0; left: 0; right: 0;
+            height: 2px;
         }
 
-        .stat-card.critical::before { background: var(--critical-gradient); }
-        .stat-card.warning::before { background: var(--warning-gradient); }
-        .stat-card.success::before { background: var(--success-gradient); }
+        .stat-card.total::before   { background: var(--blue); }
+        .stat-card.critical::before { background: var(--red); }
+        .stat-card.warning::before  { background: var(--orange); }
+        .stat-card.info::before     { background: var(--green); }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
+        .stat-card:hover { border-color: var(--border-light); }
 
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: var(--space-lg);
-        }
-
-        /* Icône avec gradient */
-        .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            background: var(--info-gradient);
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
-        }
-
-        .stat-card.critical .stat-icon {
-            background: var(--critical-gradient);
-            box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
-        }
-
-        .stat-card.warning .stat-icon {
-            background: var(--warning-gradient);
-            box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
-        }
-
-        .stat-card.success .stat-icon {
-            background: var(--success-gradient);
-            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-        }
-
-        .stat-card h3 {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 600;
+        .stat-card .label {
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: var(--space-xs);
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: 10px;
         }
 
         .stat-card .value {
-            font-size: 2.5rem;
+            font-size: 36px;
             font-weight: 800;
-            color: var(--text-primary);
             line-height: 1;
+            font-family: var(--font-mono);
         }
 
-        .stat-trend {
+        .stat-card.total .value   { color: var(--blue); }
+        .stat-card.critical .value { color: var(--red); }
+        .stat-card.warning .value  { color: var(--orange); }
+        .stat-card.info .value     { color: var(--green); }
+
+        .stat-card .sub {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ====================================================================
+           SECTION GÉNÉRIQUE
+           ==================================================================== */
+        .sec-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .panel-header {
             display: flex;
             align-items: center;
-            gap: var(--space-xs);
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-top: var(--space-md);
-            padding: var(--space-xs) var(--space-sm);
-            background: var(--info-light);
-            color: var(--info);
-            border-radius: 6px;
-            width: fit-content;
-        }
-
-        .stat-trend.up {
-            background: var(--critical-light);
-            color: var(--critical);
-        }
-
-        .stat-trend.down {
-            background: var(--success-light);
-            color: var(--success);
-        }
-
-        /* Comparaison avec hier */
-        .stat-comparison {
-            display: flex;
-            align-items: center;
-            gap: var(--space-xs);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: var(--space-sm);
-        }
-
-        /* ================================================
-           ALERT BANNER - Bannière d'alerte critique
-           ================================================ */
-        .alert-banner {
-            background: var(--critical-light);
-            border-left: 4px solid var(--critical);
-            border-radius: 12px;
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
-            display: flex;
-            align-items: center;
-            gap: var(--space-lg);
-            box-shadow: var(--shadow-md);
-            animation: slideIn 0.4s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-icon {
-            font-size: 2.5rem;
-            flex-shrink: 0;
-            animation: shake 0.5s infinite;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
-
-        .alert-content {
-            flex: 1;
-        }
-
-        .alert-title {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--critical);
-            margin-bottom: var(--space-xs);
-        }
-
-        .alert-description {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .alert-actions {
-            display: flex;
-            gap: var(--space-sm);
-        }
-
-        /* ================================================
-           SECTIONS
-           ================================================ */
-        .section {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: var(--space-xl);
-            margin-bottom: var(--space-xl);
-            box-shadow: var(--shadow-md);
-        }
-
-        .section-header {
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-xl);
-            padding-bottom: var(--space-lg);
-            border-bottom: 2px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: var(--space-md);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .section-title {
-            font-size: 1.5rem;
+        .panel-title {
+            font-size: 13px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: 8px;
         }
 
-        .section-actions {
-            display: flex;
-            gap: var(--space-sm);
-            flex-wrap: wrap;
-        }
+        .panel-body { padding: 20px; }
 
-        /* ================================================
-           ADVANCED SEARCH - Recherche avancée
-           ================================================ */
-        .search-panel {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            padding: var(--space-lg);
-            margin-bottom: var(--space-lg);
-        }
-
-        .search-grid {
+        /* ====================================================================
+           FORMULAIRE DE FILTRES
+           ==================================================================== */
+        .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
+            grid-template-columns: 1fr 1fr 1fr 1fr 2fr auto;
+            gap: 10px;
+            align-items: end;
         }
 
-        .search-field {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xs);
-        }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
 
-        .search-field label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+        .filter-group label {
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: .8px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
         }
 
-        .search-field input,
-        .search-field select {
-            padding: var(--space-sm) var(--space-md);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-secondary);
+        /* Inputs et selects */
+        .filter-group input,
+        .filter-group select {
+            background: var(--bg-base);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
             color: var(--text-primary);
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .search-field input:focus,
-        .search-field select:focus {
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
             outline: none;
-            border-color: var(--info);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transition: border-color var(--transition);
         }
 
-        .search-actions {
-            display: flex;
-            gap: var(--space-sm);
-            justify-content: flex-end;
-        }
+        .filter-group input:focus,
+        .filter-group select:focus { border-color: var(--blue); }
 
-        /* ================================================
-           CHARTS GRID - Grille de graphiques
-           ================================================ */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: var(--space-xl);
-            margin-bottom: var(--space-xl);
-        }
+        .filter-group select option { background: var(--bg-card); }
 
-        .chart-card {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: var(--space-xl);
-            box-shadow: var(--shadow-md);
-        }
-
-        .chart-card.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .chart-header {
-            margin-bottom: var(--space-lg);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chart-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: var(--space-xs);
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .chart-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-
-        .chart-container.tall {
-            height: 400px;
-        }
-
-        /* ================================================
-           SUSPICIOUS IPS - Cartes IPs suspectes
-           ================================================ */
-        .suspicious-ips-grid {
-            display: grid;
-            gap: var(--space-md);
-        }
-
-        .suspicious-ip-card {
-            background: linear-gradient(135deg, #fff5f5 0%, var(--bg-secondary) 100%);
-            border: 2px solid var(--critical-light);
-            border-left: 4px solid var(--critical);
-            border-radius: 12px;
-            padding: var(--space-lg);
-            transition: all 0.3s ease;
-        }
-
-        [data-theme="dark"] .suspicious-ip-card {
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, var(--bg-secondary) 100%);
-        }
-
-        .suspicious-ip-card:hover {
-            transform: translateX(4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--critical);
-        }
-
-        .suspicious-ip-card.whitelisted {
-            border-left-color: var(--success);
-            border-color: var(--success-light);
-            background: linear-gradient(135deg, #f0fdf4 0%, var(--bg-secondary) 100%);
-        }
-
-        [data-theme="dark"] .suspicious-ip-card.whitelisted {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-secondary) 100%);
-        }
-
-        .ip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-md);
-        }
-
-        .ip-address {
-            font-size: 1.25rem;
-            font-weight: 700;
-            font-family: 'Courier New', monospace;
-            color: var(--critical);
-        }
-
-        .ip-badges {
-            display: flex;
-            gap: var(--space-xs);
-        }
-
-        .score-badge {
-            background: var(--critical-gradient);
-            color: white;
-            padding: var(--space-xs) var(--space-md);
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-        }
-
-        .whitelist-badge {
-            background: var(--success-gradient);
-            color: white;
-            padding: var(--space-xs) var(--space-md);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .ip-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
-        }
-
-        .ip-detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .ip-detail-label {
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            text-transform: uppercase;
+        /* Boutons filtres */
+        .btn-filter {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-ui);
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: 0.05em;
-            margin-bottom: var(--space-xs);
-        }
-
-        .ip-detail-value {
-            color: var(--text-primary);
-            font-weight: 700;
-            font-size: 1.125rem;
-        }
-
-        .ip-notes {
-            background: var(--bg-primary);
-            border-radius: 8px;
-            padding: var(--space-md);
-            margin-bottom: var(--space-md);
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .ip-notes-empty {
-            font-style: italic;
-            opacity: 0.6;
-        }
-
-        .ip-actions {
-            margin-top: var(--space-md);
-            padding-top: var(--space-md);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: var(--space-sm);
-            flex-wrap: wrap;
-        }
-
-        /* ================================================
-           EVENTS TABLE - Tableau des événements
-           ================================================ */
-        .filters {
-            display: flex;
-            gap: var(--space-sm);
-            flex-wrap: wrap;
-            margin-bottom: var(--space-lg);
-        }
-
-        .filter-btn {
-            padding: var(--space-sm) var(--space-md);
-            border: 2px solid var(--border-color);
-            background: var(--bg-secondary);
-            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-primary);
-        }
-
-        .filter-btn:hover {
-            border-color: var(--info);
-            color: var(--info);
-        }
-
-        .filter-btn.active {
-            background: var(--info-gradient);
-            color: white;
-            border-color: var(--info);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .events-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .events-table th {
-            background: var(--bg-primary);
-            padding: var(--space-md);
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 2px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .events-table th input[type="checkbox"] {
-            cursor: pointer;
-        }
-
-        .events-table td {
-            padding: var(--space-md);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.875rem;
-        }
-
-        .events-table tbody tr {
-            transition: background 0.2s;
-            cursor: pointer;
-        }
-
-        .events-table tbody tr:hover {
-            background: var(--bg-primary);
-        }
-
-        .events-table tbody tr.selected {
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .events-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Badges de sévérité */
-        .severity-badge {
-            display: inline-block;
-            padding: var(--space-xs) var(--space-sm);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .severity-badge.critical {
-            background: var(--critical);
-            color: white;
-        }
-
-        .severity-badge.warning {
-            background: var(--warning);
-            color: white;
-        }
-
-        .severity-badge.info {
-            background: var(--info);
-            color: white;
-        }
-
-        /* Type d'événement */
-        .event-type {
-            font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
-            background: var(--bg-primary);
-            padding: var(--space-xs) var(--space-sm);
-            border-radius: 4px;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* Timestamp */
-        .timestamp {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            transition: all var(--transition);
+            border: none;
             white-space: nowrap;
         }
 
-        /* ================================================
+        .btn-apply {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-apply:hover { background: #3a8ef0; }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border-light) !important;
+            color: var(--text-secondary);
+            border: none;
+            margin-left: 4px;
+        }
+
+        .btn-reset:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        /* Boutons export */
+        .export-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid var(--border-light);
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            font-family: var(--font-ui);
+        }
+
+        .btn-export:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-export.csv:hover { border-color: var(--green); color: var(--green); }
+        .btn-export.json:hover { border-color: var(--orange); color: var(--orange); }
+
+        /* ====================================================================
+           GRILLE GRAPHIQUES
+           ==================================================================== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .chart-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .chart-box.wide { grid-column: span 2; }
+
+        .chart-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: 14px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 220px;
+        }
+
+        /* ====================================================================
+           CARTES IPs SUSPECTES
+           ==================================================================== */
+        .ips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 12px;
+        }
+
+        .ip-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: border-color var(--transition);
+        }
+
+        .ip-card:hover { border-color: var(--border-light); }
+
+        .ip-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .ip-addr {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .score-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .score-badge.high   { background: var(--red-dim);    color: var(--red);    border: 1px solid rgba(255,59,59,.25); }
+        .score-badge.medium { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,140,66,.25); }
+        .score-badge.low    { background: var(--blue-dim);   color: var(--blue);   border: 1px solid rgba(74,158,255,.25); }
+
+        /* Métriques de l'IP */
+        .ip-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .ip-metric {
+            background: var(--bg-base);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            text-align: center;
+        }
+
+        .ip-metric .m-val {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ip-metric .m-lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+
+        .ip-last {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: 10px;
+        }
+
+        /* Boutons actions IP */
+        .ip-actions { display: flex; gap: 6px; }
+
+        .btn-ip {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            border: 1px solid var(--border-light);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-ui);
+        }
+
+        .btn-ip:hover            { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-ip.block:hover      { border-color: var(--red);    color: var(--red); }
+        .btn-ip.whitelist:hover  { border-color: var(--green);  color: var(--green); }
+        .btn-ip.filter:hover     { border-color: var(--blue);   color: var(--blue); }
+
+        /* ====================================================================
+           TABLEAU DES ÉVÉNEMENTS
+           ==================================================================== */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            background: var(--bg-panel);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background var(--transition);
+        }
+
+        tbody tr:hover { background: var(--bg-hover); }
+
+        tbody td {
+            padding: 10px 14px;
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+
+        /* Cellule timestamp */
+        .td-time {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Badges de sévérité */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .badge.CRITICAL { background: var(--red-dim);    color: var(--red);    border: 1px solid rgba(255,59,59,.25); }
+        .badge.WARNING  { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(255,140,66,.25); }
+        .badge.INFO     { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(46,204,113,.25); }
+
+        /* Type d'événement */
+        .td-type {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            background: var(--bg-panel);
+            color: var(--text-primary);
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        /* IP cliquable */
+        .td-ip {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--blue);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .td-ip:hover { text-decoration: underline; }
+
+        /* URI tronquée */
+        .td-uri {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        /* Data JSON */
+        .td-data {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            cursor: help;
+        }
+
+        /* Message vide */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .empty-state .icon { font-size: 32px; margin-bottom: 12px; display: block; opacity: .4; }
+
+        /* ====================================================================
            PAGINATION
-           ================================================ */
+           ==================================================================== */
         .pagination {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-top: var(--space-lg);
-            padding-top: var(--space-lg);
-            border-top: 2px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: var(--space-md);
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
         }
 
         .pagination-info {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
         }
 
-        .pagination-controls {
-            display: flex;
-            gap: var(--space-xs);
-        }
+        .pagination-btns { display: flex; gap: 4px; }
 
-        .pagination-btn {
-            padding: var(--space-sm) var(--space-md);
-            border: 2px solid var(--border-color);
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-primary);
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            border-color: var(--info);
-            color: var(--info);
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination-btn.active {
-            background: var(--info-gradient);
-            color: white;
-            border-color: var(--info);
-        }
-
-        /* ================================================
-           MODAL - Modal de détails
-           ================================================ */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 10px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            padding: var(--space-lg);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            box-shadow: var(--shadow-xl);
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            padding: var(--space-xl);
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            text-decoration: none;
             color: var(--text-secondary);
-            transition: color 0.2s;
+            border: 1px solid var(--border-light);
+            background: transparent;
+            transition: all var(--transition);
+            font-family: var(--font-mono);
         }
 
-        .modal-close:hover {
-            color: var(--text-primary);
-        }
+        .page-btn:hover    { background: var(--bg-hover); color: var(--text-primary); }
+        .page-btn.active   { background: var(--blue); color: #fff; border-color: var(--blue); }
+        .page-btn.disabled { opacity: .3; pointer-events: none; }
 
-        .modal-body {
-            padding: var(--space-xl);
-        }
-
-        .modal-section {
-            margin-bottom: var(--space-lg);
-        }
-
-        .modal-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .modal-section-title {
-            font-size: 0.875rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-            margin-bottom: var(--space-md);
-        }
-
-        .modal-data {
-            background: var(--bg-primary);
-            border-radius: 8px;
-            padding: var(--space-md);
-            font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
-            overflow-x: auto;
-        }
-
-        .modal-footer {
-            padding: var(--space-xl);
-            border-top: 2px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--space-sm);
-        }
-
-        /* ================================================
+        /* ====================================================================
            TOAST NOTIFICATIONS
-           ================================================ */
-        .toast-container {
+           ==================================================================== */
+        #toast-container {
             position: fixed;
-            top: var(--space-xl);
-            right: var(--space-xl);
-            z-index: 2000;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: var(--space-md);
-            max-width: 400px;
+            gap: 8px;
         }
 
         .toast {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-xl);
-            border-left: 4px solid var(--info);
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            font-size: 13px;
+            min-width: 260px;
+            animation: slideIn .3s ease;
             display: flex;
-            align-items: flex-start;
-            gap: var(--space-md);
-            animation: slideInRight 0.3s ease-out;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.5);
         }
 
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+        .toast.success { border-left: 3px solid var(--green); }
+        .toast.error   { border-left: 3px solid var(--red);   }
 
-        .toast.success {
-            border-left-color: var(--success);
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
 
-        .toast.error {
-            border-left-color: var(--critical);
-        }
-
-        .toast.warning {
-            border-left-color: var(--warning);
-        }
-
-        .toast-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 700;
-            margin-bottom: var(--space-xs);
-        }
-
-        .toast-message {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: color 0.2s;
-        }
-
-        .toast-close:hover {
-            color: var(--text-primary);
-        }
-
-        /* ================================================
-           BULK ACTIONS BAR - Barre d'actions en masse
-           ================================================ */
-        .bulk-actions-bar {
+        /* ====================================================================
+           MODAL CONFIRMATION BLOCAGE IP
+           ==================================================================== */
+        .modal-overlay {
+            display: none;
             position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-xl);
-            display: flex;
-            align-items: center;
-            gap: var(--space-lg);
-            z-index: 100;
-            transition: bottom 0.3s ease-out;
-            border: 2px solid var(--border-color);
-        }
-
-        .bulk-actions-bar.active {
-            bottom: var(--space-xl);
-        }
-
-        .bulk-actions-info {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .bulk-actions-btns {
-            display: flex;
-            gap: var(--space-sm);
-        }
-
-        /* ================================================
-           DOWNLOAD SECTION - Section de téléchargement
-           ================================================ */
-        .download-grid {
-            display: grid;
-            gap: var(--space-sm);
-        }
-
-        .download-btn {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            padding: var(--space-md);
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .download-btn:hover {
-            border-color: var(--info);
-            transform: translateX(4px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* ================================================
-           BUTTONS - Boutons
-           ================================================ */
-        .btn {
-            display: inline-flex;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.875rem;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 28px;
+            width: 400px;
+            max-width: 90vw;
+            animation: fadeIn .2s ease;
+        }
+
+        .modal h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .modal p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .modal-ip-display {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red);
+            background: var(--red-dim);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,59,59,.2);
+        }
+
+        .modal input[type="text"] {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .modal input:focus { border-color: var(--red); }
+
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+        .btn-confirm-block {
+            padding: 9px 20px;
+            background: var(--red);
+            color: #fff;
             border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            transition: background var(--transition);
         }
 
-        .btn-primary {
-            background: var(--info-gradient);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
+        .btn-confirm-block:hover { background: #e02020; }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-danger {
-            background: var(--critical-gradient);
-            color: white;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
-        }
-
-        .btn-success {
-            background: var(--success-gradient);
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-outline {
-            background: var(--bg-secondary);
+        .btn-cancel {
+            padding: 9px 20px;
+            background: transparent;
             color: var(--text-secondary);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--info);
-            color: var(--info);
-        }
-
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-
-        /* ================================================
-           UTILITIES
-           ================================================ */
-        .no-data {
-            text-align: center;
-            padding: var(--space-2xl);
-            color: var(--text-secondary);
-        }
-
-        .no-data-icon {
-            font-size: 3rem;
-            margin-bottom: var(--space-md);
-            opacity: 0.5;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-sm);
-            color: var(--info);
-            text-decoration: none;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
             font-weight: 600;
-            margin-top: var(--space-2xl);
+            cursor: pointer;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            transition: all var(--transition);
         }
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
+        .btn-cancel:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-        /* Badge générique */
-        .badge {
-            display: inline-block;
-            padding: var(--space-xs) var(--space-md);
-            border-radius: 24px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--info);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: var(--space-xl) auto;
-        }
-
-        /* ================================================
-           KEYBOARD SHORTCUTS HELP
-           ================================================ */
-        .shortcuts-help {
-            position: fixed;
-            bottom: var(--space-xl);
-            left: var(--space-xl);
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: var(--space-lg);
-            box-shadow: var(--shadow-xl);
-            border: 2px solid var(--border-color);
-            max-width: 300px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .shortcuts-help.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .shortcuts-help h3 {
-            margin-bottom: var(--space-md);
-            font-size: 1rem;
-        }
-
-        .shortcut-item {
-            display: flex;
-            justify-content: space-between;
-            padding: var(--space-xs) 0;
-            font-size: 0.875rem;
-        }
-
-        .shortcut-key {
-            background: var(--bg-primary);
-            padding: var(--space-xs) var(--space-sm);
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: 700;
-        }
-
-        /* ================================================
+        /* ====================================================================
            RESPONSIVE
-           ================================================ */
-        @media (max-width: 1024px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
+           ==================================================================== */
+        @media (max-width: 1100px) {
+            .charts-grid { grid-template-columns: 1fr 1fr; }
+            .chart-box.wide { grid-column: span 2; }
         }
 
         @media (max-width: 768px) {
-            .security-dashboard {
-                padding: var(--space-lg);
-            }
-
-            .dashboard-header {
-                flex-direction: column;
-                gap: var(--space-lg);
-                align-items: flex-start;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .alert-banner {
-                flex-direction: column;
-            }
-
-            .search-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .toast-container {
-                top: var(--space-md);
-                right: var(--space-md);
-                left: var(--space-md);
-                max-width: none;
-            }
-
-            .bulk-actions-bar {
-                left: var(--space-md);
-                right: var(--space-md);
-                transform: none;
-                width: calc(100% - var(--space-2xl));
-            }
-
-            .shortcuts-help {
-                bottom: var(--space-md);
-                left: var(--space-md);
-            }
+            .stats-grid      { grid-template-columns: 1fr 1fr; }
+            .charts-grid     { grid-template-columns: 1fr; }
+            .chart-box.wide  { grid-column: span 1; }
+            .filters-grid    { grid-template-columns: 1fr 1fr; }
+            .sec-header      { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .ips-grid        { grid-template-columns: 1fr; }
         }
 
-        /* ================================================
-           ANIMATIONS
-           ================================================ */
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .slide-up {
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+<div class="sec-wrap">
 
-    <!-- Shortcuts Help Panel -->
-    <div class="shortcuts-help" id="shortcutsHelp">
-        <h3>⌨️ Raccourcis clavier</h3>
-        <div class="shortcut-item">
-            <span>Recherche</span>
-            <kbd class="shortcut-key">Ctrl+K</kbd>
+    <!-- ===================================================================
+         HEADER
+         =================================================================== -->
+    <header class="sec-header">
+        <div class="sec-header-left">
+            <h1>
+                <span class="live-dot"></span>
+                Security Monitor
+            </h1>
+            <p>
+                <?= date('d/m/Y H:i') ?> &nbsp;·&nbsp;
+                Fenêtre active : <?= htmlspecialchars($filters['date_from']) ?> → <?= htmlspecialchars($filters['date_to']) ?>
+            </p>
         </div>
-        <div class="shortcut-item">
-            <span>Actualiser</span>
-            <kbd class="shortcut-key">Ctrl+R</kbd>
-        </div>
-        <div class="shortcut-item">
-            <span>Exporter</span>
-            <kbd class="shortcut-key">Ctrl+E</kbd>
-        </div>
-        <div class="shortcut-item">
-            <span>Mode sombre</span>
-            <kbd class="shortcut-key">Ctrl+D</kbd>
-        </div>
-        <div class="shortcut-item">
-            <span>Aide</span>
-            <kbd class="shortcut-key">?</kbd>
-        </div>
-    </div>
 
-    <!-- Bulk Actions Bar -->
-    <div class="bulk-actions-bar" id="bulkActionsBar">
-        <span class="bulk-actions-info">
-            <span id="selectedCount">0</span> événement(s) sélectionné(s)
+        <div style="display:flex;align-items:center;gap:10px;">
+            <!-- Boutons export CSV / JSON (filtres actuels) -->
+            <div class="export-btns">
+                <a href="/admin/security/export/csv?<?= http_build_query($filters) ?>"
+                   class="btn-export csv">
+                    ↓ CSV
+                </a>
+                <a href="/admin/security/export/json?<?= http_build_query($filters) ?>"
+                   class="btn-export json">
+                    ↓ JSON
+                </a>
+            </div>
+            <a href="/admin/dashboard" class="btn-back">← Admin</a>
+        </div>
+    </header>
+
+    <!-- ===================================================================
+         ALERTE CRITIQUE (si événements critiques présents)
+         =================================================================== -->
+    <?php if (!empty($criticalEvents) && $criticalEvents > 0): ?>
+    <div class="alert-critical">
+        <span>⚠</span>
+        <span>
+            <strong><?= number_format($criticalEvents) ?> événement(s) critique(s)</strong>
+            détecté(s) sur les 7 derniers jours — vérifiez les IPs suspectes ci-dessous.
         </span>
-        <div class="bulk-actions-btns">
-            <button class="btn btn-danger btn-sm" onclick="bulkBlockIPs()">
-                🚫 Bloquer les IPs
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="bulkExport()">
-                💾 Exporter
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="clearSelection()">
-                ✕ Annuler
-            </button>
+    </div>
+    <?php endif; ?>
+
+    <!-- ===================================================================
+         STATISTIQUES GLOBALES (4 cartes)
+         =================================================================== -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="label">Total événements</div>
+            <div class="value"><?= number_format($totalEvents ?? 0) ?></div>
+            <div class="sub">7 derniers jours</div>
+        </div>
+        <div class="stat-card critical">
+            <div class="label">Critiques</div>
+            <div class="value"><?= number_format($criticalEvents ?? 0) ?></div>
+            <div class="sub">CSRF · XSS · SQLi</div>
+        </div>
+        <div class="stat-card warning">
+            <div class="label">Avertissements</div>
+            <div class="value"><?= number_format($warningEvents ?? 0) ?></div>
+            <div class="sub">Tentatives échouées</div>
+        </div>
+        <div class="stat-card info">
+            <div class="label">Normaux</div>
+            <div class="value"><?= number_format($infoEvents ?? 0) ?></div>
+            <div class="sub">Connexions · Inscriptions</div>
         </div>
     </div>
 
-    <!-- Event Details Modal -->
-    <div class="modal-overlay" id="eventModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span>🔍</span>
-                    <span>Détails de l'événement</span>
-                </div>
-                <button class="modal-close" onclick="closeEventModal()">×</button>
-            </div>
-            <div class="modal-body" id="eventModalBody">
-                <!-- Content will be injected here -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger btn-sm" onclick="blockIPFromModal()">
-                    🚫 Bloquer cette IP
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="closeEventModal()">
-                    Fermer
-                </button>
+    <!-- ===================================================================
+         GRAPHIQUES (3 colonnes)
+         =================================================================== -->
+    <div class="charts-grid">
+
+        <!-- Graphique Timeline (occupe 2 colonnes) -->
+        <div class="chart-box wide">
+            <div class="chart-label">📈 Évolution sur 7 jours</div>
+            <div class="chart-wrap">
+                <canvas id="chartTimeline"></canvas>
             </div>
         </div>
+
+        <!-- Graphique Donut répartition par type -->
+        <div class="chart-box">
+            <div class="chart-label">🍩 Répartition par type</div>
+            <div class="chart-wrap">
+                <canvas id="chartDonut"></canvas>
+            </div>
+        </div>
+
     </div>
 
-    <div class="security-dashboard">
-        
-        <!-- ================================================
-             HEADER - En-tête avec statut
-             ================================================ -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h1>
-                    <span>🔐</span>
-                    Monitoring Sécurité
-                </h1>
-                <div class="header-subtitle">
-                    Surveillance en temps réel des menaces et des événements de sécurité
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="live-status">
-                    <div class="live-pulse"></div>
-                    <span>Surveillance active</span>
-                </div>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Mode sombre (Ctrl+D)">
-                    <span id="themeIcon">🌙</span>
-                    <span id="themeText">Mode sombre</span>
-                </button>
-                <button class="refresh-btn" onclick="refreshDashboard()" title="Actualiser (Ctrl+R)">
-                    <span class="icon">🔄</span>
-                    <span>Actualiser</span>
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="toggleShortcutsHelp()">
-                    <span>⌨️</span>
-                    <span>Raccourcis</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- ================================================
-             ALERTE CRITIQUE (si événements critiques)
-             ================================================ -->
-        <?php if (($criticalEvents ?? 0) > 0): ?>
-        <div class="alert-banner fade-in">
-            <div class="alert-icon">🚨</div>
-            <div class="alert-content">
-                <div class="alert-title">
-                    <?= $criticalEvents ?> événement(s) critique(s) détecté(s) !
-                </div>
-                <div class="alert-description">
-                    Des menaces de haute gravité nécessitent une attention immédiate. Veuillez vérifier les détails ci-dessous.
-                </div>
-            </div>
-            <div class="alert-actions">
-                <a href="#events-section" class="btn btn-danger btn-sm">Voir les détails</a>
-                <button class="btn btn-outline btn-sm" onclick="playAlertSound()">🔊 Son</button>
-            </div>
+    <!-- ===================================================================
+         IPs SUSPECTES
+         =================================================================== -->
+    <?php if (!empty($suspiciousIPs)): ?>
+    <div class="sec-panel" style="margin-bottom:20px;">
+        <div class="panel-header">
+            <span class="panel-title">⚠ IPs Suspectes (top 10 · 7 jours)</span>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">
+                <?= count($suspiciousIPs) ?> IP(s) détectée(s)
+            </span>
         </div>
-        <?php endif; ?>
-
-        <!-- ================================================
-             STATS CARDS - Statistiques principales
-             ================================================ -->
-        <div class="stats-grid">
-            <!-- Total événements aujourd'hui -->
-            <div class="stat-card fade-in" style="animation-delay: 0.1s">
-                <div class="stat-card-header">
-                    <div class="stat-icon">📊</div>
-                </div>
-                <h3>Événements aujourd'hui</h3>
-                <div class="value"><?= number_format($todayTotal ?? 0) ?></div>
-                <div class="stat-trend <?= ($todayTotal ?? 0) > ($yesterdayTotal ?? 0) ? 'up' : 'down' ?>">
-                    <span><?= ($todayTotal ?? 0) > ($yesterdayTotal ?? 0) ? '📈' : '📉' ?></span>
-                    <span>
-                        <?php
-                        $diff = ($todayTotal ?? 0) - ($yesterdayTotal ?? 0);
-                        $sign = $diff > 0 ? '+' : '';
-                        echo $sign . number_format($diff);
-                        ?>
-                    </span>
-                </div>
-                <div class="stat-comparison">
-                    vs hier: <?= number_format($yesterdayTotal ?? 0) ?>
-                </div>
-            </div>
-
-            <!-- Événements critiques -->
-            <div class="stat-card critical fade-in" style="animation-delay: 0.2s">
-                <div class="stat-card-header">
-                    <div class="stat-icon">⚠️</div>
-                </div>
-                <h3>Alertes critiques</h3>
-                <div class="value"><?= number_format($criticalEvents ?? 0) ?></div>
-                <div class="stat-trend">
-                    <span>🚨</span>
-                    <span>Action requise</span>
-                </div>
-            </div>
-
-            <!-- IPs bloquées -->
-            <div class="stat-card warning fade-in" style="animation-delay: 0.3s">
-                <div class="stat-card-header">
-                    <div class="stat-icon">🚫</div>
-                </div>
-                <h3>IPs bloquées</h3>
-                <div class="value"><?= number_format(count($suspiciousIPs ?? [])) ?></div>
-                <div class="stat-trend">
-                    <span>🔒</span>
-                    <span>Actives</span>
-                </div>
-            </div>
-
-            <!-- Tentatives d'intrusion -->
-            <div class="stat-card success fade-in" style="animation-delay: 0.4s">
-                <div class="stat-card-header">
-                    <div class="stat-icon">🛡️</div>
-                </div>
-                <h3>Tentatives bloquées</h3>
-                <div class="value"><?= number_format(($stats['LOGIN_BLOCKED'] ?? 0) + ($stats['CSRF_VIOLATION'] ?? 0)) ?></div>
-                <div class="stat-trend">
-                    <span>✅</span>
-                    <span>Système protégé</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================================================
-             RECHERCHE AVANCÉE
-             ================================================ -->
-        <div class="section fade-in">
-            <div class="section-header">
-                <div class="section-title">
-                    <span>🔍</span>
-                    Recherche avancée
-                </div>
-                <button class="btn btn-outline btn-sm" onclick="resetSearch()">
-                    Réinitialiser
-                </button>
-            </div>
-
-            <div class="search-panel">
-                <div class="search-grid">
-                    <div class="search-field">
-                        <label>Date de début</label>
-                        <input type="date" id="searchDateStart" value="<?= date('Y-m-d') ?>">
-                    </div>
-                    <div class="search-field">
-                        <label>Date de fin</label>
-                        <input type="date" id="searchDateEnd" value="<?= date('Y-m-d') ?>">
-                    </div>
-                    <div class="search-field">
-                        <label>Adresse IP</label>
-                        <input type="text" id="searchIP" placeholder="Ex: 192.168.1.1">
-                    </div>
-                    <div class="search-field">
-                        <label>Type d'événement</label>
-                        <select id="searchEventType">
-                            <option value="">Tous les types</option>
-                            <option value="LOGIN_BLOCKED">Login bloqué</option>
-                            <option value="CSRF_VIOLATION">Violation CSRF</option>
-                            <option value="XSS_ATTEMPT">Tentative XSS</option>
-                            <option value="SQLI_ATTEMPT">Tentative SQL Injection</option>
-                            <option value="FILE_UPLOAD_BLOCKED">Upload bloqué</option>
-                        </select>
-                    </div>
-                    <div class="search-field">
-                        <label>Sévérité</label>
-                        <select id="searchSeverity">
-                            <option value="">Toutes</option>
-                            <option value="CRITICAL">Critique</option>
-                            <option value="WARNING">Warning</option>
-                            <option value="INFO">Info</option>
-                        </select>
-                    </div>
-                    <div class="search-field">
-                        <label>URI contient</label>
-                        <input type="text" id="searchURI" placeholder="Ex: /admin">
-                    </div>
-                </div>
-                <div class="search-actions">
-                    <button class="btn btn-primary" onclick="performSearch()">
-                        <span>🔍</span>
-                        <span>Rechercher</span>
-                    </button>
-                    <button class="btn btn-outline" onclick="exportSearchResults()">
-                        <span>💾</span>
-                        <span>Exporter résultats</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================================================
-             GRAPHIQUES
-             ================================================ -->
-        <div class="charts-grid">
-            <!-- Graphique 1 : Timeline temporelle -->
-            <div class="chart-card fade-in full-width">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">
-                            <span>📈</span>
-                            Évolution des événements (7 derniers jours)
-                        </div>
-                        <div class="chart-subtitle">Tendance des menaces détectées</div>
-                    </div>
-                    <div class="section-actions">
-                        <button class="btn btn-outline btn-sm" onclick="changeTimelineRange('24h')">24h</button>
-                        <button class="btn btn-outline btn-sm active" onclick="changeTimelineRange('7d')">7j</button>
-                        <button class="btn btn-outline btn-sm" onclick="changeTimelineRange('30d')">30j</button>
-                    </div>
-                </div>
-                <div class="chart-container tall">
-                    <canvas id="timelineChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Graphique 2 : Répartition par type -->
-            <div class="chart-card fade-in">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">
-                            <span>📊</span>
-                            Répartition par type d'événement
-                        </div>
-                        <div class="chart-subtitle">Distribution des menaces détectées</div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="donutChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Graphique 3 : Top IPs suspectes -->
-            <div class="chart-card fade-in">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">
-                            <span>🎯</span>
-                            Top 5 IPs suspectes
-                        </div>
-                        <div class="chart-subtitle">IPs avec le plus haut score de gravité</div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="ipsChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================================================
-             IPS SUSPECTES
-             ================================================ -->
-        <?php if (!empty($suspiciousIPs)): ?>
-        <div class="section fade-in">
-            <div class="section-header">
-                <div class="section-title">
-                    <span>⚠️</span>
-                    IPs suspectes détectées
-                </div>
-                <div class="section-actions">
-                    <span class="badge" style="background: var(--critical-light); color: var(--critical);">
-                        <?= count($suspiciousIPs) ?> IP(s)
-                    </span>
-                    <button class="btn btn-outline btn-sm" onclick="exportIPsList()">
-                        <span>💾</span>
-                        <span>Exporter</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="suspicious-ips-grid">
-                <?php foreach (array_slice($suspiciousIPs, 0, 10) as $index => $suspiciousIP): 
-                    $isWhitelisted = $suspiciousIP['whitelisted'] ?? false;
+        <div class="panel-body">
+            <div class="ips-grid">
+                <?php foreach ($suspiciousIPs as $ipData):
+                    // Déterminer la classe du score selon sa valeur
+                    $scoreClass = $ipData['severity_score'] >= 50 ? 'high'
+                                : ($ipData['severity_score'] >= 20 ? 'medium' : 'low');
                 ?>
-                    <div class="suspicious-ip-card <?= $isWhitelisted ? 'whitelisted' : '' ?>" data-ip="<?= htmlspecialchars($suspiciousIP['ip']) ?>">
-                        <div class="ip-header">
-                            <div class="ip-address"><?= htmlspecialchars($suspiciousIP['ip']) ?></div>
-                            <div class="ip-badges">
-                                <?php if ($isWhitelisted): ?>
-                                    <span class="whitelist-badge">✅ Whitelist</span>
-                                <?php endif; ?>
-                                <div class="score-badge">
-                                    Score: <?= $suspiciousIP['severity_score'] ?>
-                                </div>
-                            </div>
-                        </div>
+                <div class="ip-card">
+                    <div class="ip-card-header">
+                        <!-- IP cliquable pour filtrer les événements -->
+                        <span class="ip-addr"
+                              onclick="filterByIP('<?= htmlspecialchars($ipData['ip']) ?>')"
+                              style="cursor:pointer;"
+                              title="Filtrer les événements de cette IP">
+                            <?= htmlspecialchars($ipData['ip']) ?>
+                        </span>
+                        <span class="score-badge <?= $scoreClass ?>">
+                            Score <?= $ipData['severity_score'] ?>
+                        </span>
+                    </div>
 
-                        <?php if (!empty($suspiciousIP['notes'])): ?>
-                        <div class="ip-notes">
-                            📝 <?= htmlspecialchars($suspiciousIP['notes']) ?>
+                    <!-- 6 métriques de l'IP -->
+                    <div class="ip-metrics">
+                        <div class="ip-metric">
+                            <div class="m-val"><?= $ipData['total'] ?></div>
+                            <div class="m-lbl">Total</div>
                         </div>
-                        <?php else: ?>
-                        <div class="ip-notes ip-notes-empty">
-                            Aucune note
+                        <div class="ip-metric">
+                            <div class="m-val" style="<?= $ipData['failed_logins'] > 0 ? 'color:var(--orange)' : '' ?>">
+                                <?= $ipData['failed_logins'] ?>
+                            </div>
+                            <div class="m-lbl">Échecs</div>
                         </div>
-                        <?php endif; ?>
-
-                        <div class="ip-details">
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Échecs login</div>
-                                <div class="ip-detail-value"><?= $suspiciousIP['failed_logins'] ?? 0 ?></div>
+                        <div class="ip-metric">
+                            <div class="m-val" style="<?= $ipData['csrf_violations'] > 0 ? 'color:var(--red)' : '' ?>">
+                                <?= $ipData['csrf_violations'] ?>
                             </div>
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Violations CSRF</div>
-                                <div class="ip-detail-value"><?= $suspiciousIP['csrf_violations'] ?? 0 ?></div>
-                            </div>
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Tentatives XSS</div>
-                                <div class="ip-detail-value"><?= $suspiciousIP['xss_attempts'] ?? 0 ?></div>
-                            </div>
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Tentatives SQL</div>
-                                <div class="ip-detail-value"><?= $suspiciousIP['sqli_attempts'] ?? 0 ?></div>
-                            </div>
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Total événements</div>
-                                <div class="ip-detail-value"><?= $suspiciousIP['total_events'] ?? 0 ?></div>
-                            </div>
-                            <div class="ip-detail-item">
-                                <div class="ip-detail-label">Dernière activité</div>
-                                <div class="ip-detail-value" style="font-size: 0.875rem;">
-                                    <?= date('H:i', strtotime($suspiciousIP['last_seen'] ?? 'now')) ?>
-                                </div>
-                            </div>
+                            <div class="m-lbl">CSRF</div>
                         </div>
-
-                        <div class="ip-actions">
-                            <?php if (!$isWhitelisted): ?>
-                                <button class="btn btn-danger btn-sm" onclick="blockIP('<?= htmlspecialchars($suspiciousIP['ip']) ?>')">
-                                    🚫 Bloquer définitivement
-                                </button>
-                                <button class="btn btn-success btn-sm" onclick="whitelistIP('<?= htmlspecialchars($suspiciousIP['ip']) ?>')">
-                                    ✅ Whitelist
-                                </button>
-                            <?php else: ?>
-                                <button class="btn btn-outline btn-sm" onclick="removeFromWhitelist('<?= htmlspecialchars($suspiciousIP['ip']) ?>')">
-                                    ❌ Retirer de la whitelist
-                                </button>
-                            <?php endif; ?>
-                            <button class="btn btn-outline btn-sm" onclick="addNoteToIP('<?= htmlspecialchars($suspiciousIP['ip']) ?>')">
-                                📝 Ajouter note
-                            </button>
-                            <button class="btn btn-outline btn-sm" onclick="viewIPDetails('<?= htmlspecialchars($suspiciousIP['ip']) ?>')">
-                                📋 Voir détails
-                            </button>
+                        <div class="ip-metric">
+                            <div class="m-val" style="<?= $ipData['xss_attempts'] > 0 ? 'color:var(--red)' : '' ?>">
+                                <?= $ipData['xss_attempts'] ?>
+                            </div>
+                            <div class="m-lbl">XSS</div>
+                        </div>
+                        <div class="ip-metric">
+                            <div class="m-val" style="<?= $ipData['sqli_attempts'] > 0 ? 'color:var(--red)' : '' ?>">
+                                <?= $ipData['sqli_attempts'] ?>
+                            </div>
+                            <div class="m-lbl">SQLi</div>
+                        </div>
+                        <div class="ip-metric">
+                            <div class="m-val" style="<?= $ipData['blocks'] > 0 ? 'color:var(--orange)' : '' ?>">
+                                <?= $ipData['blocks'] ?>
+                            </div>
+                            <div class="m-lbl">Bloquée</div>
                         </div>
                     </div>
+
+                    <!-- Dernier événement -->
+                    <div class="ip-last">
+                        Dernier événement : <?= htmlspecialchars($ipData['last_event']) ?>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="ip-actions">
+                        <!-- Filtrer les événements de cette IP -->
+                        <button class="btn-ip filter"
+                                onclick="filterByIP('<?= htmlspecialchars($ipData['ip']) ?>')">
+                            🔍 Voir
+                        </button>
+                        <!-- Bloquer l'IP (ouvre la modal) -->
+                        <button class="btn-ip block"
+                                onclick="openBlockModal('<?= htmlspecialchars($ipData['ip']) ?>')">
+                            🚫 Bloquer
+                        </button>
+                        <!-- Whitelist -->
+                        <button class="btn-ip whitelist"
+                                onclick="whitelistIP('<?= htmlspecialchars($ipData['ip']) ?>')">
+                            ✅ Whitelist
+                        </button>
+                    </div>
+                </div>
                 <?php endforeach; ?>
             </div>
         </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ===================================================================
+         FILTRES + TABLEAU DES ÉVÉNEMENTS
+         =================================================================== -->
+    <div class="sec-panel">
+        <div class="panel-header">
+            <span class="panel-title">📋 Événements récents</span>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">
+                <?= number_format($pagination['total']) ?> résultat(s)
+            </span>
+        </div>
+
+        <!-- Formulaire de filtres -->
+        <div class="panel-body" style="padding-bottom:0;border-bottom:1px solid var(--border);">
+            <form method="GET" action="/admin/security" id="filterForm">
+                <div class="filters-grid">
+
+                    <!-- Date début -->
+                    <div class="filter-group">
+                        <label>Du</label>
+                        <input type="date"
+                               name="date_from"
+                               value="<?= htmlspecialchars($filters['date_from']) ?>"
+                               max="<?= date('Y-m-d') ?>">
+                    </div>
+
+                    <!-- Date fin -->
+                    <div class="filter-group">
+                        <label>Au</label>
+                        <input type="date"
+                               name="date_to"
+                               value="<?= htmlspecialchars($filters['date_to']) ?>"
+                               max="<?= date('Y-m-d') ?>">
+                    </div>
+
+                    <!-- Type d'événement -->
+                    <div class="filter-group">
+                        <label>Type</label>
+                        <select name="event_type">
+                            <option value="">Tous les types</option>
+                            <?php foreach ($eventTypes as $type): ?>
+                            <option value="<?= htmlspecialchars($type) ?>"
+                                <?= $filters['event_type'] === $type ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($type) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Sévérité -->
+                    <div class="filter-group">
+                        <label>Sévérité</label>
+                        <select name="severity">
+                            <option value="">Toutes</option>
+                            <option value="CRITICAL" <?= $filters['severity'] === 'CRITICAL' ? 'selected' : '' ?>>CRITICAL</option>
+                            <option value="WARNING"  <?= $filters['severity'] === 'WARNING'  ? 'selected' : '' ?>>WARNING</option>
+                            <option value="INFO"     <?= $filters['severity'] === 'INFO'     ? 'selected' : '' ?>>INFO</option>
+                        </select>
+                    </div>
+
+                    <!-- Recherche (IP, URI, email) -->
+                    <div class="filter-group">
+                        <label>Recherche (IP / URI / email)</label>
+                        <input type="text"
+                               name="search"
+                               placeholder="ex: 192.168.1.100 ou /login"
+                               value="<?= htmlspecialchars($filters['search']) ?>">
+                        <!-- Champ IP caché (rempli par les boutons "Voir" des IP cards) -->
+                        <input type="hidden" name="ip" id="ipHidden" value="<?= htmlspecialchars($filters['ip']) ?>">
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="filter-group" style="flex-direction:row;gap:6px;">
+                        <button type="submit" class="btn-filter btn-apply">Filtrer</button>
+                        <a href="/admin/security" class="btn-filter btn-reset">✕</a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- Tableau des événements -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date / Heure</th>
+                        <th>Sévérité</th>
+                        <th>Type</th>
+                        <th>IP</th>
+                        <th>URI</th>
+                        <th>Email</th>
+                        <th>Données</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($recentEvents)): ?>
+                        <?php foreach ($recentEvents as $event): ?>
+                        <tr>
+                            <!-- Timestamp -->
+                            <td class="td-time">
+                                <?= htmlspecialchars($event['timestamp']) ?>
+                            </td>
+
+                            <!-- Badge sévérité -->
+                            <td>
+                                <span class="badge <?= htmlspecialchars($event['severity']) ?>">
+                                    <?= htmlspecialchars($event['severity']) ?>
+                                </span>
+                            </td>
+
+                            <!-- Type d'événement -->
+                            <td>
+                                <span class="td-type"><?= htmlspecialchars($event['event_type']) ?></span>
+                            </td>
+
+                            <!-- IP cliquable pour filtrer -->
+                            <td>
+                                <?php if ($event['ip']): ?>
+                                <span class="td-ip"
+                                      onclick="filterByIP('<?= htmlspecialchars($event['ip']) ?>')"
+                                      title="Filtrer par cette IP">
+                                    <?= htmlspecialchars($event['ip']) ?>
+                                </span>
+                                <?php else: ?>
+                                <span style="color:var(--text-muted)">—</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <!-- URI tronquée -->
+                            <td>
+                                <span class="td-uri" title="<?= htmlspecialchars($event['uri'] ?? '') ?>">
+                                    <?= htmlspecialchars($event['uri'] ?? '—') ?>
+                                </span>
+                            </td>
+
+                            <!-- Email utilisateur -->
+                            <td style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);">
+                                <?= htmlspecialchars($event['user_email'] ?? '—') ?>
+                            </td>
+
+                            <!-- Données JSON (tooltip au survol) -->
+                            <td>
+                                <?php
+                                $dataStr = '';
+                                if (!empty($event['data'])) {
+                                    $dataStr = is_array($event['data'])
+                                        ? json_encode($event['data'], JSON_UNESCAPED_UNICODE)
+                                        : $event['data'];
+                                }
+                                ?>
+                                <?php if ($dataStr): ?>
+                                <span class="td-data"
+                                      title="<?= htmlspecialchars($dataStr) ?>">
+                                    <?= htmlspecialchars(
+                                        strlen($dataStr) > 40
+                                            ? substr($dataStr, 0, 40) . '…'
+                                            : $dataStr
+                                    ) ?>
+                                </span>
+                                <?php else: ?>
+                                <span style="color:var(--text-muted);">—</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <span class="icon">🛡</span>
+                                    Aucun événement pour ces critères
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ================================================================
+             PAGINATION
+             ================================================================ -->
+        <?php if ($pagination['total_pages'] > 1): ?>
+        <div class="pagination">
+            <!-- Info résultats -->
+            <span class="pagination-info">
+                <?php
+                $from = (($pagination['page'] - 1) * $pagination['per_page']) + 1;
+                $to   = min($pagination['page'] * $pagination['per_page'], $pagination['total']);
+                ?>
+                Affichage de <?= $from ?> à <?= $to ?> sur <?= number_format($pagination['total']) ?>
+            </span>
+
+            <!-- Boutons de navigation -->
+            <div class="pagination-btns">
+                <?php
+                // Construire les paramètres de la requête actuelle sans 'page'
+                $queryParams = array_merge($filters, ['per_page' => $pagination['per_page']]);
+
+                // Bouton précédent
+                $prevPage = $pagination['page'] - 1;
+                $prevClass = $pagination['page'] <= 1 ? 'page-btn disabled' : 'page-btn';
+                $prevUrl = '/admin/security?' . http_build_query(array_merge($queryParams, ['page' => $prevPage]));
+                ?>
+                <a href="<?= $prevUrl ?>" class="<?= $prevClass ?>">←</a>
+
+                <?php
+                // Afficher au max 5 pages autour de la page courante
+                $currentPage  = $pagination['page'];
+                $totalPages   = $pagination['total_pages'];
+                $startPage    = max(1, $currentPage - 2);
+                $endPage      = min($totalPages, $currentPage + 2);
+
+                // Toujours afficher la première page si on est loin
+                if ($startPage > 1): ?>
+                    <a href="<?= '/admin/security?' . http_build_query(array_merge($queryParams, ['page' => 1])) ?>"
+                       class="page-btn">1</a>
+                    <?php if ($startPage > 2): ?><span class="page-btn disabled">…</span><?php endif; ?>
+                <?php endif; ?>
+
+                <?php for ($p = $startPage; $p <= $endPage; $p++):
+                    $pageClass = ($p === $currentPage) ? 'page-btn active' : 'page-btn';
+                    $pageUrl   = '/admin/security?' . http_build_query(array_merge($queryParams, ['page' => $p]));
+                ?>
+                <a href="<?= $pageUrl ?>" class="<?= $pageClass ?>"><?= $p ?></a>
+                <?php endfor; ?>
+
+                <?php
+                // Toujours afficher la dernière page si on est loin
+                if ($endPage < $totalPages): ?>
+                    <?php if ($endPage < $totalPages - 1): ?><span class="page-btn disabled">…</span><?php endif; ?>
+                    <a href="<?= '/admin/security?' . http_build_query(array_merge($queryParams, ['page' => $totalPages])) ?>"
+                       class="page-btn"><?= $totalPages ?></a>
+                <?php endif; ?>
+
+                <?php
+                // Bouton suivant
+                $nextPage = $pagination['page'] + 1;
+                $nextClass = $pagination['page'] >= $totalPages ? 'page-btn disabled' : 'page-btn';
+                $nextUrl = '/admin/security?' . http_build_query(array_merge($queryParams, ['page' => $nextPage]));
+                ?>
+                <a href="<?= $nextUrl ?>" class="<?= $nextClass ?>">→</a>
+            </div>
+        </div>
         <?php endif; ?>
 
-        <!-- ================================================
-             ÉVÉNEMENTS RÉCENTS
-             ================================================ -->
-        <div class="section fade-in" id="events-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <span>📝</span>
-                    Événements récents
-                </div>
-                <div class="section-actions">
-                    <button class="btn btn-primary btn-sm" onclick="exportEvents('csv')">
-                        <span>📄</span>
-                        <span>CSV</span>
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="exportEvents('json')">
-                        <span>{ }</span>
-                        <span>JSON</span>
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="exportEvents('pdf')">
-                        <span>📑</span>
-                        <span>PDF</span>
-                    </button>
-                </div>
-            </div>
+    </div><!-- /.sec-panel -->
 
-            <!-- Filtres -->
-            <div class="filters">
-                <button class="filter-btn active" onclick="filterEvents('all')">
-                    Tous (<?= count($recentEvents ?? []) ?>)
-                </button>
-                <button class="filter-btn" onclick="filterEvents('critical')">
-                    🚨 Critiques (<?= count(array_filter($recentEvents ?? [], fn($e) => $e['severity'] === 'CRITICAL')) ?>)
-                </button>
-                <button class="filter-btn" onclick="filterEvents('warning')">
-                    ⚠️ Warnings (<?= count(array_filter($recentEvents ?? [], fn($e) => $e['severity'] === 'WARNING')) ?>)
-                </button>
-                <button class="filter-btn" onclick="filterEvents('info')">
-                    ℹ️ Info (<?= count(array_filter($recentEvents ?? [], fn($e) => $e['severity'] === 'INFO')) ?>)
-                </button>
-            </div>
+</div><!-- /.sec-wrap -->
 
-            <!-- Tableau des événements -->
-            <div class="table-container">
-                <table class="events-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
-                            </th>
-                            <th>Date & Heure</th>
-                            <th>Sévérité</th>
-                            <th>Type</th>
-                            <th>IP Source</th>
-                            <th>URI</th>
-                            <th>Détails</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="eventsTableBody">
-                        <?php if (!empty($recentEvents)): ?>
-                            <?php foreach (array_slice($recentEvents, 0, 20) as $index => $event): ?>
-                                <tr data-severity="<?= strtolower($event['severity']) ?>" 
-                                    data-event-id="<?= $index ?>"
-                                    onclick="viewEventDetails(<?= $index ?>)">
-                                    <td onclick="event.stopPropagation()">
-                                        <input type="checkbox" class="event-checkbox" value="<?= $index ?>">
-                                    </td>
-                                    <td class="timestamp">
-                                        <?= htmlspecialchars($event['timestamp']) ?>
-                                    </td>
-                                    <td>
-                                        <span class="severity-badge <?= strtolower($event['severity']) ?>">
-                                            <?= htmlspecialchars($event['severity']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="event-type"><?= htmlspecialchars($event['event_type']) ?></span>
-                                    </td>
-                                    <td>
-                                        <span style="font-family: monospace; font-weight: 600;">
-                                            <?= htmlspecialchars($event['ip']) ?>
-                                        </span>
-                                    </td>
-                                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
-                                        <?= htmlspecialchars($event['uri']) ?>
-                                    </td>
-                                    <td>
-                                        <div style="max-width: 250px; overflow: hidden; text-overflow: ellipsis;">
-                                            <?php 
-                                            if (!empty($event['data'])) {
-                                                $dataStr = json_encode($event['data']);
-                                                echo htmlspecialchars(strlen($dataStr) > 50 ? substr($dataStr, 0, 50) . '...' : $dataStr);
-                                            } else {
-                                                echo '-';
-                                            }
-                                            ?>
-                                        </div>
-                                    </td>
-                                    <td onclick="event.stopPropagation()">
-                                        <button class="btn btn-outline btn-sm" onclick="viewEventDetails(<?= $index ?>)">
-                                            👁️
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="8" class="no-data">
-                                    <div class="no-data-icon">✅</div>
-                                    <p>Aucun événement récent - Le système est sécurisé</p>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <?php if (count($recentEvents ?? []) > 20): ?>
-            <div class="pagination">
-                <div class="pagination-info">
-                    Affichage de <strong id="showingStart">1</strong> à <strong id="showingEnd">20</strong> 
-                    sur <strong><?= count($recentEvents) ?></strong> événements
-                </div>
-                <div class="pagination-controls">
-                    <button class="pagination-btn" onclick="changePage(1)" id="firstPageBtn">
-                        ⏮️
-                    </button>
-                    <button class="pagination-btn" onclick="changePage(currentPage - 1)" id="prevPageBtn">
-                        ◀️
-                    </button>
-                    <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn" onclick="changePage(currentPage + 1)" id="nextPageBtn">
-                        ▶️
-                    </button>
-                    <button class="pagination-btn" onclick="changePage(totalPages)" id="lastPageBtn">
-                        ⏭️
-                    </button>
-                </div>
-            </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- ================================================
-             TÉLÉCHARGEMENT DES LOGS
-             ================================================ -->
-        <div class="section fade-in">
-            <div class="section-header">
-                <div class="section-title">
-                    <span>💾</span>
-                    Télécharger les logs
-                </div>
-            </div>
-
-            <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
-                Téléchargez les fichiers de logs bruts pour une analyse externe ou une conservation.
-            </p>
-
-            <div class="download-grid">
-                <?php
-                // Générer les liens pour les 7 derniers jours
-                for ($i = 0; $i < 7; $i++):
-                    $date = date('Y-m-d', strtotime("-{$i} days"));
-                    $logFile = __DIR__ . '/../../../logs/security-' . $date . '.log';
-                    
-                    if (file_exists($logFile)):
-                        $fileSize = filesize($logFile);
-                        $fileSizeKB = round($fileSize / 1024, 2);
-                ?>
-                    <a href="/admin/security/download/<?= $date ?>" class="download-btn">
-                        <span>📄</span>
-                        <span>security-<?= $date ?>.log</span>
-                        <span style="margin-left: auto; color: var(--text-secondary); font-size: 0.875rem;">
-                            <?= $fileSizeKB ?> KB
-                        </span>
-                    </a>
-                <?php 
-                    endif;
-                endfor; 
-                ?>
-            </div>
-        </div>
-
-        <!-- Lien retour -->
-        <div style="text-align: center;">
-            <a href="/admin/dashboard" class="back-link">
-                <span>←</span>
-                <span>Retour au dashboard admin</span>
-            </a>
+<!-- =========================================================================
+     MODAL CONFIRMATION BLOCAGE IP
+     ========================================================================= -->
+<div class="modal-overlay" id="blockModal">
+    <div class="modal">
+        <h3>🚫 Bloquer cette IP</h3>
+        <p>Cette IP sera immédiatement bloquée. Toutes ses requêtes seront rejetées.</p>
+        <div class="modal-ip-display" id="modalIPDisplay">—</div>
+        <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:block;">
+            Raison du blocage
+        </label>
+        <input type="text" id="blockReason" placeholder="ex: Tentatives XSS répétées" value="">
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeBlockModal()">Annuler</button>
+            <button class="btn-confirm-block" onclick="confirmBlockIP()">🚫 Confirmer le blocage</button>
         </div>
     </div>
+</div>
 
-    <!-- ================================================
-         CHART.JS - Bibliothèque de graphiques
-         ================================================ -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<!-- =========================================================================
+     CONTENEUR TOAST
+     ========================================================================= -->
+<div id="toast-container"></div>
 
-    <!-- ================================================
-         SCRIPTS - Fonctionnalités interactives
-         ================================================ -->
-    <script>
-        // ================================================
-        // VARIABLES GLOBALES
-        // ================================================
-        let currentPage = 1;
-        let itemsPerPage = 20;
-        let totalPages = <?= ceil(count($recentEvents ?? []) / 20) ?>;
-        let selectedEvents = new Set();
-        let currentEventData = null;
-        let charts = {};
+<!-- =========================================================================
+     SCRIPTS
+     ========================================================================= -->
+<script>
+    // =========================================================================
+    // SECTION 1 : DONNÉES PHP → JAVASCRIPT (pour les graphiques)
+    // =========================================================================
 
-        // Données PHP converties en JavaScript
-        const eventsData = <?= json_encode($recentEvents ?? []) ?>;
-        const statsData = <?= json_encode($stats ?? []) ?>;
-        const suspiciousIPsData = <?= json_encode($suspiciousIPs ?? []) ?>;
+    // Données timeline (graphique d'évolution sur 7 jours)
+    const timelineLabels   = <?= json_encode($timelineLabels   ?? []) ?>;
+    const timelineCritical = <?= json_encode($timelineCritical ?? []) ?>;
+    const timelineWarning  = <?= json_encode($timelineWarning  ?? []) ?>;
+    const timelineInfo     = <?= json_encode($timelineInfo     ?? []) ?>;
 
-        // ================================================
-        // THEME MANAGEMENT - Gestion du mode sombre
-        // ================================================
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Mettre à jour l'icône et le texte
-            const themeIcon = document.getElementById('themeIcon');
-            const themeText = document.getElementById('themeText');
-            
-            if (newTheme === 'dark') {
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Mode clair';
-            } else {
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Mode sombre';
-            }
-            
-            // Recharger les graphiques avec les nouvelles couleurs
-            updateChartsTheme();
-            
-            showToast('Thème modifié', 'Le mode ' + (newTheme === 'dark' ? 'sombre' : 'clair') + ' a été activé', 'success');
+    // Données donut (répartition par type d'événement)
+    const donutLabels = <?= json_encode($chartLabels ?? []) ?>;
+    const donutData   = <?= json_encode($chartData   ?? []) ?>;
+    const donutColors = <?= json_encode($chartColors ?? []) ?>;
+
+    // =========================================================================
+    // SECTION 2 : CONFIGURATION CHART.JS (defaults communes)
+    // =========================================================================
+
+    // Appliquer un thème sombre global à tous les graphiques
+    Chart.defaults.color            = '#8494b0'; // Couleur texte par défaut
+    Chart.defaults.font.family      = "'JetBrains Mono', monospace";
+    Chart.defaults.font.size        = 11;
+    Chart.defaults.borderColor      = '#1e2840'; // Couleur des grilles
+
+    // =========================================================================
+    // SECTION 3 : GRAPHIQUE TIMELINE (barres empilées)
+    // =========================================================================
+    (function() {
+        const ctx = document.getElementById('chartTimeline');
+        if (!ctx) return;
+
+        // Si pas de données timeline, afficher un message
+        if (timelineLabels.length === 0) {
+            ctx.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:80px 0;font-family:var(--font-mono);">Aucune donnée disponible</p>';
+            return;
         }
 
-        // Charger le thème sauvegardé
-        function loadSavedTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            
-            if (savedTheme === 'dark') {
-                document.getElementById('themeIcon').textContent = '☀️';
-                document.getElementById('themeText').textContent = 'Mode clair';
-            }
-        }
-
-        // ================================================
-        // TOAST NOTIFICATIONS
-        // ================================================
-        function showToast(title, message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            
-            const icons = {
-                success: '✅',
-                error: '❌',
-                warning: '⚠️',
-                info: 'ℹ️'
-            };
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type]}</div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-            `;
-            
-            container.appendChild(toast);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-        }
-
-        // ================================================
-        // REFRESH DASHBOARD
-        // ================================================
-        function refreshDashboard() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.classList.add('loading');
-            
-            showToast('Actualisation', 'Mise à jour des données en cours...', 'info');
-            
-            setTimeout(() => {
-                location.reload();
-            }, 500);
-        }
-
-        // ================================================
-        // SEARCH FUNCTIONALITY
-        // ================================================
-        function performSearch() {
-            const filters = {
-                dateStart: document.getElementById('searchDateStart').value,
-                dateEnd: document.getElementById('searchDateEnd').value,
-                ip: document.getElementById('searchIP').value,
-                eventType: document.getElementById('searchEventType').value,
-                severity: document.getElementById('searchSeverity').value,
-                uri: document.getElementById('searchURI').value
-            };
-            
-            console.log('Recherche avec filtres:', filters);
-            showToast('Recherche', 'Recherche en cours...', 'info');
-            
-            // TODO: Implémenter la logique de recherche côté serveur
-            // Pour l'instant, simuler avec un filtrage côté client
-            
-            setTimeout(() => {
-                showToast('Recherche terminée', '15 résultats trouvés', 'success');
-            }, 1000);
-        }
-
-        function resetSearch() {
-            document.getElementById('searchDateStart').value = new Date().toISOString().split('T')[0];
-            document.getElementById('searchDateEnd').value = new Date().toISOString().split('T')[0];
-            document.getElementById('searchIP').value = '';
-            document.getElementById('searchEventType').value = '';
-            document.getElementById('searchSeverity').value = '';
-            document.getElementById('searchURI').value = '';
-            
-            showToast('Réinitialisation', 'Filtres réinitialisés', 'success');
-        }
-
-        function exportSearchResults() {
-            showToast('Export', 'Export des résultats de recherche...', 'info');
-            // TODO: Implémenter l'export
-        }
-
-        // ================================================
-        // EVENTS FILTERING
-        // ================================================
-        function filterEvents(type) {
-            const rows = document.querySelectorAll('.events-table tbody tr[data-severity]');
-            const buttons = document.querySelectorAll('.filter-btn');
-            
-            // Mettre à jour les boutons actifs
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Filtrer les lignes
-            rows.forEach(row => {
-                if (type === 'all') {
-                    row.style.display = '';
-                } else {
-                    row.style.display = row.dataset.severity === type ? '' : 'none';
-                }
-            });
-        }
-
-        // ================================================
-        // BULK SELECTION
-        // ================================================
-        function toggleSelectAll(checkbox) {
-            const checkboxes = document.querySelectorAll('.event-checkbox');
-            checkboxes.forEach(cb => {
-                cb.checked = checkbox.checked;
-                if (checkbox.checked) {
-                    selectedEvents.add(parseInt(cb.value));
-                    cb.closest('tr').classList.add('selected');
-                } else {
-                    selectedEvents.delete(parseInt(cb.value));
-                    cb.closest('tr').classList.remove('selected');
-                }
-            });
-            updateBulkActionsBar();
-        }
-
-        // Écouter les changements sur les checkboxes individuelles
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.event-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const eventId = parseInt(this.value);
-                    if (this.checked) {
-                        selectedEvents.add(eventId);
-                        this.closest('tr').classList.add('selected');
-                    } else {
-                        selectedEvents.delete(eventId);
-                        this.closest('tr').classList.remove('selected');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: timelineLabels,
+                datasets: [
+                    {
+                        label: 'CRITICAL',
+                        data: timelineCritical,
+                        backgroundColor: 'rgba(255,59,59,.8)',
+                        borderRadius: 2,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'WARNING',
+                        data: timelineWarning,
+                        backgroundColor: 'rgba(255,140,66,.8)',
+                        borderRadius: 2,
+                        borderSkipped: false,
+                    },
+                    {
+                        label: 'INFO',
+                        data: timelineInfo,
+                        backgroundColor: 'rgba(74,158,255,.5)',
+                        borderRadius: 2,
+                        borderSkipped: false,
                     }
-                    updateBulkActionsBar();
-                });
-            });
-        });
-
-        function updateBulkActionsBar() {
-            const bar = document.getElementById('bulkActionsBar');
-            const count = document.getElementById('selectedCount');
-            
-            count.textContent = selectedEvents.size;
-            
-            if (selectedEvents.size > 0) {
-                bar.classList.add('active');
-            } else {
-                bar.classList.remove('active');
-            }
-        }
-
-        function clearSelection() {
-            selectedEvents.clear();
-            document.querySelectorAll('.event-checkbox').forEach(cb => {
-                cb.checked = false;
-                cb.closest('tr').classList.remove('selected');
-            });
-            document.getElementById('selectAll').checked = false;
-            updateBulkActionsBar();
-        }
-
-        function bulkBlockIPs() {
-            if (selectedEvents.size === 0) return;
-            
-            const ips = [];
-            selectedEvents.forEach(id => {
-                if (eventsData[id]) {
-                    ips.push(eventsData[id].ip);
-                }
-            });
-            
-            const uniqueIPs = [...new Set(ips)];
-            
-            if (confirm(`Voulez-vous bloquer ${uniqueIPs.length} IP(s) ?
-
-${uniqueIPs.join('
-')}`)) {
-                console.log('Blocage des IPs:', uniqueIPs);
-                showToast('Blocage en masse', `${uniqueIPs.length} IP(s) bloquée(s)`, 'success');
-                clearSelection();
-                // TODO: Implémenter le blocage côté serveur
-            }
-        }
-
-        function bulkExport() {
-            if (selectedEvents.size === 0) return;
-            
-            const selectedData = [];
-            selectedEvents.forEach(id => {
-                if (eventsData[id]) {
-                    selectedData.push(eventsData[id]);
-                }
-            });
-            
-            const csv = convertToCSV(selectedData);
-            downloadFile(csv, 'selected-events.csv', 'text/csv');
-            
-            showToast('Export', `${selectedEvents.size} événement(s) exporté(s)`, 'success');
-        }
-
-        // ================================================
-        // EVENT DETAILS MODAL
-        // ================================================
-        function viewEventDetails(eventId) {
-            const event = eventsData[eventId];
-            if (!event) return;
-            
-            currentEventData = event;
-            
-            const modalBody = document.getElementById('eventModalBody');
-            modalBody.innerHTML = `
-                <div class="modal-section">
-                    <div class="modal-section-title">Informations générales</div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                        <div>
-                            <strong>Date & Heure:</strong><br>
-                            ${event.timestamp}
-                        </div>
-                        <div>
-                            <strong>Sévérité:</strong><br>
-                            <span class="severity-badge ${event.severity.toLowerCase()}">${event.severity}</span>
-                        </div>
-                        <div>
-                            <strong>Type:</strong><br>
-                            <span class="event-type">${event.event_type}</span>
-                        </div>
-                        <div>
-                            <strong>IP Source:</strong><br>
-                            <code>${event.ip}</code>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-section">
-                    <div class="modal-section-title">Détails de la requête</div>
-                    <div style="display: grid; gap: 1rem;">
-                        <div>
-                            <strong>URI:</strong><br>
-                            <code>${event.uri}</code>
-                        </div>
-                        <div>
-                            <strong>Méthode HTTP:</strong><br>
-                            ${event.method || 'GET'}
-                        </div>
-                        <div>
-                            <strong>User Agent:</strong><br>
-                            <code style="font-size: 0.75rem; word-break: break-all;">
-                                ${event.user_agent || 'Non disponible'}
-                            </code>
-                        </div>
-                    </div>
-                </div>
-                
-                ${event.data ? `
-                <div class="modal-section">
-                    <div class="modal-section-title">Données supplémentaires</div>
-                    <div class="modal-data">
-                        ${JSON.stringify(event.data, null, 2)}
-                    </div>
-                </div>
-                ` : ''}
-            `;
-            
-            document.getElementById('eventModal').classList.add('active');
-        }
-
-        function closeEventModal() {
-            document.getElementById('eventModal').classList.remove('active');
-            currentEventData = null;
-        }
-
-        function blockIPFromModal() {
-            if (currentEventData && currentEventData.ip) {
-                blockIP(currentEventData.ip);
-                closeEventModal();
-            }
-        }
-
-        // Fermer le modal en cliquant sur l'overlay
-        document.getElementById('eventModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeEventModal();
-            }
-        });
-
-        // ================================================
-        // IP MANAGEMENT
-        // ================================================
-        function blockIP(ip) {
-            if (confirm(`Voulez-vous vraiment bloquer définitivement l'IP ${ip} ?`)) {
-                console.log('Blocage de l\'IP:', ip);
-                showToast('IP bloquée', `L'IP ${ip} a été bloquée définitivement`, 'success');
-                // TODO: Implémenter le blocage côté serveur
-            }
-        }
-
-        function whitelistIP(ip) {
-            if (confirm(`Voulez-vous vraiment ajouter l'IP ${ip} à la whitelist ?`)) {
-                console.log('Ajout à la whitelist:', ip);
-                showToast('IP whitelistée', `L'IP ${ip} a été ajoutée à la whitelist`, 'success');
-                
-                // Mettre à jour visuellement la carte
-                const card = document.querySelector(`.suspicious-ip-card[data-ip="${ip}"]`);
-                if (card) {
-                    card.classList.add('whitelisted');
-                    const badges = card.querySelector('.ip-badges');
-                    badges.insertAdjacentHTML('afterbegin', '<span class="whitelist-badge">✅ Whitelist</span>');
-                }
-                
-                // TODO: Implémenter côté serveur
-            }
-        }
-
-        function removeFromWhitelist(ip) {
-            if (confirm(`Voulez-vous vraiment retirer l'IP ${ip} de la whitelist ?`)) {
-                console.log('Retrait de la whitelist:', ip);
-                showToast('IP retirée', `L'IP ${ip} a été retirée de la whitelist`, 'success');
-                
-                // Mettre à jour visuellement la carte
-                const card = document.querySelector(`.suspicious-ip-card[data-ip="${ip}"]`);
-                if (card) {
-                    card.classList.remove('whitelisted');
-                    const badge = card.querySelector('.whitelist-badge');
-                    if (badge) badge.remove();
-                }
-                
-                // TODO: Implémenter côté serveur
-            }
-        }
-
-        function addNoteToIP(ip) {
-            const note = prompt(`Ajouter une note pour l'IP ${ip}:`);
-            if (note) {
-                console.log('Note ajoutée pour', ip, ':', note);
-                showToast('Note ajoutée', 'La note a été enregistrée', 'success');
-                
-                // Mettre à jour visuellement
-                const card = document.querySelector(`.suspicious-ip-card[data-ip="${ip}"]`);
-                if (card) {
-                    const notesDiv = card.querySelector('.ip-notes');
-                    notesDiv.className = 'ip-notes';
-                    notesDiv.textContent = '📝 ' + note;
-                }
-                
-                // TODO: Sauvegarder côté serveur
-            }
-        }
-
-        function viewIPDetails(ip) {
-            console.log('Voir détails de l\'IP:', ip);
-            showToast('Détails IP', `Affichage des détails pour ${ip}`, 'info');
-            // TODO: Implémenter la vue détaillée
-        }
-
-        function exportIPsList() {
-            const csv = convertToCSV(suspiciousIPsData);
-            downloadFile(csv, 'suspicious-ips.csv', 'text/csv');
-            showToast('Export', 'Liste des IPs exportée', 'success');
-        }
-
-        // ================================================
-        // EXPORT FUNCTIONALITY
-        // ================================================
-        function exportEvents(format) {
-            console.log('Export au format:', format);
-            
-            switch(format) {
-                case 'csv':
-                    const csv = convertToCSV(eventsData);
-                    downloadFile(csv, 'security-events.csv', 'text/csv');
-                    break;
-                    
-                case 'json':
-                    const json = JSON.stringify(eventsData, null, 2);
-                    downloadFile(json, 'security-events.json', 'application/json');
-                    break;
-                    
-                case 'pdf':
-                    showToast('Export PDF', 'Génération du PDF en cours...', 'info');
-                    // TODO: Implémenter l'export PDF côté serveur
-                    setTimeout(() => {
-                        showToast('Export PDF', 'PDF généré avec succès', 'success');
-                    }, 2000);
-                    break;
-            }
-        }
-
-        function convertToCSV(data) {
-            if (!data || data.length === 0) return '';
-            
-            const headers = Object.keys(data[0]);
-            const csvRows = [headers.join(',')];
-            
-            data.forEach(row => {
-                const values = headers.map(header => {
-                    const value = row[header];
-                    const escaped = ('' + value).replace(/"/g, '\\"');
-                    return `"${escaped}"`;
-                });
-                csvRows.push(values.join(','));
-            });
-            
-            return csvRows.join('
-');
-        }
-
-        function downloadFile(content, filename, contentType) {
-            const blob = new Blob([content], { type: contentType });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('Téléchargement', `Fichier ${filename} téléchargé`, 'success');
-        }
-
-        // ================================================
-        // PAGINATION
-        // ================================================
-        function changePage(page) {
-            if (page < 1 || page > totalPages) return;
-            
-            currentPage = page;
-            
-            // TODO: Charger les données de la page
-            showToast('Pagination', `Page ${page} chargée`, 'info');
-        }
-
-        // ================================================
-        // KEYBOARD SHORTCUTS
-        // ================================================
-        function toggleShortcutsHelp() {
-            const help = document.getElementById('shortcutsHelp');
-            help.classList.toggle('active');
-        }
-
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+K: Focus sur la recherche
-            if (e.ctrlKey && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('searchIP').focus();
-            }
-            
-            // Ctrl+R: Refresh
-            if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                refreshDashboard();
-            }
-            
-            // Ctrl+E: Export
-            if (e.ctrlKey && e.key === 'e') {
-                e.preventDefault();
-                exportEvents('csv');
-            }
-            
-            // Ctrl+D: Dark mode
-            if (e.ctrlKey && e.key === 'd') {
-                e.preventDefault();
-                toggleTheme();
-            }
-            
-            // ?: Help
-            if (e.key === '?') {
-                toggleShortcutsHelp();
-            }
-            
-            // Escape: Close modals
-            if (e.key === 'Escape') {
-                closeEventModal();
-                document.getElementById('shortcutsHelp').classList.remove('active');
-            }
-        });
-
-        // ================================================
-        // ALERT SOUND
-        // ================================================
-        function playAlertSound() {
-            // Créer un beep simple
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
-            
-            showToast('Alerte sonore', 'Son d\'alerte activé', 'warning');
-        }
-
-        // ================================================
-        // AUTO-REFRESH
-        // ================================================
-        let refreshTimer;
-        function startAutoRefresh() {
-            refreshTimer = setTimeout(() => {
-                console.log('🔄 Auto-refresh du dashboard...');
-                location.reload();
-            }, 30000); // 30 secondes
-        }
-
-        // ================================================
-        // CHARTS INITIALIZATION
-        // ================================================
-        function initCharts() {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js non chargé');
-                return;
-            }
-
-            // Configuration commune
-            const commonOptions = {
+                ]
+            },
+            options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: {
-                        labels: {
-                            font: { size: 12, weight: '600' },
-                            usePointStyle: true
-                        }
+                        position: 'bottom',
+                        labels: { padding: 16, boxWidth: 10, boxHeight: 10 }
+                    },
+                    tooltip: {
+                        backgroundColor: '#141920',
+                        borderColor: '#1e2840',
+                        borderWidth: 1,
+                        padding: 10,
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true, // Barres empilées
+                        grid: { display: false },
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: { precision: 0 }, // Entiers uniquement
+                        grid: { color: '#1e2840' }
                     }
                 }
-            };
-
-            // ============================================
-            // GRAPHIQUE 1: Timeline
-            // ============================================
-            const timelineCtx = document.getElementById('timelineChart');
-            if (timelineCtx) {
-                // Générer des données pour les 7 derniers jours
-                const labels = [];
-                const criticalData = [];
-                const warningData = [];
-                const infoData = [];
-                
-                for (let i = 6; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    labels.push(date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }));
-                    
-                    // Données simulées (à remplacer par des vraies données)
-                    criticalData.push(Math.floor(Math.random() * 20));
-                    warningData.push(Math.floor(Math.random() * 50));
-                    infoData.push(Math.floor(Math.random() * 100));
-                }
-
-                charts.timeline = new Chart(timelineCtx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Critiques',
-                                data: criticalData,
-                                borderColor: '#dc2626',
-                                backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Warnings',
-                                data: warningData,
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Info',
-                                data: infoData,
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        ...commonOptions,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                            },
-                            x: {
-                                grid: { display: false }
-                            }
-                        }
-                    }
-                });
             }
-
-            // ============================================
-            // GRAPHIQUE 2: Donut
-            // ============================================
-            const statsLabels = Object.keys(statsData);
-            const statsValues = Object.values(statsData);
-            
-            if (statsLabels.length > 0) {
-                const donutCtx = document.getElementById('donutChart');
-                charts.donut = new Chart(donutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: statsLabels,
-                        datasets: [{
-                            data: statsValues,
-                            backgroundColor: [
-                                '#dc2626', '#f59e0b', '#3b82f6', '#10b981', 
-                                '#8b5cf6', '#06b6d4', '#64748b', '#f97316'
-                            ],
-                            borderWidth: 3,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        ...commonOptions,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 15,
-                                    font: { size: 12, weight: '600' },
-                                    usePointStyle: true
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.parsed || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                        return label + ': ' + value + ' (' + percentage + '%)';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // ============================================
-            // GRAPHIQUE 3: IPs
-            // ============================================
-            const top5IPs = suspiciousIPsData.slice(0, 5);
-            const ipLabels = top5IPs.map(ip => ip.ip);
-            const ipScores = top5IPs.map(ip => ip.severity_score);
-
-            if (ipLabels.length > 0) {
-                const ipsCtx = document.getElementById('ipsChart');
-                charts.ips = new Chart(ipsCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ipLabels,
-                        datasets: [{
-                            label: 'Score de gravité',
-                            data: ipScores,
-                            backgroundColor: ipScores.map(score => {
-                                if (score >= 50) return '#dc2626';
-                                if (score >= 20) return '#f59e0b';
-                                return '#3b82f6';
-                            }),
-                            borderWidth: 0,
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        ...commonOptions,
-                        indexAxis: 'y',
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const ip = top5IPs[context.dataIndex];
-                                        let details = 'Score: ' + context.parsed.x;
-                                        if (ip.failed_logins > 0) details += ' | Échecs: ' + ip.failed_logins;
-                                        if (ip.csrf_violations > 0) details += ' | CSRF: ' + ip.csrf_violations;
-                                        return details;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'Score de gravité', font: { weight: '600' } },
-                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                            },
-                            y: {
-                                grid: { display: false }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        function updateChartsTheme() {
-            // Détruire et recréer les graphiques avec les nouvelles couleurs
-            Object.values(charts).forEach(chart => chart.destroy());
-            charts = {};
-            initCharts();
-        }
-
-        function changeTimelineRange(range) {
-            console.log('Changement de plage:', range);
-            // TODO: Recharger les données du graphique
-            showToast('Graphique', `Plage modifiée: ${range}`, 'info');
-        }
-
-        // ================================================
-        // INITIALIZATION
-        // ================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Initialisation du dashboard de sécurité...');
-            
-            // Charger le thème sauvegardé
-            loadSavedTheme();
-            
-            // Initialiser les graphiques
-            if (typeof Chart !== 'undefined') {
-                initCharts();
-            }
-            
-            // Démarrer l'auto-refresh
-            startAutoRefresh();
-            
-            // Afficher un message de bienvenue
-            <?php if (($criticalEvents ?? 0) > 0): ?>
-            playAlertSound();
-            <?php endif; ?>
-            
-            console.log('✅ Dashboard initialisé avec succès !');
         });
-    </script>
+    })();
+
+    // =========================================================================
+    // SECTION 4 : GRAPHIQUE DONUT (répartition par type)
+    // =========================================================================
+    (function() {
+        const ctx = document.getElementById('chartDonut');
+        if (!ctx) return;
+
+        if (donutLabels.length === 0) {
+            ctx.parentElement.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:80px 0;font-family:var(--font-mono);">Aucune donnée</p>';
+            return;
+        }
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: donutLabels,
+                datasets: [{
+                    data: donutData,
+                    backgroundColor: donutColors,
+                    borderWidth: 2,
+                    borderColor: '#141920', // Séparation entre segments
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%', // Trou central plus grand pour un look moderne
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 12,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            // Tronquer les labels trop longs
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                return data.labels.map((label, i) => ({
+                                    text: label.length > 16 ? label.substring(0, 16) + '…' : label,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    hidden: false,
+                                    index: i
+                                }));
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#141920',
+                        borderColor: '#1e2840',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            // Afficher le pourcentage dans le tooltip
+                            label: function(ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct   = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                return ` ${ctx.label} : ${ctx.parsed} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    })();
+
+    // =========================================================================
+    // SECTION 5 : FILTRE PAR IP (depuis les cartes ou le tableau)
+    // =========================================================================
+
+    /**
+     * Remplit le champ IP caché et soumet le formulaire de filtres
+     * @param {string} ip - Adresse IP à filtrer
+     */
+    function filterByIP(ip) {
+        // Remplir le champ caché IP
+        document.getElementById('ipHidden').value = ip;
+        // Vider le champ search pour éviter conflit
+        document.querySelector('input[name="search"]').value = '';
+        // Soumettre le formulaire
+        document.getElementById('filterForm').submit();
+    }
+
+    // =========================================================================
+    // SECTION 6 : MODAL BLOCAGE IP
+    // =========================================================================
+
+    let currentIPToBlock = ''; // IP stockée en attente de confirmation
+
+    /**
+     * Ouvre la modal de confirmation de blocage
+     * @param {string} ip - Adresse IP à bloquer
+     */
+    function openBlockModal(ip) {
+        currentIPToBlock = ip;
+        document.getElementById('modalIPDisplay').textContent = ip;
+        document.getElementById('blockReason').value = '';
+        document.getElementById('blockModal').classList.add('open');
+        // Focus sur le champ raison
+        setTimeout(() => document.getElementById('blockReason').focus(), 100);
+    }
+
+    /** Ferme la modal de confirmation */
+    function closeBlockModal() {
+        document.getElementById('blockModal').classList.remove('open');
+        currentIPToBlock = '';
+    }
+
+    // Fermer la modal en cliquant sur l'overlay
+    document.getElementById('blockModal').addEventListener('click', function(e) {
+        if (e.target === this) closeBlockModal();
+    });
+
+    // =========================================================================
+    // SECTION 7 : ACTIONS AJAX SUR LES IPs
+    // =========================================================================
+
+    /**
+     * Envoie une requête POST AJAX pour une action sur une IP
+     * @param {string} url     - URL de l'action (/admin/security/block-ip, etc.)
+     * @param {object} data    - Données à envoyer (ip, reason, etc.)
+     * @param {function} onSuccess - Callback en cas de succès
+     */
+    async function ipAction(url, data, onSuccess) {
+        try {
+            // Construire le body en form-urlencoded (compatible $_POST PHP)
+            const body = Object.entries(data)
+                .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+                .join('&');
+
+            const res  = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            });
+
+            const json = await res.json();
+
+            if (json.success) {
+                showToast(json.message, 'success');
+                if (onSuccess) onSuccess();
+            } else {
+                showToast(json.message || 'Erreur serveur', 'error');
+            }
+
+        } catch (err) {
+            showToast('Erreur de connexion', 'error');
+            console.error('ipAction error:', err);
+        }
+    }
+
+    /** Confirme le blocage après validation dans la modal */
+    function confirmBlockIP() {
+        if (!currentIPToBlock) return;
+
+        const reason = document.getElementById('blockReason').value.trim()
+                    || 'Bloquée manuellement par admin';
+
+        closeBlockModal();
+
+        ipAction('/admin/security/block-ip', {
+            ip: currentIPToBlock,
+            reason
+        }, () => {
+            // Recharger la page après blocage pour actualiser les données
+            setTimeout(() => location.reload(), 1200);
+        });
+    }
+
+    /**
+     * Ajoute une IP à la whitelist
+     * @param {string} ip - Adresse IP à whitelister
+     */
+    function whitelistIP(ip) {
+        if (!confirm(`Ajouter ${ip} à la whitelist ?\n\nCette IP ne sera plus jamais bloquée automatiquement.`)) {
+            return;
+        }
+
+        ipAction('/admin/security/whitelist-ip', {
+            ip,
+            description: 'Ajoutée manuellement depuis le dashboard'
+        }, () => {
+            setTimeout(() => location.reload(), 1200);
+        });
+    }
+
+    // =========================================================================
+    // SECTION 8 : SYSTÈME DE TOAST (notifications)
+    // =========================================================================
+
+    /**
+     * Affiche une notification toast temporaire
+     * @param {string} message - Message à afficher
+     * @param {string} type    - 'success' ou 'error'
+     */
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+
+        const toast     = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <span>${type === 'success' ? '✅' : '❌'}</span>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        // Auto-supprimer après 3 secondes
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all .3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // =========================================================================
+    // SECTION 9 : AUTO-REFRESH INTELLIGENT (toutes les 60s si onglet actif)
+    // =========================================================================
+
+    let refreshTimer = null;
+
+    /**
+     * Lance l'auto-refresh uniquement si l'onglet est visible
+     * Évite de recharger inutilement en arrière-plan
+     */
+    function startAutoRefresh() {
+        // Recharger toutes les 60 secondes (moins agressif que l'ancien 30s)
+        refreshTimer = setTimeout(() => {
+            if (!document.hidden) {
+                location.reload();
+            } else {
+                // Si onglet caché, reprogrammer plus tard
+                startAutoRefresh();
+            }
+        }, 60000);
+    }
+
+    // Démarrer l'auto-refresh
+    startAutoRefresh();
+
+    // Réinitialiser le timer quand l'onglet redevient visible
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            clearTimeout(refreshTimer);
+            startAutoRefresh();
+        }
+    });
+
+    // =========================================================================
+    // SECTION 10 : AVERTISSEMENT CONSOLE pour événements critiques
+    // =========================================================================
+    <?php if (!empty($criticalEvents) && $criticalEvents > 0): ?>
+    console.warn(
+        '%c⚠ MarketFlow Security',
+        'color:#ff3b3b;font-weight:bold;font-size:14px',
+        '\n<?= $criticalEvents ?> événement(s) critique(s) détecté(s) sur les 7 derniers jours.'
+    );
+    <?php endif; ?>
+
+</script>
+
 </body>
 </html>
