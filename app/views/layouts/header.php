@@ -35,11 +35,15 @@
 
 <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
 
+<!-- ⭐ CSS : Ordre important ! style.css puis dark-mode.css -->
 <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
+<link rel="stylesheet" href="<?= CSS_URL ?>/dark-mode.css">
 <link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
 <link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">  
 
+<!-- ⭐ JS : app.js puis dark-mode.js -->
     <script src="<?= JS_URL ?>/app.js" defer></script>
+    <script src="<?= JS_URL ?>/dark-mode.js" defer></script>
     <script src="<?= JS_URL ?>/notifications.js" defer></script>
     <script src="<?= JS_URL ?>/wishlist.js" defer></script>
     <script src="<?= JS_URL ?>/animations.js" defer></script>  
@@ -77,7 +81,7 @@
     transition-delay: 150ms;
 }
 
-/* NOUVEAU : Bouton Licence Fondateur animé */
+/* Bouton Licence Fondateur animé */
 @keyframes shimmer {
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
@@ -128,6 +132,29 @@
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
+
+/* ⭐ Navigation repensée pour centrer le bouton Licence Fondateur */
+.nav-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+}
+
+.nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 1;
+}
 </style>
 </head>
 
@@ -135,318 +162,342 @@
 
 <nav>
     <div class="container">
-        <div class="flex flex-between" style="height:70px;">
-        <!-- LOGO -->
-        <a href="/" class="flex gap-4" style="align-items:center;">
-            <div style="
-    width:42px;height:42px;
-    border-radius:12px;
-    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-weight:900;
-    box-shadow: var(--shadow-md);
-">
-    M
-</div>
-            <span style="font-size:1.2rem;font-weight:800;">
-                MarketFlow
-            </span>
-        </a>
-
-        <!-- NAV LINKS -->
-        <div class="flex gap-4" style="align-items:center;">
-            <a href="/">Accueil</a>
-            <a href="/products">Produits</a>
-            <a href="/category">Catégories</a>
+        <div class="nav-wrapper">
             
-            <!-- 🔥 NOUVEAU : Bouton Licence Fondateur -->
-            <a href="/licence-fondateur" class="btn-licence-fondateur">
-                <span class="rocket">🚀</span>
-                Licence Fondateur
-                <span class="badge-urgent">3</span>
-            </a>
-        </div>
-
-        <!-- SEARCH -->
-        <form action="/search" method="GET" style="position:relative;max-width:280px;width:100%;">
-            <input type="text" name="q" placeholder="Rechercher..."
-                   style="
-                    width:100%;
-                    padding:.6rem 2.2rem .6rem 1rem;
-                    border-radius: var(--radius-lg);
-                    border:1px solid var(--gray-200);
-                    background: var(--bg-primary);
-                   ">
-            <button type="submit" style="
-                position:absolute;
-                right:.6rem;top:50%;
-                transform:translateY(-50%);
-                background:none;border:none;
-                cursor:pointer;
-                color:var(--text-secondary);
-            ">
-                🔍
-            </button>
-        </form>
-
-        <!-- ACTIONS -->
-        <div class="flex gap-4" style="align-items:center;">
-
-            <?php if (isLoggedIn()): ?>
-                <?php 
-                $wishlistModel = new \App\Models\Wishlist();
-                $wishlistCount = $wishlistModel->getCount($_SESSION["user_id"]);
-                ?>
-
-                <!-- Wishlist -->
-                <a href="/wishlist" style="position:relative;">
-                    ❤️
-                    <?php if ($wishlistCount > 0): ?>
-                    <span class="wishlist-count" style="
-                        position:absolute;
-                        top:-8px;right:-10px;
-                        background:#ef4444;
-                        color:white;
-                        font-size:.65rem;
-                        font-weight:700;
-                        width:18px;height:18px;
-                        border-radius:50%;
+            <!-- ⭐ GAUCHE : Logo + Nav Links -->
+            <div class="nav-left">
+                <!-- LOGO -->
+                <a href="/" class="flex gap-4" style="align-items:center;">
+                    <div style="
+                        width:42px;height:42px;
+                        border-radius:12px;
+                        background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
                         display:flex;
                         align-items:center;
                         justify-content:center;
-                    ">
-                        <?= e($wishlistCount) ?>
-                    </span>
-                    <?php endif; ?>
+                        color:white;
+                        font-weight:900;
+                        box-shadow: var(--shadow-md);
+                    ">M</div>
+                    <span style="font-size:1.2rem;font-weight:800;">MarketFlow</span>
                 </a>
-            <?php endif; ?>
 
-            <!-- Cart -->
-            <a href="/cart" style="position:relative;">🛒
-                <?php $cartCount = $_SESSION['cart_count'] ?? 0; ?>
-                <?php if ($cartCount > 0): ?>
-                <span style="
-                    position:absolute;
-                    top:-8px;right:-10px;
-                    background:#ef4444;
-                    color:white;
-                    font-size:.65rem;
-                    font-weight:700;
-                    width:18px;height:18px;
-                    border-radius:50%;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                ">
-                    <?= e($cartCount) ?>
-                </span>
-                <?php endif; ?>
-            </a>
-
-            <!-- USER -->
-            <?php if (isLoggedIn()): ?>
-                <?php $currentUser = getCurrentUser(); ?>
-
-                <div class="relative" data-dropdown>
-    <button class="flex gap-4" style="
-        align-items:center;
-        padding: 0.5rem 1rem;
-        border-radius: 12px;
-        transition: all 0.3s;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-        <div style="
-            width:40px;
-            height:40px;
-            border-radius:50%;
-            background:<?= $currentUser['role']==='admin' ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)' ?>;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:white;
-            font-weight:800;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px <?= $currentUser['role']==='admin' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)' ?>;
-            position: relative;
-        ">
-            <?= strtoupper(substr($currentUser['username'],0,1)) ?>
-            <?php if ($currentUser['role']==='admin'): ?>
-                <span style="
-                    position: absolute;
-                    bottom: -2px;
-                    right: -2px;
-                    background: #fbbf24;
-                    width: 16px;
-                    height: 16px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 0.6rem;
-                    border: 2px solid white;
-                ">👑</span>
-            <?php endif; ?>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">
-                <?= e($currentUser['username']) ?>
-            </span>
-            <?php if ($currentUser['role']==='admin'): ?>
-                <span style="
-                    font-size: 0.7rem;
-                    color: white;
-                    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-                    padding: 0.1rem 0.5rem;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    margin-top: 2px;
-                ">ADMIN</span>
-            <?php endif; ?>
-        </div>
-        <span style="margin-left: 0.25rem; color: var(--text-tertiary); font-size: 0.8rem;">▼</span>
-    </button>
-                    <div class="dropdown-menu" style="
-                    position: absolute;
-                    right: 0;
-                    top: 100%;
-                    min-width: 220px;
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-                    padding: 0.5rem;
-                    border: 1px solid rgba(0, 0, 0, 0.05);
-                    
-                ">
-                    <a href="/account" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        👤 Mon compte
-                    </a>
-                    
-                    <a href="/orders" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        📦 Mes commandes
-                    </a>
-                    
-                    <a href="/wishlist" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        ❤️ Mes favoris
-                    </a>
-
-                    <?php if ($currentUser['role']==='seller'): ?>
-                        <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-                        <a href="/seller/dashboard" style="
-                            display: block;
-                            padding: 0.75rem 1rem;
-                            border-radius: 8px;
-                            color: var(--text-primary);
-                            text-decoration: none;
-                            transition: all 0.2s;
-                            font-size: 0.95rem;
-                        " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                            🏪 Dashboard vendeur
-                        </a>
-                    <?php endif; ?>
-
-                    <?php if ($currentUser['role']==='admin'): ?>
-    <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-    
-    <a href="/admin" style="
-        display: block;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        color: white;
-        text-decoration: none;
-        transition: all 0.2s;
-        font-weight: 600;
-        font-size: 0.95rem;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-    " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(59, 130, 246, 0.3)'">
-        👑 Administration
-    </a>
-    
-    <?php $criticalCount = getSecurityAlerts(); ?>
-    
-    <a href="/admin/security" style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        <?= $criticalCount > 0 ? 'background: rgba(245, 87, 108, 0.1);' : '' ?>
-        color: <?= $criticalCount > 0 ? '#f5576c' : 'var(--text-primary)' ?>;
-        text-decoration: none;
-        transition: all 0.2s;
-        font-size: 0.95rem;
-        <?= $criticalCount > 0 ? 'font-weight: 600;' : '' ?>
-    " onmouseover="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.15)' : 'var(--bg-secondary)' ?>'" onmouseout="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.1)' : 'transparent' ?>'">
-        <span>🔒 Monitoring Sécurité</span>
-        <?php if ($criticalCount > 0): ?>
-            <span style="
-                background: #f5576c;
-                color: white;
-                font-size: 0.7rem;
-                font-weight: 700;
-                padding: 0.15rem 0.5rem;
-                border-radius: 12px;
-                margin-left: 0.5rem;
-            "><?= $criticalCount ?></span>
-        <?php endif; ?>
-    </a>
-<?php endif; ?>
-
-                    <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-                    
-                    <a href="/logout" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: #ef4444;
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                        font-weight: 500;
-                    " onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
-                        🚪 Déconnexion
-                    </a>
+                <!-- NAV LINKS -->
+                <div class="flex gap-4" style="align-items:center;">
+                    <a href="/">Accueil</a>
+                    <a href="/products">Produits</a>
+                    <a href="/category">Catégories</a>
                 </div>
             </div>
 
-            <?php else: ?>
-                <a href="/login">Connexion</a>
-                <a href="/register" class="btn btn-primary">Inscription</a>
-            <?php endif; ?>
+            <!-- ⭐ CENTRE : Bouton Licence Fondateur (position absolue centrée) -->
+            <div class="nav-center">
+                <a href="/licence-fondateur" class="btn-licence-fondateur">
+                    <span class="rocket">🚀</span>
+                    Licence Fondateur
+                    <span class="badge-urgent">3</span>
+                </a>
+            </div>
 
+            <!-- ⭐ DROITE : Search + Actions + Mode Sombre -->
+            <div class="nav-right">
+                
+                <!-- SEARCH -->
+                <form action="/search" method="GET" style="position:relative;max-width:200px;width:100%;">
+                    <input type="text" name="q" placeholder="Rechercher..."
+                           style="
+                            width:100%;
+                            padding:.6rem 2.2rem .6rem 1rem;
+                            border-radius: var(--radius-lg);
+                            border:1px solid var(--gray-200);
+                            background: var(--bg-primary);
+                           ">
+                    <button type="submit" style="
+                        position:absolute;
+                        right:.6rem;top:50%;
+                        transform:translateY(-50%);
+                        background:none;border:none;
+                        cursor:pointer;
+                        color:var(--text-secondary);
+                    ">🔍</button>
+                </form>
+
+                <!-- ACTIONS -->
+                <?php if (isLoggedIn()): ?>
+                    <?php 
+                    $wishlistModel = new \App\Models\Wishlist();
+                    $wishlistCount = $wishlistModel->getCount($_SESSION["user_id"]);
+                    ?>
+
+                    <!-- Wishlist -->
+                    <a href="/wishlist" style="position:relative;">
+                        ❤️
+                        <?php if ($wishlistCount > 0): ?>
+                            <span class="wishlist-count" style="
+                                position:absolute;
+                                top:-8px;right:-8px;
+                                background:#ef4444;
+                                color:white;
+                                font-size:0.7rem;
+                                font-weight:700;
+                                width:20px;height:20px;
+                                border-radius:50%;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                            "><?= $wishlistCount ?></span>
+                        <?php endif; ?>
+                    </a>
+
+                    <!-- Panier -->
+                    <?php 
+                    $cartModel = new \App\Models\Cart();
+                    $cartCount = $cartModel->getCount($_SESSION["user_id"]);
+                    ?>
+                    <a href="/cart" style="position:relative;">
+                        🛒
+                        <?php if ($cartCount > 0): ?>
+                            <span class="cart-count" style="
+                                position:absolute;
+                                top:-8px;right:-8px;
+                                background:#3b82f6;
+                                color:white;
+                                font-size:0.7rem;
+                                font-weight:700;
+                                width:20px;height:20px;
+                                border-radius:50%;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                            "><?= $cartCount ?></span>
+                        <?php endif; ?>
+                    </a>
+
+                    <!-- User Dropdown -->
+                    <?php 
+                    $userModel = new \App\Models\User();
+                    $currentUser = $userModel->findById($_SESSION["user_id"]);
+                    ?>
+
+                    <div class="relative" data-dropdown>
+                        <button class="flex gap-4" style="
+                            align-items:center;
+                            padding: 0.5rem 1rem;
+                            border-radius: 12px;
+                            transition: all 0.3s;
+                            background: transparent;
+                            border: none;
+                            cursor: pointer;
+                        " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                            <div style="
+                                width:40px;
+                                height:40px;
+                                border-radius:50%;
+                                background:<?= $currentUser['role']==='admin' ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)' ?>;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                color:white;
+                                font-weight:800;
+                                font-size: 1.1rem;
+                                box-shadow: 0 4px 12px <?= $currentUser['role']==='admin' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)' ?>;
+                                position: relative;
+                            ">
+                                <?= strtoupper(substr($currentUser['username'],0,1)) ?>
+                                <?php if ($currentUser['role']==='admin'): ?>
+                                    <span style="
+                                        position: absolute;
+                                        bottom: -2px;
+                                        right: -2px;
+                                        background: #fbbf24;
+                                        width: 16px;
+                                        height: 16px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-size: 0.6rem;
+                                        border: 2px solid white;
+                                    ">👑</span>
+                                <?php endif; ?>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">
+                                    <?= e($currentUser['username']) ?>
+                                </span>
+                                <?php if ($currentUser['role']==='admin'): ?>
+                                    <span style="
+                                        font-size: 0.7rem;
+                                        color: white;
+                                        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+                                        padding: 0.1rem 0.5rem;
+                                        border-radius: 6px;
+                                        font-weight: 600;
+                                        margin-top: 2px;
+                                    ">ADMIN</span>
+                                <?php endif; ?>
+                            </div>
+                            <span style="margin-left: 0.25rem; color: var(--text-tertiary); font-size: 0.8rem;">▼</span>
+                        </button>
+                        
+                        <div class="dropdown-menu" style="
+                            position: absolute;
+                            right: 0;
+                            top: 100%;
+                            min-width: 220px;
+                            background: white;
+                            border-radius: 12px;
+                            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                            padding: 0.5rem;
+                            border: 1px solid rgba(0, 0, 0, 0.05);
+                        ">
+                            <a href="/account" style="
+                                display: block;
+                                padding: 0.75rem 1rem;
+                                border-radius: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                transition: all 0.2s;
+                                font-size: 0.95rem;
+                            " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                                👤 Mon compte
+                            </a>
+                            
+                            <a href="/orders" style="
+                                display: block;
+                                padding: 0.75rem 1rem;
+                                border-radius: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                transition: all 0.2s;
+                                font-size: 0.95rem;
+                            " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                                📦 Mes commandes
+                            </a>
+                            
+                            <a href="/wishlist" style="
+                                display: block;
+                                padding: 0.75rem 1rem;
+                                border-radius: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                transition: all 0.2s;
+                                font-size: 0.95rem;
+                            " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                                ❤️ Mes favoris
+                            </a>
+
+                            <?php if ($currentUser['role']==='seller'): ?>
+                                <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
+                                <a href="/seller/dashboard" style="
+                                    display: block;
+                                    padding: 0.75rem 1rem;
+                                    border-radius: 8px;
+                                    color: var(--text-primary);
+                                    text-decoration: none;
+                                    transition: all 0.2s;
+                                    font-size: 0.95rem;
+                                " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                                    🏪 Dashboard vendeur
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($currentUser['role']==='admin'): ?>
+                                <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
+                                
+                                <a href="/admin" style="
+                                    display: block;
+                                    padding: 0.75rem 1rem;
+                                    border-radius: 8px;
+                                    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+                                    color: white;
+                                    text-decoration: none;
+                                    transition: all 0.2s;
+                                    font-weight: 600;
+                                    font-size: 0.95rem;
+                                    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+                                " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(59, 130, 246, 0.3)'">
+                                    👑 Administration
+                                </a>
+                                
+                                <?php $criticalCount = getSecurityAlerts(); ?>
+                                
+                                <a href="/admin/security" style="
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    padding: 0.75rem 1rem;
+                                    border-radius: 8px;
+                                    <?= $criticalCount > 0 ? 'background: rgba(245, 87, 108, 0.1);' : '' ?>
+                                    color: <?= $criticalCount > 0 ? '#f5576c' : 'var(--text-primary)' ?>;
+                                    text-decoration: none;
+                                    transition: all 0.2s;
+                                    font-size: 0.95rem;
+                                    <?= $criticalCount > 0 ? 'font-weight: 600;' : '' ?>
+                                " onmouseover="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.15)' : 'var(--bg-secondary)' ?>'" onmouseout="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.1)' : 'transparent' ?>'">
+                                    <span>🔒 Monitoring Sécurité</span>
+                                    <?php if ($criticalCount > 0): ?>
+                                        <span style="
+                                            background: #f5576c;
+                                            color: white;
+                                            font-size: 0.7rem;
+                                            font-weight: 700;
+                                            padding: 0.15rem 0.5rem;
+                                            border-radius: 12px;
+                                            margin-left: 0.5rem;
+                                        "><?= $criticalCount ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            <?php endif; ?>
+
+                            <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
+                            
+                            <a href="/logout" style="
+                                display: block;
+                                padding: 0.75rem 1rem;
+                                border-radius: 8px;
+                                color: #ef4444;
+                                text-decoration: none;
+                                transition: all 0.2s;
+                                font-size: 0.95rem;
+                                font-weight: 500;
+                            " onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
+                                🚪 Déconnexion
+                            </a>
+                        </div>
+                    </div>
+
+                <?php else: ?>
+                    <a href="/login">Connexion</a>
+                    <a href="/register" class="btn btn-primary">Inscription</a>
+                <?php endif; ?>
+
+                <!-- ⭐ BOUTON MODE SOMBRE (discret et élégant) -->
+                <div class="dark-mode-toggle">
+                    <button id="dark-mode-toggle" class="dark-mode-btn" aria-label="Basculer le mode sombre" title="Basculer le mode sombre">
+                        <!-- Icône Soleil (visible en mode sombre) -->
+                        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        
+                        <!-- Icône Lune (visible en mode clair) -->
+                        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
-
 </nav>
 
 <!-- Flash message -->

@@ -1,0 +1,202 @@
+/**
+ * ================================================================
+ * MARKETFLOW PRO - MODE SOMBRE v1.0
+ * ================================================================
+ * Extension élégante du design system existant
+ * Fichier : public/css/dark-mode.css
+ * ================================================================
+ */
+
+/* ============================================================
+   VARIABLES MODE SOMBRE
+   Remplace les variables quand body.dark-mode est actif
+   ============================================================ */
+body.dark-mode {
+    /* Backgrounds - Palette sombre élégante */
+    --bg-primary: #0f172a;       /* Bleu nuit profond */
+    --bg-secondary: #1e293b;     /* Bleu nuit moyen */
+    --bg-tertiary: #334155;      /* Bleu-gris */
+    
+    /* Texte - Optimisé pour le contraste */
+    --text-primary: #f1f5f9;     /* Blanc cassé (plus doux) */
+    --text-secondary: #cbd5e1;   /* Gris clair */
+    --text-tertiary: #94a3b8;    /* Gris moyen */
+    --text-inverse: #0f172a;     /* Texte foncé sur fond clair */
+    
+    /* Gris inversés pour le mode sombre */
+    --gray-50: #1e293b;
+    --gray-100: #334155;
+    --gray-200: #475569;
+    --gray-300: #64748b;
+    --gray-400: #94a3b8;
+    --gray-500: #cbd5e1;
+    --gray-600: #e2e8f0;
+    --gray-700: #f1f5f9;
+    --gray-800: #f8fafc;
+    --gray-900: #ffffff;
+    
+    /* Ombres adaptées au mode sombre */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.6);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.7), 0 4px 6px -4px rgb(0 0 0 / 0.7);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.8), 0 8px 10px -6px rgb(0 0 0 / 0.8);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.9);
+}
+
+/* ============================================================
+   AJUSTEMENTS SPÉCIFIQUES MODE SOMBRE
+   ============================================================ */
+
+/* Navigation */
+body.dark-mode nav {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+/* Cards produits */
+body.dark-mode .product-card {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+}
+
+body.dark-mode .product-card:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--gray-300);
+}
+
+/* Container image produit */
+body.dark-mode .product-image-container {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+/* Footer de carte */
+body.dark-mode .product-footer {
+    border-top-color: var(--gray-200);
+}
+
+/* Badge catégorie */
+body.dark-mode .product-badge {
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--primary-400);
+}
+
+/* Bouton wishlist */
+body.dark-mode .wishlist-btn {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: var(--gray-300);
+}
+
+body.dark-mode .wishlist-btn:hover {
+    background: rgba(51, 65, 85, 1);
+}
+
+/* Inputs et formulaires */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+    color: var(--text-primary);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* Dropdown menu */
+body.dark-mode .dropdown-menu {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Feature cards */
+body.dark-mode .feature-card {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+}
+
+body.dark-mode .feature-card:hover {
+    background: var(--bg-tertiary);
+}
+
+/* Category cards */
+body.dark-mode .category-card {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+}
+
+body.dark-mode .category-card:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ============================================================
+   BOUTON TOGGLE MODE SOMBRE
+   Style discret et élégant qui s'intègre à la nav
+   ============================================================ */
+
+.dark-mode-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark-mode-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dark-mode-btn:hover {
+    background: var(--bg-tertiary);
+    transform: scale(1.05);
+}
+
+/* Icônes soleil et lune */
+.dark-mode-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-primary);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.3s ease;
+    position: absolute;
+}
+
+/* Animation de rotation au clic */
+.dark-mode-btn.rotating svg {
+    animation: rotateIcon 0.5s ease;
+}
+
+@keyframes rotateIcon {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(0.8); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .dark-mode-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .dark-mode-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
