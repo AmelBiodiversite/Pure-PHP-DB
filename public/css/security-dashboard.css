@@ -1,0 +1,1100 @@
+/**
+ * ================================================================
+ * MARKETFLOW PRO - SECURITY DASHBOARD CSS v2.0
+ * ================================================================
+ * 
+ * Styles dédiés au tableau de bord de sécurité admin.
+ * Utilise exclusivement les variables CSS du design system MarketFlow.
+ * Aucun framework externe (zéro Bootstrap).
+ *
+ * DÉPENDANCES :
+ *   - variables.css (palette, spacing, shadows, etc.)
+ *   - reset.css (normalisation)
+ *   - animations.css (keyframes réutilisables)
+ *
+ * @author  A.Devance
+ * @version 2.0
+ * ================================================================
+ */
+
+/* ================================================================
+   VARIABLES SPÉCIFIQUES SÉCURITÉ
+   ================================================================ */
+:root {
+    /* Couleurs de sévérité */
+    --sec-critical: #ef4444;
+    --sec-critical-bg: rgba(239, 68, 68, 0.08);
+    --sec-critical-border: rgba(239, 68, 68, 0.2);
+
+    --sec-warning: #f59e0b;
+    --sec-warning-bg: rgba(245, 158, 11, 0.08);
+    --sec-warning-border: rgba(245, 158, 11, 0.2);
+
+    --sec-info: #3b82f6;
+    --sec-info-bg: rgba(59, 130, 246, 0.08);
+    --sec-info-border: rgba(59, 130, 246, 0.2);
+
+    --sec-success: #10b981;
+    --sec-success-bg: rgba(16, 185, 129, 0.08);
+    --sec-success-border: rgba(16, 185, 129, 0.2);
+
+    /* Surface du dashboard (légèrement teinté sombre) */
+    --sec-surface: #ffffff;
+    --sec-surface-elevated: #ffffff;
+    --sec-surface-sunken: #f8fafc;
+    --sec-border: #e2e8f0;
+    --sec-border-light: #f1f5f9;
+}
+
+/* ================================================================
+   LAYOUT PRINCIPAL DU DASHBOARD
+   ================================================================ */
+
+/* Container principal - s'adapte au layout admin existant */
+.security-dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--space-6);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Header du dashboard avec titre + actions */
+.sec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+/* Titre principal */
+.sec-header__title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Sous-titre avec indicateur temps réel */
+.sec-header__subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* Dot vert pulsant = système actif */
+.sec-header__live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sec-success);
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Groupe de boutons d'action (actualiser, exporter) */
+.sec-header__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+/* ================================================================
+   SCORE DE SANTÉ GLOBAL (nouveau)
+   ================================================================ */
+
+/* Barre de score en haut du dashboard */
+.sec-health {
+    background: var(--sec-surface-elevated);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Score circulaire */
+.sec-health__score {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.sec-health__score svg {
+    transform: rotate(-90deg);
+    width: 100px;
+    height: 100px;
+}
+
+.sec-health__score-bg {
+    fill: none;
+    stroke: var(--sec-border-light);
+    stroke-width: 8;
+}
+
+.sec-health__score-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-out, stroke 0.5s ease;
+}
+
+.sec-health__score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Détails du score */
+.sec-health__details {
+    flex: 1;
+    min-width: 200px;
+}
+
+.sec-health__label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1);
+}
+
+.sec-health__status {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.sec-health__summary {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Variantes du score */
+.sec-health--excellent .sec-health__score-fill { stroke: var(--sec-success); }
+.sec-health--excellent .sec-health__score-text { color: var(--sec-success); }
+.sec-health--excellent .sec-health__status { color: var(--sec-success); }
+
+.sec-health--good .sec-health__score-fill { stroke: var(--sec-info); }
+.sec-health--good .sec-health__score-text { color: var(--sec-info); }
+.sec-health--good .sec-health__status { color: var(--sec-info); }
+
+.sec-health--warning .sec-health__score-fill { stroke: var(--sec-warning); }
+.sec-health--warning .sec-health__score-text { color: var(--sec-warning); }
+.sec-health--warning .sec-health__status { color: var(--sec-warning); }
+
+.sec-health--critical .sec-health__score-fill { stroke: var(--sec-critical); }
+.sec-health--critical .sec-health__score-text { color: var(--sec-critical); }
+.sec-health--critical .sec-health__status { color: var(--sec-critical); }
+
+/* Mini métriques à droite du score */
+.sec-health__metrics {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.sec-health__metric {
+    text-align: center;
+}
+
+.sec-health__metric-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.sec-health__metric-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+}
+
+/* ================================================================
+   CARTES DE STATISTIQUES
+   ================================================================ */
+
+/* Grille des 4 cartes de stats */
+.sec-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+/* Carte individuelle */
+.sec-stat-card {
+    background: var(--sec-surface-elevated);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    box-shadow: var(--shadow-xs);
+}
+
+.sec-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Bande de couleur en haut de la carte */
+.sec-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+/* Variantes de couleur */
+.sec-stat-card--critical { --card-accent: var(--sec-critical); }
+.sec-stat-card--warning  { --card-accent: var(--sec-warning); }
+.sec-stat-card--info     { --card-accent: var(--sec-info); }
+.sec-stat-card--success  { --card-accent: var(--sec-success); }
+
+/* Icône de fond décorative */
+.sec-stat-card__icon {
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+/* Valeur numérique */
+.sec-stat-card__value {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: var(--space-1);
+}
+
+/* Label de la carte */
+.sec-stat-card__label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Tendance (flèche haut/bas + pourcentage) */
+.sec-stat-card__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: var(--space-2);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.sec-stat-card__trend--up {
+    color: var(--sec-critical);
+    background: var(--sec-critical-bg);
+}
+
+.sec-stat-card__trend--down {
+    color: var(--sec-success);
+    background: var(--sec-success-bg);
+}
+
+.sec-stat-card__trend--stable {
+    color: var(--text-secondary);
+    background: var(--sec-surface-sunken);
+}
+
+/* ================================================================
+   BARRE DE FILTRES
+   ================================================================ */
+
+.sec-filters {
+    background: var(--sec-surface-elevated);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-6);
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: flex-end;
+    box-shadow: var(--shadow-xs);
+}
+
+/* Groupe label + input */
+.sec-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 150px;
+}
+
+.sec-filter-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+/* Inputs et selects uniformisés */
+.sec-filter-group input,
+.sec-filter-group select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: var(--sec-surface);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    font-family: inherit;
+    height: 38px;
+}
+
+.sec-filter-group input:focus,
+.sec-filter-group select:focus {
+    outline: none;
+    border-color: var(--primary-400);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Boutons de la barre de filtres */
+.sec-filter-actions {
+    display: flex;
+    gap: var(--space-2);
+    align-self: flex-end;
+}
+
+/* ================================================================
+   BOUTONS (système propre, zéro Bootstrap)
+   ================================================================ */
+
+.sec-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    text-decoration: none;
+    line-height: 1.5;
+    height: 38px;
+}
+
+.sec-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.sec-btn:active {
+    transform: translateY(0);
+}
+
+/* Variantes */
+.sec-btn--primary {
+    background: var(--primary-600);
+    color: #fff;
+    border-color: var(--primary-600);
+}
+.sec-btn--primary:hover {
+    background: var(--primary-700);
+}
+
+.sec-btn--outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--sec-border);
+}
+.sec-btn--outline:hover {
+    background: var(--sec-surface-sunken);
+    color: var(--text-primary);
+    border-color: var(--gray-300);
+}
+
+.sec-btn--danger {
+    background: var(--sec-critical);
+    color: #fff;
+    border-color: var(--sec-critical);
+}
+.sec-btn--danger:hover {
+    background: #dc2626;
+}
+
+.sec-btn--success {
+    background: var(--sec-success);
+    color: #fff;
+    border-color: var(--sec-success);
+}
+.sec-btn--success:hover {
+    background: #059669;
+}
+
+.sec-btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: var(--space-1) var(--space-2);
+}
+.sec-btn--ghost:hover {
+    color: var(--text-primary);
+    background: var(--sec-surface-sunken);
+}
+
+.sec-btn--sm {
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.8rem;
+    height: 30px;
+}
+
+/* État loading */
+.sec-btn--loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.sec-btn--loading::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    top: 50%;
+    left: 50%;
+    margin: -7px 0 0 -7px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ================================================================
+   PANNEAUX / CARTES (sections du dashboard)
+   ================================================================ */
+
+.sec-panel {
+    background: var(--sec-surface-elevated);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-xs);
+}
+
+.sec-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--sec-border-light);
+}
+
+.sec-panel__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.sec-panel__badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    background: var(--sec-info-bg);
+    color: var(--sec-info);
+}
+
+.sec-panel__body {
+    padding: var(--space-5);
+}
+
+.sec-panel__body--flush {
+    padding: 0;
+}
+
+/* ================================================================
+   GRILLE DE GRAPHIQUES (2 colonnes)
+   ================================================================ */
+
+.sec-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+/* Container d'un graphique avec hauteur fixe */
+.sec-chart-container {
+    position: relative;
+    height: 280px;
+    padding: var(--space-2);
+}
+
+/* ================================================================
+   TABLEAU D'ÉVÉNEMENTS
+   ================================================================ */
+
+.sec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.sec-table thead th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    background: var(--sec-surface-sunken);
+    border-bottom: 1px solid var(--sec-border);
+    white-space: nowrap;
+}
+
+.sec-table tbody tr {
+    border-bottom: 1px solid var(--sec-border-light);
+    transition: background var(--transition-fast);
+}
+
+.sec-table tbody tr:hover {
+    background: var(--sec-surface-sunken);
+}
+
+.sec-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.sec-table td {
+    padding: var(--space-3) var(--space-4);
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+/* Cellule avec code (IP, event type) */
+.sec-table .cell-code {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    background: var(--sec-surface-sunken);
+    border-radius: var(--radius-sm);
+    color: var(--primary-700);
+}
+
+/* Cellule tronquée pour les détails longs */
+.sec-table .cell-truncate {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* ================================================================
+   BADGES DE SÉVÉRITÉ
+   ================================================================ */
+
+.sec-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.sec-badge--critical {
+    background: var(--sec-critical-bg);
+    color: var(--sec-critical);
+    border: 1px solid var(--sec-critical-border);
+}
+
+.sec-badge--warning {
+    background: var(--sec-warning-bg);
+    color: var(--sec-warning);
+    border: 1px solid var(--sec-warning-border);
+}
+
+.sec-badge--info {
+    background: var(--sec-info-bg);
+    color: var(--sec-info);
+    border: 1px solid var(--sec-info-border);
+}
+
+.sec-badge--success {
+    background: var(--sec-success-bg);
+    color: var(--sec-success);
+    border: 1px solid var(--sec-success-border);
+}
+
+/* Dot pulsant dans le badge CRITICAL */
+.sec-badge--critical::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sec-critical);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ================================================================
+   IPs SUSPECTES - CARTES COMPACTES
+   ================================================================ */
+
+.sec-ip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.sec-ip-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--sec-border-light);
+    transition: background var(--transition-fast);
+    gap: var(--space-3);
+}
+
+.sec-ip-item:last-child {
+    border-bottom: none;
+}
+
+.sec-ip-item:hover {
+    background: var(--sec-surface-sunken);
+}
+
+.sec-ip-item__address {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 120px;
+}
+
+.sec-ip-item__stats {
+    display: flex;
+    gap: var(--space-4);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+.sec-ip-item__stat {
+    white-space: nowrap;
+}
+
+.sec-ip-item__stat strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Barre de score de menace */
+.sec-threat-bar {
+    width: 60px;
+    height: 6px;
+    background: var(--sec-border-light);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.sec-threat-bar__fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.8s ease-out;
+}
+
+.sec-threat-bar__fill--low    { background: var(--sec-success); }
+.sec-threat-bar__fill--medium { background: var(--sec-warning); }
+.sec-threat-bar__fill--high   { background: var(--sec-critical); }
+
+.sec-ip-item__actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* ================================================================
+   PAGINATION
+   ================================================================ */
+
+.sec-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--sec-border-light);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.sec-pagination__info {
+    font-weight: 500;
+}
+
+.sec-pagination__controls {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.sec-pagination__btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-md);
+    background: var(--sec-surface);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+
+.sec-pagination__btn:hover:not(:disabled) {
+    background: var(--sec-surface-sunken);
+    border-color: var(--gray-300);
+    color: var(--text-primary);
+}
+
+.sec-pagination__btn--active {
+    background: var(--primary-600) !important;
+    color: #fff !important;
+    border-color: var(--primary-600) !important;
+}
+
+.sec-pagination__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ================================================================
+   MODAL DE BLOCAGE IP
+   ================================================================ */
+
+.sec-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.sec-modal-overlay.active {
+    display: flex;
+}
+
+.sec-modal {
+    background: var(--sec-surface-elevated);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    max-width: 480px;
+    width: 90%;
+    box-shadow: var(--shadow-2xl);
+    animation: slideInUpElastic 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.sec-modal__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 var(--space-2);
+    color: var(--text-primary);
+}
+
+.sec-modal__desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-5);
+}
+
+.sec-modal__desc code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--sec-critical);
+    font-weight: 600;
+    background: var(--sec-critical-bg);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.sec-modal__textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--sec-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    color: var(--text-primary);
+    background: var(--sec-surface);
+    transition: border-color var(--transition-fast);
+    margin-bottom: var(--space-5);
+}
+
+.sec-modal__textarea:focus {
+    outline: none;
+    border-color: var(--primary-400);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.sec-modal__label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.sec-modal__actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+/* ================================================================
+   TOAST NOTIFICATIONS (redesign MarketFlow)
+   ================================================================ */
+
+.sec-toast-container {
+    position: fixed;
+    top: var(--space-5);
+    right: var(--space-5);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    pointer-events: none;
+}
+
+.sec-toast {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    min-width: 300px;
+    max-width: 440px;
+    background: var(--sec-surface-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--toast-color, var(--sec-info));
+    animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.sec-toast--success { --toast-color: var(--sec-success); }
+.sec-toast--error   { --toast-color: var(--sec-critical); }
+.sec-toast--warning { --toast-color: var(--sec-warning); }
+.sec-toast--info    { --toast-color: var(--sec-info); }
+
+.sec-toast__icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.sec-toast__message {
+    flex: 1;
+    font-weight: 500;
+}
+
+.sec-toast__close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 2px;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: color var(--transition-fast);
+}
+
+.sec-toast__close:hover {
+    color: var(--text-primary);
+}
+
+/* ================================================================
+   EMPTY STATES
+   ================================================================ */
+
+.sec-empty {
+    text-align: center;
+    padding: var(--space-10) var(--space-4);
+    color: var(--text-secondary);
+}
+
+.sec-empty__icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-3);
+    opacity: 0.5;
+}
+
+.sec-empty__text {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 768px) {
+    .security-dashboard {
+        padding: var(--space-4);
+    }
+
+    .sec-header {
+        flex-direction: column;
+    }
+
+    .sec-health {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sec-health__metrics {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .sec-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sec-filters {
+        flex-direction: column;
+    }
+
+    .sec-filter-group {
+        width: 100%;
+    }
+
+    .sec-charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sec-ip-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sec-ip-item__actions {
+        width: 100%;
+    }
+
+    .sec-table {
+        font-size: 0.8rem;
+    }
+
+    .sec-table td,
+    .sec-table th {
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+@media (max-width: 480px) {
+    .sec-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .sec-stat-card__value {
+        font-size: 1.5rem;
+    }
+}
+
+/* ================================================================
+   ANIMATIONS D'ENTRÉE STAGGERÉES
+   ================================================================ */
+
+.sec-stat-card {
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.sec-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.sec-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.sec-stat-card:nth-child(3) { animation-delay: 0.15s; }
+.sec-stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+.sec-panel {
+    animation: fadeInUp 0.5s ease-out backwards;
+    animation-delay: 0.25s;
+}
+
+/* ================================================================
+   ACCESSIBILITY
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .sec-stat-card,
+    .sec-panel,
+    .sec-toast,
+    .sec-modal {
+        animation: none !important;
+    }
+
+    .sec-health__score-fill {
+        transition: none !important;
+    }
+}
+
+/* Focus visible pour navigation clavier */
+.sec-btn:focus-visible,
+.sec-filter-group input:focus-visible,
+.sec-filter-group select:focus-visible,
+.sec-pagination__btn:focus-visible {
+    outline: 2px solid var(--primary-400);
+    outline-offset: 2px;
+}
+
+/* ================================================================
+   FIN DU CSS SÉCURITÉ
+   ================================================================ */

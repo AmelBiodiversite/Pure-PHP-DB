@@ -30,19 +30,29 @@ class AuthController extends Controller {
 
     /**
      * Constructeur
-     * Initialise le modèle User et démarre la session si nécessaire
+     * Initialise le modèle User et le logger de sécurité
+     * 
+     * ⚠️ NOTE : La session est déjà démarrée dans index.php
+     * On n'appelle PAS session_start() ici pour éviter les doublons
      */
     public function __construct() {
         parent::__construct();
         $this->userModel = new User();
         $this->securityLogger = new SecurityLogger();
 
-
-        // Démarrer la session si pas déjà démarrée
-        // La session est nécessaire pour stocker les infos de connexion
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-            
+        // ✅ La session est déjà démarrée dans index.php
+        // Pas besoin de vérifier ou redémarrer ici
+        
+        // 🛡️ RÉGÉNÉRATION PÉRIODIQUE DE L'ID DE SESSION
+        // Protection supplémentaire contre session hijacking
+        // Régénérer toutes les 15 minutes (900 secondes)
+        if (isset($_SESSION['LAST_REGENERATION'])) {
+            if (time() - $_SESSION['LAST_REGENERATION'] > 900) {
+                session_regenerate_id(true);
+                $_SESSION['LAST_REGENERATION'] = time();
+            }
+        } else {
+            $_SESSION['LAST_REGENERATION'] = time();
         }
     }
 
@@ -130,7 +140,7 @@ class AuthController extends Controller {
             return;
         }
 
-        // 🔐 ÉTAPE 4 : AUTHENTIFIER L'UTILISATEUR
+        // 🔍 ÉTAPE 4 : AUTHENTIFIER L'UTILISATEUR
         // Le modèle User vérifie email + password hashé en base
         $user = $this->userModel->authenticate($email, $password);
 
@@ -390,6 +400,7 @@ class AuthController extends Controller {
         $_SESSION['user_role'] = $user['role']; // admin, seller, buyer
         $_SESSION['logged_in'] = true;
         $_SESSION['login_time'] = time(); // Timestamp de connexion
+        $_SESSION['LAST_REGENERATION'] = time(); // Initialiser le timestamp de régénération
 
         // 🍪 COOKIE "REMEMBER ME" (optionnel)
         if ($remember) {

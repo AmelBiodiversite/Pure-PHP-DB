@@ -95,24 +95,6 @@ ini_set('session.gc_divisor', '100');
 ini_set('session.name', 'MARKETFLOW_SESSION');
 
 /**
- * 🛡️ RÉGÉNÉRATION PÉRIODIQUE DE L'ID
- * Régénérer l'ID de session toutes les 15 minutes
- * Protection supplémentaire contre session hijacking
- * 
- * Note : La régénération complète est déjà faite dans AuthController
- * lors de la connexion (session_regenerate_id(true))
- */
-if (isset($_SESSION['LAST_REGENERATION'])) {
-    // Si plus de 15 minutes depuis la dernière régénération
-    if (time() - $_SESSION['LAST_REGENERATION'] > 900) {
-        session_regenerate_id(true);
-        $_SESSION['LAST_REGENERATION'] = time();
-    }
-} else {
-    $_SESSION['LAST_REGENERATION'] = time();
-}
-
-/**
  * 🌐 PATH ET DOMAIN
  * Path : Chemin où le cookie est valide (/ = tout le site)
  * Domain : Domaine où le cookie est valide (vide = domaine actuel uniquement)
@@ -122,16 +104,38 @@ ini_set('session.cookie_path', '/');
 
 /**
  * 💾 STOCKAGE DES SESSIONS
- * Par défaut : fichiers (/tmp ou /var/lib/php/sessions)
- * Pour un site à fort trafic, considérer Redis ou Memcached
+ * ⚠️ CRITIQUE : Définir explicitement le chemin de stockage
+ * 
+ * Stratégie multi-environnement :
+ * 1. Essayer /tmp/php-sessions (Railway/prod)
+ * 2. Sinon créer et utiliser /tmp/marketflow-sessions (local)
  */
-// ini_set('session.save_handler', 'files'); // Par défaut
-// ini_set('session.save_path', '/path/to/sessions'); // Optionnel
+$sessionPath = '/tmp/php-sessions';
+
+// Si le répertoire n'existe pas, utiliser un chemin alternatif
+if (!is_dir($sessionPath)) {
+    $sessionPath = '/tmp/marketflow-sessions';
+    
+    // Créer le répertoire s'il n'existe pas
+    if (!is_dir($sessionPath)) {
+        mkdir($sessionPath, 0700, true); // 0700 = lecture/écriture proprio uniquement
+    }
+}
+
+// Vérifier que le répertoire est accessible en écriture
+if (!is_writable($sessionPath)) {
+    // Tenter de corriger les permissions
+    @chmod($sessionPath, 0700);
+}
+
+// Définir le chemin de sauvegarde
+ini_set('session.save_path', $sessionPath);
 
 /**
  * ✅ LOG DE DÉMARRAGE (pour debug)
  * En développement uniquement
  */
-if (!$isProduction && PHP_SAPI === 'cli-server') {
+if (!$isProduction) {
     error_log('[SESSION CONFIG] Configuration sécurisée chargée');
+    error_log('[SESSION CONFIG] Save path: ' . $sessionPath);
 }
