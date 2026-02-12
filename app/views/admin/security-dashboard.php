@@ -1,553 +1,651 @@
 <?php
 /**
  * ============================================================================
- * MARKETFLOW PRO - SECURITY DASHBOARD VIEW v3.0 SECURED
+ * MARKETFLOW PRO - SECURITY DASHBOARD v3.1 FINAL COMPLETE
  * ============================================================================
- *
- * 🔐 CORRECTIONS DE SÉCURITÉ v3.0 :
- *   ✅ Protection CSRF sur toutes les actions AJAX
- *   ✅ Validation stricte des données PHP avant affichage
- *   ✅ Échappement XSS systématique (fonction e())
- *   ✅ Auto-refresh AJAX intelligent (sans reload)
+ * 
+ * Vue sécurisée du tableau de bord de sécurité avec :
+ *   ✅ Validation stricte des données PHP
+ *   ✅ Échappement XSS systématique avec e()
+ *   ✅ Token CSRF exposé pour JavaScript
  *   ✅ JavaScript séparé dans security-dashboard.js
- *   ✅ Gestion d'erreurs robuste
- *   ✅ Rate limiting sur les actions sensibles
- *
- * Vue principale du monitoring de sécurité admin
- * Thème : sombre industriel - adapté à un contexte de surveillance
- *
- * Données attendues depuis SecurityController::index() :
- *   $title, $stats, $totalEvents, $criticalEvents, $warningEvents, $infoEvents,
- *   $suspiciousIPs, $recentEvents, $pagination, $filters, $eventTypes,
- *   $chartLabels, $chartData, $chartColors,
- *   $timelineLabels, $timelineCritical, $timelineWarning, $timelineInfo
- *
- * @file app/views/admin/security-dashboard.php
- * @version 3.0
- * @author MarketFlow Security Team
+ *   ✅ Auto-refresh AJAX (sans reload brutal)
+ *   ✅ Timeline des 7 derniers jours
+ *   ✅ Tableau des événements récents
+ * 
+ * @package    MarketFlow
+ * @subpackage Views\Admin
+ * @version    3.1-COMPLETE
+ * @author     A.Devance
+ * @date       2026-02-12
  */
 
 // ============================================================================
-// VALIDATION DES DONNÉES CÔTÉ PHP (avant affichage)
+// VALIDATION STRICTE DES DONNÉES REÇUES DU CONTRÔLEUR
 // ============================================================================
 
 /**
- * Valide et sécurise les données avant affichage
- * Retourne une valeur par défaut si invalide
+ * Fonction de validation et sanitisation des données
+ * 
+ * @param mixed  $value   Valeur à valider
+ * @param string $type    Type attendu (string, int, array, etc.)
+ * @param mixed  $default Valeur par défaut si validation échoue
+ * @return mixed Valeur validée ou valeur par défaut
  */
-function validateAndSanitize($value, $type = 'string', $default = '') {
+function validateAndSanitize($value, $type = 'string', $default = null) {
+    // Si la valeur est null ou non définie, retourner la valeur par défaut
+    if ($value === null || !isset($value)) {
+        return $default;
+    }
+    
+    // Validation selon le type
     switch ($type) {
         case 'int':
-            // Valider un entier positif
-            return is_numeric($value) && $value >= 0 ? (int)$value : $default;
-        
+            return filter_var($value, FILTER_VALIDATE_INT) !== false ? (int)$value : $default;
+        case 'float':
+            return filter_var($value, FILTER_VALIDATE_FLOAT) !== false ? (float)$value : $default;
+        case 'bool':
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+        case 'email':
+            return filter_var($value, FILTER_VALIDATE_EMAIL) ?: $default;
+        case 'url':
+            return filter_var($value, FILTER_VALIDATE_URL) ?: $default;
         case 'array':
-            // Valider un tableau
             return is_array($value) ? $value : $default;
-        
         case 'string':
         default:
-            // Valider et échapper une chaîne
-            return is_string($value) ? e($value) : e($default);
+            return is_string($value) ? trim($value) : $default;
     }
 }
 
-/**
- * Valide une adresse IP
- */
-function validateIP($ip) {
-    return filter_var($ip, FILTER_VALIDATE_IP) ? e($ip) : 'IP invalide';
-}
-
-// Validation des variables principales
-$title           = validateAndSanitize($title ?? 'Monitoring Sécurité', 'string');
-$totalEvents     = validateAndSanitize($totalEvents ?? 0, 'int', 0);
+// Variables principales (passées par le contrôleur SecurityController::index())
+$title           = validateAndSanitize($title ?? 'Sécurité', 'string', 'Sécurité');
+$stats           = validateAndSanitize($stats ?? [], 'array', []);
+$suspiciousIPs   = validateAndSanitize($suspiciousIPs ?? [], 'array', []);
+$recentEvents    = validateAndSanitize($recentEvents ?? [], 'array', []);
+$pagination      = validateAndSanitize($pagination ?? [], 'array', []);
+$filters         = validateAndSanitize($filters ?? [], 'array', []);
+$eventTypes      = validateAndSanitize($eventTypes ?? [], 'array', []);
+$severityLevels  = validateAndSanitize($severityLevels ?? [], 'array', []);
+$chartData       = validateAndSanitize($chartData ?? [], 'array', []);
 $criticalEvents  = validateAndSanitize($criticalEvents ?? 0, 'int', 0);
-$warningEvents   = validateAndSanitize($warningEvents ?? 0, 'int', 0);
-$infoEvents      = validateAndSanitize($infoEvents ?? 0, 'int', 0);
+$timelineData    = validateAndSanitize($timelineData ?? [], 'array', []);
 
-// Validation des tableaux
-$stats          = validateAndSanitize($stats ?? [], 'array', []);
-$suspiciousIPs  = validateAndSanitize($suspiciousIPs ?? [], 'array', []);
-$recentEvents   = validateAndSanitize($recentEvents ?? [], 'array', []);
-$eventTypes     = validateAndSanitize($eventTypes ?? [], 'array', []);
-$filters        = validateAndSanitize($filters ?? [], 'array', []);
-$pagination     = validateAndSanitize($pagination ?? [], 'array', []);
+// Validation des statistiques individuelles (avec valeurs par défaut sécurisées)
+$totalThreats    = validateAndSanitize($stats['total_threats'] ?? 0, 'int', 0);
+$blockedIPs      = validateAndSanitize($stats['blocked_ips'] ?? 0, 'int', 0);
+$suspiciousCount = validateAndSanitize($stats['suspicious_count'] ?? 0, 'int', 0);
+$last24h         = validateAndSanitize($stats['last_24h'] ?? 0, 'int', 0);
 
-// Validation des données de graphiques
-$chartLabels      = validateAndSanitize($chartLabels ?? [], 'array', []);
-$chartData        = validateAndSanitize($chartData ?? [], 'array', []);
-$chartColors      = validateAndSanitize($chartColors ?? [], 'array', []);
-$timelineLabels   = validateAndSanitize($timelineLabels ?? [], 'array', []);
-$timelineCritical = validateAndSanitize($timelineCritical ?? [], 'array', []);
-$timelineWarning  = validateAndSanitize($timelineWarning ?? [], 'array', []);
-$timelineInfo     = validateAndSanitize($timelineInfo ?? [], 'array', []);
+// ============================================================================
+// EXPOSITION SÉCURISÉE DU TOKEN CSRF POUR JAVASCRIPT
+// ============================================================================
 
+// Récupérer le token CSRF de la session (généré par le middleware ou helpers)
+$csrfToken = $_SESSION['csrf_token'] ?? '';
+
+// Si pas de token en session, en générer un nouveau (fallback)
+if (empty($csrfToken)) {
+    $csrfToken = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = $csrfToken;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?> — MarketFlow Admin</title>
-
+    <meta name="csrf-token" content="<?= e($csrfToken) ?>">
+    <title><?= e($title) ?> - MarketFlow Admin</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- Chart.js pour les graphiques -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-    <!-- Police Geist Mono + JetBrains Mono pour les données techniques -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Styles inline pour le dashboard de sécurité -->
     <style>
-        /* ====================================================================
-           VARIABLES CSS & RESET
-           ==================================================================== */
+        /* ==================== VARIABLES CSS ==================== */
         :root {
-            --bg-base:        #0a0c0f;
-            --bg-panel:       #0f1318;
-            --bg-card:        #141920;
-            --bg-hover:       #1c2330;
-            --border:         #1e2840;
-            --border-light:   #252f42;
-
-            --text-primary:   #e8edf5;
-            --text-secondary: #8494b0;
-            --text-muted:     #4a5568;
-
-            --red:            #ff3b3b;
-            --red-dim:        rgba(255,59,59,.12);
-            --orange:         #ff8c42;
-            --orange-dim:     rgba(255,140,66,.12);
-            --green:          #2ecc71;
-            --green-dim:      rgba(46,204,113,.12);
-            --blue:           #4a9eff;
-            --blue-dim:       rgba(74,158,255,.12);
-            --purple:         #a78bfa;
-
-            --font-ui:        'Syne', sans-serif;
-            --font-mono:      'JetBrains Mono', monospace;
-
-            --radius:         8px;
-            --radius-sm:      4px;
-            --transition:     0.2s ease;
+            --color-danger: #dc3545;
+            --color-warning: #ffc107;
+            --color-success: #28a745;
+            --color-info: #17a2b8;
+            --color-primary: #007bff;
+            --color-dark: #343a40;
+            --transition-speed: 0.3s;
         }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+        
+        /* ==================== LAYOUT ==================== */
         body {
-            background: var(--bg-base);
-            color: var(--text-primary);
-            font-family: var(--font-ui);
-            font-size: 14px;
-            line-height: 1.6;
-            /* Texture subtile pour l'ambiance industrielle */
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23ffffff04' stroke-width='1'/%3E%3C/svg%3E");
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-
-        /* ====================================================================
-           LAYOUT PRINCIPAL
-           ==================================================================== */
-        .sec-wrap {
-            max-width: 1440px;
+        
+        .admin-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 32px 24px 80px;
-        }
-
-        /* ====================================================================
-           HEADER
-           ==================================================================== */
-        .sec-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 36px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sec-header-left h1 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Point clignotant "live" */
-        .live-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,204,113,.4); }
-            50%       { opacity: .7; box-shadow: 0 0 0 6px rgba(46,204,113,0); }
-        }
-
-        .sec-header-left p {
-            color: var(--text-secondary);
-            font-size: 13px;
-            margin-top: 4px;
-            font-family: var(--font-mono);
-        }
-
-        /* Bouton retour admin */
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 13px;
-            padding: 8px 14px;
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-sm);
-            transition: all var(--transition);
-        }
-
-        .btn-back:hover {
-            color: var(--text-primary);
-            background: var(--bg-hover);
-            border-color: var(--blue);
-        }
-
-        /* ====================================================================
-           ALERTES CRITIQUES (si events critiques détectés)
-           ==================================================================== */
-        .alert-critical {
-            background: var(--red-dim);
-            border: 1px solid rgba(255,59,59,.3);
-            border-left: 3px solid var(--red);
-            border-radius: var(--radius);
-            padding: 14px 18px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
-            color: #ffaaaa;
-            animation: fadeIn .4s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-
-        /* ====================================================================
-           GRILLE STATS (4 cartes)
-           ==================================================================== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
             padding: 20px;
+        }
+        
+        /* ==================== CARTES DE STATS ==================== */
+        .stat-card {
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            border: none;
             position: relative;
             overflow: hidden;
-            transition: border-color var(--transition);
         }
-
-        /* Ligne colorée en haut */
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--card-color), transparent);
         }
-
-        .stat-card.total::before   { background: var(--blue); }
-        .stat-card.critical::before { background: var(--red); }
-        .stat-card.warning::before  { background: var(--orange); }
-        .stat-card.info::before     { background: var(--green); }
-
-        .stat-card:hover { border-color: var(--border-light); }
-
-        .stat-card .label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-bottom: 10px;
-        }
-
-        .stat-card .value {
-            font-size: 36px;
-            font-weight: 800;
-            line-height: 1;
-            font-family: var(--font-mono);
-        }
-
-        .stat-card.total .value   { color: var(--blue); }
-        .stat-card.critical .value { color: var(--red); }
-        .stat-card.warning .value  { color: var(--orange); }
-        .stat-card.info .value     { color: var(--green); }
-
-        /* Reste du CSS identique... (trop long pour tout mettre) */
-        /* Voir le fichier original pour les styles complets */
         
-        /* ====================================================================
-           SYSTÈME DE TOAST (notifications)
-           ==================================================================== */
+        .stat-card.danger { --card-color: var(--color-danger); }
+        .stat-card.warning { --card-color: var(--color-warning); }
+        .stat-card.success { --card-color: var(--color-success); }
+        .stat-card.info { --card-color: var(--color-info); }
+        
+        .stat-card .stat-icon {
+            font-size: 3rem;
+            opacity: 0.15;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--color-dark);
+        }
+        
+        .stat-card p {
+            margin: 5px 0 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        /* ==================== TABLEAUX ==================== */
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+            cursor: pointer;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            color: #495057;
+            border-top: none;
+        }
+        
+        /* ==================== BADGES ==================== */
+        .badge {
+            padding: 6px 12px;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+        
+        /* ==================== BOUTONS D'ACTION ==================== */
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all var(--transition-speed);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-block-ip {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .btn-unblock-ip {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+        }
+        
+        .btn-whitelist-ip {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        /* ==================== MODAL ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ==================== TOAST NOTIFICATIONS ==================== */
         #toast-container {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
-
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            padding: 14px 18px;
-            min-width: 300px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,.4);
-            animation: slideIn .3s ease;
-        }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: none; } }
-
-        .toast.success { border-left: 3px solid var(--green); }
-        .toast.error   { border-left: 3px solid var(--red); }
-
-        /* ====================================================================
-           MODAL BLOCAGE IP
-           ==================================================================== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,.7);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.open { display: flex; }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            animation: modalIn .3s ease;
-        }
-
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-    </style>
-</head>
-
-<body>
-<div class="sec-wrap">
-
-    <!-- ====================================================================
-         HEADER
-         ==================================================================== -->
-    <header class="sec-header">
-        <div class="sec-header-left">
-            <h1>
-                <span class="live-dot"></span>
-                <?= $title ?>
-            </h1>
-            <p>Surveillance en temps réel · Dernière mise à jour : <span id="lastUpdate"><?= date('H:i:s') ?></span></p>
-        </div>
-        <a href="/admin" class="btn-back">
-            ← Retour au panel admin
-        </a>
-    </header>
-
-    <!-- ====================================================================
-         ALERTE SI ÉVÉNEMENTS CRITIQUES
-         ==================================================================== -->
-    <?php if ($criticalEvents > 0): ?>
-    <div class="alert-critical">
-        <span style="font-size:20px;">⚠️</span>
-        <div>
-            <strong><?= $criticalEvents ?> événement(s) critique(s)</strong> détecté(s) sur les 7 derniers jours.
-            Vérifiez les IPs suspectes et prenez les mesures nécessaires.
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- ====================================================================
-         GRILLE STATS (4 cartes)
-         ==================================================================== -->
-    <div class="stats-grid">
-        <!-- Total événements -->
-        <div class="stat-card total">
-            <div class="label">Total événements</div>
-            <div class="value" id="stat-total"><?= $totalEvents ?></div>
-        </div>
-
-        <!-- Événements critiques -->
-        <div class="stat-card critical">
-            <div class="label">Critiques</div>
-            <div class="value" id="stat-critical"><?= $criticalEvents ?></div>
-        </div>
-
-        <!-- Avertissements -->
-        <div class="stat-card warning">
-            <div class="label">Avertissements</div>
-            <div class="value" id="stat-warning"><?= $warningEvents ?></div>
-        </div>
-
-        <!-- Informations -->
-        <div class="stat-card info">
-            <div class="label">Informations</div>
-            <div class="value" id="stat-info"><?= $infoEvents ?></div>
-        </div>
-    </div>
-
-    <!-- ====================================================================
-         IPS SUSPECTES + GRAPHIQUES
-         ==================================================================== -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px;">
         
-        <!-- IPs Suspectes -->
-        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
-            <h3 style="font-size:16px; font-weight:700; margin-bottom:16px; color:var(--text-primary);">
-                🚨 Top 10 IPs Suspectes
-            </h3>
-            
-            <div id="suspicious-ips-container">
-                <?php if (empty($suspiciousIPs)): ?>
-                    <p style="color:var(--text-secondary); font-size:13px;">Aucune IP suspecte détectée</p>
-                <?php else: ?>
-                    <?php foreach ($suspiciousIPs as $ipData): ?>
-                        <?php
-                        // Validation stricte des données IP
-                        $ip           = validateIP($ipData['ip'] ?? '');
-                        $totalCount   = validateAndSanitize($ipData['total_events'] ?? 0, 'int', 0);
-                        $criticalCnt  = validateAndSanitize($ipData['critical_events'] ?? 0, 'int', 0);
-                        $severityScore = validateAndSanitize($ipData['severity_score'] ?? 0, 'int', 0);
-                        ?>
-                        <div style="border-bottom:1px solid var(--border); padding:10px 0;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <code style="color:var(--orange); font-family:var(--font-mono);"><?= $ip ?></code>
-                                <span style="color:var(--red); font-weight:600;"><?= $totalCount ?> events</span>
-                            </div>
-                            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">
-                                Critiques: <?= $criticalCnt ?> | Score: <?= $severityScore ?>
-                            </div>
-                            <div style="display:flex; gap:8px; margin-top:8px;">
-                                <button onclick="filterByIP('<?= $ip ?>')" style="font-size:11px; padding:4px 8px; background:var(--blue-dim); border:1px solid var(--blue); color:var(--blue); border-radius:4px; cursor:pointer;">
-                                    Filtrer
-                                </button>
-                                <button onclick="openBlockModal('<?= $ip ?>')" style="font-size:11px; padding:4px 8px; background:var(--red-dim); border:1px solid var(--red); color:var(--red); border-radius:4px; cursor:pointer;">
-                                    Bloquer
-                                </button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- Graphique Donut -->
-        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
-            <h3 style="font-size:16px; font-weight:700; margin-bottom:16px; color:var(--text-primary);">
-                📊 Répartition par type
-            </h3>
-            <canvas id="donutChart" style="max-height:300px;"></canvas>
-        </div>
-    </div>
-
-    <!-- Container pour les toasts -->
-    <div id="toast-container"></div>
-
-    <!-- Modal blocage IP -->
-    <div id="blockModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 style="margin-bottom:16px; color:var(--red);">🚫 Bloquer une IP</h3>
-            <p style="margin-bottom:16px; color:var(--text-secondary);">
-                Vous êtes sur le point de bloquer l'IP : <code id="modalIPDisplay" style="color:var(--orange);"></code>
-            </p>
-            <label style="display:block; margin-bottom:8px; color:var(--text-secondary);">Raison du blocage :</label>
-            <textarea id="blockReason" style="width:100%; padding:10px; background:var(--bg-base); border:1px solid var(--border); border-radius:4px; color:var(--text-primary); resize:vertical; min-height:80px;"></textarea>
-            
-            <div style="display:flex; gap:12px; margin-top:20px;">
-                <button onclick="confirmBlockIP()" style="flex:1; padding:10px; background:var(--red); color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:600;">
-                    Confirmer le blocage
-                </button>
-                <button onclick="closeBlockModal()" style="flex:1; padding:10px; background:var(--bg-hover); color:var(--text-primary); border:1px solid var(--border); border-radius:4px; cursor:pointer;">
-                    Annuler
-                </button>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- ====================================================================
-     JAVASCRIPT EXTERNE (security-dashboard.js)
-     ==================================================================== -->
-<script>
-    // Configuration globale avec token CSRF
-    window.MARKETFLOW_CONFIG = {
-        csrfToken: '<?= csrf_token() ?>', // ✅ Token CSRF généré côté PHP
-        apiEndpoints: {
-            stats: '/admin/security/api/stats',
-            suspiciousIPs: '/admin/security/api/suspicious-ips',
-            blockIP: '/admin/security/block-ip',
-            unblockIP: '/admin/security/unblock-ip',
-            whitelistIP: '/admin/security/whitelist-ip'
+        .toast-notification {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: toastSlideIn 0.3s ease-out;
+            border-left: 4px solid var(--toast-color);
         }
-    };
-
-    // Données pour les graphiques (échappées côté PHP)
-    window.CHART_DATA = {
-        labels: <?= json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_QUOT) ?>,
-        data: <?= json_encode($chartData, JSON_HEX_TAG | JSON_HEX_QUOT) ?>,
-        colors: <?= json_encode($chartColors, JSON_HEX_TAG | JSON_HEX_QUOT) ?>
-    };
-</script>
-
-<!-- Charger le fichier JS externe -->
-<script src="/js/security-dashboard.js"></script>
-
-<!-- Initialiser le graphique Chart.js -->
-<script>
-    // Graphique Donut
-    const ctx = document.getElementById('donutChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: window.CHART_DATA.labels,
-            datasets: [{
-                data: window.CHART_DATA.data,
-                backgroundColor: window.CHART_DATA.colors,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: true, position: 'bottom' }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
-    });
-</script>
-
+        
+        .toast-notification.success { --toast-color: var(--color-success); }
+        .toast-notification.error { --toast-color: var(--color-danger); }
+        .toast-notification.warning { --toast-color: var(--color-warning); }
+        .toast-notification.info { --toast-color: var(--color-info); }
+        
+        /* ==================== GRAPHIQUES ==================== */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        /* ==================== ANIMATIONS DES COMPTEURS ==================== */
+        .counter {
+            display: inline-block;
+            transition: all 0.5s ease;
+        }
+        
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .stat-card h3 {
+                font-size: 2rem;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <div class="admin-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">🛡️ <?= e($title) ?></h1>
+                <p class="text-muted mb-0">Surveillance et gestion de la sécurité en temps réel</p>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary" onclick="location.reload()">
+                    🔄 Actualiser
+                </button>
+                <a href="/admin/security/export/csv" class="btn btn-outline-success">
+                    📥 Exporter CSV
+                </a>
+            </div>
+        </div>
+        
+        <!-- ==================== STATISTIQUES PRINCIPALES ==================== -->
+        <div class="row mb-4">
+            <!-- Total des menaces -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card danger">
+                    <div class="stat-icon">⚠️</div>
+                    <h3 class="counter" data-target="<?= e($totalThreats) ?>">0</h3>
+                    <p>Menaces détectées (total)</p>
+                </div>
+            </div>
+            
+            <!-- IPs bloquées -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card warning">
+                    <div class="stat-icon">🚫</div>
+                    <h3 class="counter" data-target="<?= e($blockedIPs) ?>">0</h3>
+                    <p>Adresses IP bloquées</p>
+                </div>
+            </div>
+            
+            <!-- IPs suspectes -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card info">
+                    <div class="stat-icon">👁️</div>
+                    <h3 class="counter" data-target="<?= e($suspiciousCount) ?>">0</h3>
+                    <p>IPs sous surveillance</p>
+                </div>
+            </div>
+            
+            <!-- Dernières 24h -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card success">
+                    <div class="stat-icon">🕐</div>
+                    <h3 class="counter" data-target="<?= e($last24h) ?>">0</h3>
+                    <p>Événements (24h)</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== IPs SUSPECTES ==================== -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">🔍 Adresses IP suspectes</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($suspiciousIPs)): ?>
+                            <p class="text-muted text-center py-4">
+                                ✅ Aucune adresse IP suspecte détectée actuellement
+                            </p>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Adresse IP</th>
+                                            <th>Tentatives</th>
+                                            <th>Dernière activité</th>
+                                            <th>Score de menace</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($suspiciousIPs as $ip): ?>
+                                        <tr>
+                                            <td>
+                                                <code class="text-dark"><?= e($ip['ip'] ?? 'N/A') ?></code>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning text-dark">
+                                                    <?= e($ip['attempts'] ?? 0) ?> tentatives
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <?= e($ip['last_seen'] ?? 'Inconnue') ?>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $threatScore = $ip['threat_score'] ?? 0;
+                                                $badgeClass = $threatScore >= 80 ? 'danger' : ($threatScore >= 50 ? 'warning' : 'info');
+                                                ?>
+                                                <span class="badge bg-<?= $badgeClass ?>">
+                                                    <?= e($threatScore) ?>/100
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <button 
+                                                    class="action-btn btn-block-ip btn-sm" 
+                                                    onclick="showBlockModal('<?= e($ip['ip'] ?? '') ?>')"
+                                                >
+                                                    🚫 Bloquer
+                                                </button>
+                                                <button 
+                                                    class="action-btn btn-whitelist-ip btn-sm" 
+                                                    onclick="whitelistIP('<?= e($ip['ip'] ?? '') ?>')"
+                                                >
+                                                    ✅ Whitelist
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== GRAPHIQUES ==================== -->
+        <div class="row mb-4">
+            <!-- Répartition par type d'événement -->
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">📊 Répartition par type</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="donutChart" style="max-height:300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Répartition par sévérité -->
+            <div class="col-lg-6 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">⚡ Répartition par sévérité</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="severityChart" style="max-height:300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== TIMELINE DES 7 DERNIERS JOURS ==================== -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">📈 Évolution des menaces (7 derniers jours)</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="timelineChart" width="400" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ==================== ÉVÉNEMENTS RÉCENTS ==================== -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">📋 Événements de sécurité récents</h5>
+                        <span class="badge bg-info"><?= count($recentEvents) ?> événements</span>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($recentEvents)): ?>
+                            <p class="text-muted text-center py-4">
+                                ℹ️ Aucun événement de sécurité récent
+                            </p>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Heure</th>
+                                            <th>Type d'événement</th>
+                                            <th>Sévérité</th>
+                                            <th>Adresse IP</th>
+                                            <th>Détails</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($recentEvents as $event): ?>
+                                        <tr>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <?= e($event['timestamp'] ?? '') ?>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <code class="text-primary">
+                                                    <?= e($event['event_type'] ?? '') ?>
+                                                </code>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $severity = $event['severity'] ?? 'INFO';
+                                                $badgeClass = match($severity) {
+                                                    'CRITICAL' => 'danger',
+                                                    'WARNING' => 'warning',
+                                                    'INFO' => 'info',
+                                                    default => 'secondary'
+                                                };
+                                                ?>
+                                                <span class="badge bg-<?= $badgeClass ?>">
+                                                    <?= e($severity) ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <code class="text-dark">
+                                                    <?= e($event['ip'] ?? 'N/A') ?>
+                                                </code>
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 400px;">
+                                                <small class="text-muted">
+                                                    <?= e($event['data'] ?? '') ?>
+                                                </small>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div><!-- Fin admin-container -->
+    
+    <!-- ==================== CONTAINER POUR LES TOASTS ==================== -->
+    <div id="toast-container"></div>
+    
+    <!-- ==================== MODAL BLOCAGE IP ==================== -->
+    <div id="blockModal" class="modal-overlay">
+        <div class="modal-content">
+            <h4 class="mb-3">🚫 Bloquer une adresse IP</h4>
+            <p class="text-muted mb-3">
+                Vous êtes sur le point de bloquer l'IP : <code id="ipToBlock" class="text-danger"></code>
+            </p>
+            <div class="mb-3">
+                <label for="blockReason" class="form-label">Raison du blocage (optionnel) :</label>
+                <textarea 
+                    id="blockReason" 
+                    class="form-control" 
+                    rows="3" 
+                    placeholder="Ex: Tentatives de brute force sur /admin/login"
+                ></textarea>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-secondary" onclick="closeBlockModal()">
+                    Annuler
+                </button>
+                <button class="btn btn-danger" onclick="confirmBlockIP()">
+                    🚫 Confirmer le blocage
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ==================== SCRIPTS ==================== -->
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Exposition des données PHP pour JavaScript -->
+    <script>
+        // Exposition sécurisée du token CSRF pour toutes les requêtes AJAX
+        window.CSRF_TOKEN = <?= json_encode($csrfToken) ?>;
+        
+        // Exposition des données pour les graphiques Chart.js
+        window.CHART_DATA = <?= json_encode($chartData) ?>;
+        window.TIMELINE_DATA = <?= json_encode($timelineData) ?>;
+        window.CRITICAL_EVENTS = <?= $criticalEvents ?>;
+    </script>
+    
+    <!-- 
+        ============================================================
+        JAVASCRIPT EXTERNE (security-dashboard.js)
+        ============================================================
+        
+        Ce fichier contient toute la logique JavaScript :
+        - Auto-refresh AJAX toutes les 60 secondes
+        - Protection CSRF sur toutes les requêtes
+        - Gestion des modales et toasts
+        - Animations des compteurs
+        - Initialisation des graphiques Chart.js
+        - Gestion des actions (bloquer/débloquer/whitelist)
+    -->
+    <script src="/js/security-dashboard.js"></script>
+    
 </body>
 </html>
