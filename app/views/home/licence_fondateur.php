@@ -621,67 +621,6 @@
 </section>
 
 <!-- ============================================
-     TÉMOIGNAGES
-     ============================================ -->
-<section class="section-licence" style="background: #f9fafb;">
-    <div class="container">
-        <h2>Ce que disent les premiers utilisateurs</h2>
-        
-        <div style="max-width: 800px; margin: 40px auto;">
-            
-            <!-- Témoignage 1 -->
-            <div class="testimonial">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar">M</div>
-                    <div>
-                        <div class="testimonial-name">Marc D.</div>
-                        <div class="testimonial-role">CTO, Agence web Paris</div>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "On a facturé 18k€ à notre premier client pour une marketplace de formations. 
-                    Installation en 2 jours, customisation en 1 semaine. Le code est propre, 
-                    la doc en français est un vrai plus. ROI immédiat."
-                </p>
-            </div>
-            
-            <!-- Témoignage 2 -->
-            <div class="testimonial">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar">S</div>
-                    <div>
-                        <div class="testimonial-name">Sarah K.</div>
-                        <div class="testimonial-role">Founder, Marketplace créateurs Lyon</div>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "J'avais budgété 35k€ pour faire développer ma marketplace. 
-                    Avec MarketFlow, j'ai économisé 30k€ et je suis en prod depuis 3 semaines. 
-                    Le dashboard vendeur est exactement ce dont j'avais besoin."
-                </p>
-            </div>
-            
-            <!-- Témoignage 3 -->
-            <div class="testimonial">
-                <div class="testimonial-header">
-                    <div class="testimonial-avatar">T</div>
-                    <div>
-                        <div class="testimonial-name">Thomas R.</div>
-                        <div class="testimonial-role">Dev freelance, Toulouse</div>
-                    </div>
-                </div>
-                <p class="testimonial-text">
-                    "Le code est vraiment pro : architecture MVC clean, commentaires utiles, 
-                    pas de dette technique. J'ai pu ajouter mes features customs en 2 jours. 
-                    Parfait comme base pour mes clients."
-                </p>
-            </div>
-            
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
      FAQ
      ============================================ -->
 <section class="section-licence">
