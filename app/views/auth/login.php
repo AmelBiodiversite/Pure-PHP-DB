@@ -204,34 +204,6 @@
                 </div>
             </div>
 
-            <!-- Remember me -->
-            <div style="margin-bottom: var(--space-6);">
-                <label style="
-                    display: flex;
-                    align-items: center;
-                    gap: var(--space-2);
-                    cursor: pointer;
-                    padding: var(--space-2);
-                    border-radius: 8px;
-                    transition: background 0.2s;
-                " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                    <input 
-                        type="checkbox" 
-                        name="remember" 
-                        style="
-                            width: 20px;
-                            height: 20px;
-                            cursor: pointer;
-                            accent-color: #667eea;
-                            flex-shrink: 0;
-                        "
-                    >
-                    <span style="font-size: 0.9rem; color: #64748b;">
-                        Se souvenir de moi
-                    </span>
-                </label>
-            </div>
-
             <!-- Bouton de connexion -->
             <button type="submit" style="
                 width: 100%;
