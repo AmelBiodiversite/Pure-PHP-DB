@@ -1,8 +1,8 @@
 /**
  * ================================================================
- * MARKETFLOW PRO - MODE SOMBRE v1.0
+ * MARKETFLOW PRO - MODE SOMBRE v2.0 COMPLET
  * ================================================================
- * Extension élégante du design system existant
+ * Stylise TOUTE la page, pas seulement le header
  * Fichier : public/css/dark-mode.css
  * ================================================================
  */
@@ -45,16 +45,85 @@ body.dark-mode {
 }
 
 /* ============================================================
-   AJUSTEMENTS SPÉCIFIQUES MODE SOMBRE
+   ÉLÉMENTS DE BASE - Transition fluide
    ============================================================ */
 
-/* Navigation */
+/* Body - Background principal + transition */
+body.dark-mode {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tous les conteneurs principaux */
+body.dark-mode .container,
+body.dark-mode main,
+body.dark-mode section {
+    background-color: transparent;
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
 body.dark-mode nav {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--gray-200);
 }
 
-/* Cards produits */
+body.dark-mode nav a {
+    color: var(--text-primary);
+}
+
+body.dark-mode nav a:hover {
+    color: var(--primary-400);
+}
+
+/* ============================================================
+   SECTIONS ET BACKGROUNDS
+   ============================================================ */
+
+/* Section Hero */
+body.dark-mode .hero-section {
+    background: var(--bg-primary);
+}
+
+/* Toutes les sections */
+body.dark-mode .categories-section,
+body.dark-mode .products-section,
+body.dark-mode .features-section,
+body.dark-mode .cta-section {
+    background: var(--bg-primary);
+}
+
+/* Titres de section */
+body.dark-mode .section-title,
+body.dark-mode .hero-title,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: var(--text-primary);
+}
+
+/* Sous-titres */
+body.dark-mode .hero-subtitle,
+body.dark-mode .section-subtitle {
+    color: var(--text-secondary);
+}
+
+/* Paragraphes */
+body.dark-mode p {
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   CARDS - Produits, Catégories, Features
+   ============================================================ */
+
+/* Product Cards */
 body.dark-mode .product-card {
     background: var(--bg-secondary);
     border-color: var(--gray-200);
@@ -75,6 +144,16 @@ body.dark-mode .product-footer {
     border-top-color: var(--gray-200);
 }
 
+/* Titre produit */
+body.dark-mode .product-title,
+body.dark-mode .product-title a {
+    color: var(--text-primary);
+}
+
+body.dark-mode .product-card:hover .product-title {
+    color: var(--primary-400);
+}
+
 /* Badge catégorie */
 body.dark-mode .product-badge {
     background: rgba(30, 41, 59, 0.95);
@@ -91,28 +170,21 @@ body.dark-mode .wishlist-btn:hover {
     background: rgba(51, 65, 85, 1);
 }
 
-/* Inputs et formulaires */
-body.dark-mode input,
-body.dark-mode textarea,
-body.dark-mode select {
+/* Category Cards */
+body.dark-mode .category-card {
     background: var(--bg-secondary);
     border-color: var(--gray-200);
+}
+
+body.dark-mode .category-card:hover {
+    background: var(--bg-tertiary);
+}
+
+body.dark-mode .category-title {
     color: var(--text-primary);
 }
 
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-    color: var(--text-tertiary);
-}
-
-/* Dropdown menu */
-body.dark-mode .dropdown-menu {
-    background: var(--bg-secondary);
-    border-color: var(--gray-200);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-}
-
-/* Feature cards */
+/* Feature Cards */
 body.dark-mode .feature-card {
     background: var(--bg-secondary);
     border-color: var(--gray-200);
@@ -122,14 +194,180 @@ body.dark-mode .feature-card:hover {
     background: var(--bg-tertiary);
 }
 
-/* Category cards */
-body.dark-mode .category-card {
+body.dark-mode .feature-title {
+    color: var(--text-primary);
+}
+
+body.dark-mode .feature-description {
+    color: var(--text-secondary);
+}
+
+/* ============================================================
+   FORMULAIRES ET INPUTS
+   ============================================================ */
+
+/* Inputs */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
     background: var(--bg-secondary);
+    border-color: var(--gray-200);
+    color: var(--text-primary);
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+    border-color: var(--primary-500);
+    background: var(--bg-tertiary);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* Boutons */
+body.dark-mode .btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     border-color: var(--gray-200);
 }
 
-body.dark-mode .category-card:hover {
+body.dark-mode .btn:hover {
     background: var(--bg-tertiary);
+}
+
+body.dark-mode .btn-primary {
+    background: var(--primary-600);
+    color: white;
+    border-color: var(--primary-600);
+}
+
+body.dark-mode .btn-primary:hover {
+    background: var(--primary-700);
+}
+
+/* ============================================================
+   DROPDOWN MENUS
+   ============================================================ */
+body.dark-mode .dropdown-menu {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .dropdown-menu a {
+    color: var(--text-primary);
+}
+
+body.dark-mode .dropdown-menu a:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ============================================================
+   LIENS
+   ============================================================ */
+body.dark-mode a {
+    color: var(--primary-400);
+}
+
+body.dark-mode a:hover {
+    color: var(--primary-300);
+}
+
+/* ============================================================
+   CTA SECTION
+   ============================================================ */
+
+/* La section CTA garde son gradient bleu même en mode sombre */
+body.dark-mode .cta-card {
+    /* On garde le gradient bleu original car il est déjà contrasté */
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #2563eb 100%);
+}
+
+body.dark-mode .cta-title,
+body.dark-mode .cta-description {
+    color: white; /* Toujours blanc sur le gradient */
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+body.dark-mode table {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+body.dark-mode th {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--gray-200);
+}
+
+body.dark-mode td {
+    border-color: var(--gray-200);
+}
+
+body.dark-mode tr:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ============================================================
+   BADGES ET LABELS
+   ============================================================ */
+body.dark-mode .badge {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+body.dark-mode .label {
+    color: var(--text-secondary);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+body.dark-mode footer {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-top: 1px solid var(--gray-200);
+}
+
+body.dark-mode footer a {
+    color: var(--text-secondary);
+}
+
+body.dark-mode footer a:hover {
+    color: var(--primary-400);
+}
+
+/* ============================================================
+   MESSAGES ET NOTIFICATIONS
+   ============================================================ */
+body.dark-mode .alert,
+body.dark-mode .notification {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+    color: var(--text-primary);
+}
+
+body.dark-mode .alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+body.dark-mode .alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+body.dark-mode .alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: var(--warning);
+    color: var(--warning);
 }
 
 /* ============================================================
@@ -188,7 +426,56 @@ body.dark-mode .category-card:hover {
     100% { transform: rotate(360deg) scale(1); }
 }
 
-/* Responsive - Mobile */
+/* ============================================================
+   PAGES SPÉCIFIQUES
+   ============================================================ */
+
+/* Page d'accueil */
+body.dark-mode .home-section {
+    background: var(--bg-primary);
+}
+
+/* Page produit détail */
+body.dark-mode .product-detail {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Page panier */
+body.dark-mode .cart-item {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+}
+
+/* Page compte */
+body.dark-mode .account-card {
+    background: var(--bg-secondary);
+    border-color: var(--gray-200);
+}
+
+/* ============================================================
+   SCROLLBAR (optionnel mais élégant)
+   ============================================================ */
+body.dark-mode::-webkit-scrollbar {
+    width: 12px;
+}
+
+body.dark-mode::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 6px;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* ============================================================
+   RESPONSIVE - Mobile
+   ============================================================ */
 @media (max-width: 768px) {
     .dark-mode-btn {
         width: 40px;
@@ -199,4 +486,23 @@ body.dark-mode .category-card:hover {
         width: 18px;
         height: 18px;
     }
+}
+
+/* ============================================================
+   TRANSITIONS GLOBALES
+   Ajoute une transition fluide sur tous les éléments
+   ============================================================ */
+body.dark-mode * {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease;
+}
+
+/* Sauf pour les éléments qui ont déjà leur propre transition */
+body.dark-mode *[style*="transition"],
+body.dark-mode .btn,
+body.dark-mode .product-card,
+body.dark-mode .category-card,
+body.dark-mode .feature-card {
+    transition: all 0.3s ease;
 }

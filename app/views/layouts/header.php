@@ -252,7 +252,7 @@
                     <!-- Panier -->
                     <?php 
                     $cartModel = new \App\Models\Cart();
-                    $cartCount = $cartModel->getCount($_SESSION["user_id"]);
+                    $cartCount = $cartModel->count();
                     ?>
                     <a href="/cart" style="position:relative;">
                         🛒
@@ -276,7 +276,7 @@
                     <!-- User Dropdown -->
                     <?php 
                     $userModel = new \App\Models\User();
-                    $currentUser = $userModel->findById($_SESSION["user_id"]);
+                    $currentUser = $userModel->find($_SESSION["user_id"]);
                     ?>
 
                     <div class="relative" data-dropdown>

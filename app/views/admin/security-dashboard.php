@@ -172,14 +172,23 @@ $blockedIPsCount = validateAndSanitize($stats['blocked_ips'] ?? 0, 'int', 0);
         </div>
     </header>
 
-    <!-- ==================== SCORE DE SANTÉ GLOBAL ==================== -->
+
+
+<!-- ==================== SCORE DE SANTÉ GLOBAL ==================== -->
+    <!-- Encadré principal du score, la classe sec-health--excellent/good/warning/critical
+         change la couleur du cercle et du texte automatiquement via le CSS -->
     <div class="sec-health sec-health--<?= $healthClass ?>">
-        <!-- Cercle SVG du score -->
+
+        <!-- Cercle SVG animé qui affiche le score visuellement -->
         <div class="sec-health__score">
+            <!-- viewBox 100x100 = on travaille dans un carré de 100px -->
             <svg viewBox="0 0 100 100">
-                <!-- Cercle de fond -->
+                <!-- Cercle de fond gris (toujours visible à 100%) -->
                 <circle class="sec-health__score-bg" cx="50" cy="50" r="42"/>
-                <!-- Cercle de progression (animé via stroke-dashoffset) -->
+                <!-- Cercle de progression coloré
+                     stroke-dasharray = périmètre total du cercle (264)
+                     stroke-dashoffset = portion NON remplie (calculée en PHP)
+                     Plus le score est haut, plus le cercle est rempli -->
                 <circle 
                     class="sec-health__score-fill" 
                     cx="50" cy="50" r="42"
@@ -187,18 +196,20 @@ $blockedIPsCount = validateAndSanitize($stats['blocked_ips'] ?? 0, 'int', 0);
                     stroke-dashoffset="<?= $dashOffset ?>"
                 />
             </svg>
-            <!-- Valeur numérique au centre -->
+            <!-- Valeur numérique centrée dans le cercle (position:absolute dans le CSS) -->
             <span class="sec-health__score-text" id="healthScoreValue"><?= $healthScore ?></span>
         </div>
         
-        <!-- Détails du score -->
+        <!-- Détails textuels à droite du cercle -->
         <div class="sec-health__details">
             <div class="sec-health__label">Score de sécurité</div>
+            <!-- Status : "Excellent", "Bon", "Attention requise" ou "Alerte critique" -->
             <div class="sec-health__status"><?= e($healthLabel) ?></div>
+            <!-- Description contextuelle selon le score -->
             <div class="sec-health__summary"><?= e($healthDesc) ?></div>
         </div>
 
-        <!-- Mini métriques compactes -->
+        <!-- Mini compteurs à droite : résumé rapide des 7 derniers jours -->
         <div class="sec-health__metrics">
             <div class="sec-health__metric">
                 <div class="sec-health__metric-value" style="color:var(--sec-critical)"><?= $criticalEvents ?></div>
@@ -218,6 +229,10 @@ $blockedIPsCount = validateAndSanitize($stats['blocked_ips'] ?? 0, 'int', 0);
             </div>
         </div>
     </div>
+
+
+
+
 
     <!-- ==================== 4 CARTES DE STATISTIQUES ==================== -->
     <div class="sec-stats">
