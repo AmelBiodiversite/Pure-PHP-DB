@@ -29,6 +29,7 @@ $router->get('/terms', 'HomeController@terms');
 $router->get('/privacy', 'HomeController@privacy');
 $router->get('/help', 'HomeController@help');
 $router->get('/licence-fondateur', 'HomeController@licenceFondateur');
+$router->get('/licence-fondateur-en', 'HomeController@licenceFondateurEn');
 
 
 // ================================================================
@@ -176,4 +177,5 @@ $router->get('/admin/security/api/suspicious-ips','SecurityController@apiSuspici
 // ================================================================
 
 $router->dispatch();
+
 

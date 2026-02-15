@@ -162,13 +162,17 @@
             <a href="/products">Produits</a>
             <a href="/category">Catégories</a>
             
-            <!-- 🔥 NOUVEAU : Bouton Licence Fondateur -->
-            <a href="/licence-fondateur" class="btn-licence-fondateur">
-                <span class="rocket">🚀</span>
-                Licence Fondateur
-                <span class="badge-urgent">3</span>
-            </a>
-        </div>
+            <!-- 🔥 Boutons Licence Fondateur (FR + EN) -->
+<a href="/licence-fondateur" class="btn-licence-fondateur">
+    <span class="rocket">🚀</span>
+    Licence Fondateur
+    <span class="badge-urgent">3</span>
+</a>
+<a href="/licence-fondateur-en" class="btn-licence-fondateur" style="background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 50%, #3b82f6 100%);">
+    <span class="rocket">🚀</span>
+    Founder License
+    <span class="badge-urgent">3</span>
+</a>
 
         <!-- SEARCH --
         <form action="/search" method="GET" style="position:relative;max-width:280px;width:100%;">
