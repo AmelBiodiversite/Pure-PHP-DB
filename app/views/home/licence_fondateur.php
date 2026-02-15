@@ -1,695 +1,363 @@
 <?php
 /**
- * PAGE LICENCE FONDATEUR - VERSION PREMIUM
- * Prix : 4 990€ (justifié par 21K lignes de code)
- * Garantie : Testez la démo live - Code visible avant achat
+ * PAGE LICENCE FONDATEUR - MARKETFLOW PRO
+ * Version : 2026.1
+ * Prix : 4 990€ (Offre limitée)
  */
 ?>
 
 <style>
 /* ============================================
-   STYLES SPÉCIFIQUES PAGE LICENCE FONDATEUR
-   Harmonisés avec index.php
+   SYSTÈME DE DESIGN & VARIABLES
    ============================================ */
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --accent: #fbbf24;
+    --accent-dark: #f59e0b;
+    --success: #10b981;
+    --text-main: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f8fafc;
+}
 
-/* Section Hero */
+/* Base & Typography */
+.marketflow-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
 .licence-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-    padding: 80px 20px;
+    background: radial-gradient(circle at top right, #3b82f6, #1e3a8a);
+    padding: 100px 20px;
     text-align: center;
     color: white;
     position: relative;
-    overflow: hidden;
 }
 
-.licence-hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
-    opacity: 0.1;
+.badge-urgence {
+    display: inline-block;
+    background: rgba(220, 38, 38, 0.9);
+    backdrop-filter: blur(5px);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    animation: pulse 2s infinite;
 }
 
-.licence-hero-content {
-    position: relative;
-    max-width: 900px;
-    margin: 0 auto;
-    z-index: 1;
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
 .licence-hero h1 {
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 900;
-    margin-bottom: 20px;
-    line-height: 1.2;
+    margin-bottom: 25px;
+    line-height: 1.1;
 }
 
-.licence-hero .gradient-text {
+.gradient-gold {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
-.licence-hero-subtitle {
-    font-size: 1.3rem;
-    margin-bottom: 30px;
-    opacity: 0.95;
-    line-height: 1.6;
-}
-
-/* Badge urgence */
-.badge-urgence {
-    display: inline-block;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    color: white;
-    padding: 12px 30px;
-    border-radius: 10px;
-    font-weight: 700;
-    margin-bottom: 40px;
-    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
-    animation: pulse-urgence 2s ease-in-out infinite;
-}
-
-@keyframes pulse-urgence {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* Box Souveraineté */
-.box-souverainete {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    padding: 25px;
-    border-radius: 15px;
-    margin: 30px auto;
-    max-width: 700px;
-    border-left: 4px solid #fbbf24;
-}
-
-.box-souverainete h3 {
-    color: #fbbf24;
-    margin-bottom: 12px;
-    font-size: 1.3rem;
-}
-
-/* Prix */
-.prix-container {
-    margin: 50px 0;
-}
-
-.prix-principal {
-    font-size: 5rem;
-    font-weight: 900;
-    color: #fbbf24;
-    margin-bottom: 10px;
-    text-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
-}
-
-.prix-ancien {
-    text-decoration: line-through;
-    opacity: 0.7;
-    font-size: 1.1rem;
-}
-
-.prix-economie {
-    color: #86efac;
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-top: 10px;
-}
-
-/* CTA Buttons */
-.cta-primary {
-    display: inline-block;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #1f2937;
-    padding: 22px 45px;
-    border-radius: 12px;
-    font-size: 1.3rem;
-    font-weight: 800;
-    text-decoration: none;
-    box-shadow: 0 6px 25px rgba(251, 191, 36, 0.5);
-    transition: all 0.3s ease;
-    margin: 10px;
-}
-
-.cta-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 35px rgba(251, 191, 36, 0.6);
-}
-
-.cta-info {
-    margin-top: 20px;
-    opacity: 0.8;
-    font-size: 0.95rem;
-}
-
-/* Section Standard */
-.section-licence {
-    padding: 80px 20px;
-}
-
-.section-licence h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 40px;
-    color: var(--text-primary);
-}
-
-/* Grille 2 colonnes */
-.grid-2col {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 30px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-/* Carte Feature */
-.feature-box {
-    background: white;
-    padding: 35px;
-    border-radius: 15px;
-    border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
-}
-
-.feature-box:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
-    transform: translateY(-5px);
-}
-
-.feature-box h3 {
-    color: #1d4ed8;
-    margin-bottom: 15px;
+.hero-subtitle {
     font-size: 1.4rem;
-}
-
-.feature-box ul {
-    list-style: none;
-    padding: 0;
-}
-
-.feature-box li {
-    padding: 10px 0;
-    padding-left: 30px;
-    position: relative;
-    line-height: 1.6;
-}
-
-.feature-box li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #10b981;
-    font-weight: 900;
-    font-size: 1.2rem;
-}
-
-/* Table Comparaison */
-.table-compare {
-    width: 100%;
-    max-width: 900px;
-    margin: 40px auto;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-}
-
-.table-compare thead {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-}
-
-.table-compare th {
-    padding: 20px;
-    text-align: left;
-    font-weight: 700;
-}
-
-.table-compare td {
-    padding: 18px 20px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.table-compare tr:hover {
-    background: #f9fafb;
-}
-
-.table-compare .highlight {
-    color: #059669;
-    font-weight: 700;
-}
-
-/* Box Preuves Techniques */
-.box-preuves {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    padding: 40px;
-    border-radius: 15px;
-    margin: 50px auto;
     max-width: 800px;
-    border-left: 5px solid #3b82f6;
+    margin: 0 auto 40px;
+    opacity: 0.9;
 }
 
-.box-preuves h3 {
-    color: #1e40af;
-    margin-bottom: 20px;
-    font-size: 1.6rem;
+/* Prix Box */
+.prix-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    margin: 0 auto 40px;
 }
 
-.preuves-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-top: 25px;
-}
-
-.preuve-item {
-    text-align: center;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.preuve-number {
-    font-size: 2.5rem;
+.prix-current {
+    font-size: 4.5rem;
     font-weight: 900;
-    color: #3b82f6;
+    color: var(--accent);
     display: block;
 }
 
-.preuve-label {
-    font-size: 0.9rem;
-    color: #6b7280;
-    margin-top: 8px;
-}
-
-/* Témoignages */
-.testimonial {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
-}
-
-.testimonial-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.testimonial-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 900;
+.prix-old {
+    text-decoration: line-through;
+    opacity: 0.6;
     font-size: 1.2rem;
 }
-
-.testimonial-name {
+	.highlight-green {
+    color: #4ade80; /* Un vert émeraude qui ressort parfaitement sur le bleu */
     font-weight: 700;
-    color: #1f2937;
+    opacity: 1 !important; /* Pour annuler l'opacité de 0.9 du sous-titre */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Un léger ombre pour décoller le texte du fond */
 }
 
-.testimonial-role {
-    font-size: 0.85rem;
-    color: #6b7280;
+/* ============================================
+   FEATURES GRID
+   ============================================ */
+.section-padding { padding: 80px 20px; }
+.container { max-width: 1100px; margin: 0 auto; }
+
+.grid-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
 }
 
-.testimonial-text {
-    font-style: italic;
-    color: #4b5563;
-    line-height: 1.7;
-}
-
-/* FAQ */
-.faq-item {
+.card {
     background: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.faq-item h3 {
-    color: #3b82f6;
-    margin-bottom: 12px;
-    font-size: 1.2rem;
-}
-
-.faq-item p {
-    color: #6b7280;
-    line-height: 1.7;
-}
-
-/* Garantie Box */
-.garantie-box {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
     padding: 40px;
-    border-radius: 15px;
-    text-align: center;
-    margin: 50px auto;
-    max-width: 700px;
-    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
-}
-
-.garantie-box h3 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
-
-.garantie-box p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-/* CTA Final Section */
-.cta-final {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-    color: white;
-    padding: 80px 20px;
-    text-align: center;
     border-radius: 20px;
-    margin: 60px auto;
-    max-width: 1100px;
-}
-
-.cta-final h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: white;
-}
-
-.cta-final p {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    opacity: 0.95;
-}
-
-.cta-secondary {
-    display: inline-block;
-    background: white;
-    color: #1e3a8a;
-    padding: 25px 50px;
-    border-radius: 12px;
-    font-size: 1.4rem;
-    font-weight: 800;
-    text-decoration: none;
-    box-shadow: 0 6px 25px rgba(255, 255, 255, 0.3);
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
 }
 
-.cta-secondary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 35px rgba(255, 255, 255, 0.4);
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
 }
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* ============================================
+   TABLE COMPARATIVE
+   ============================================ */
+.table-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.table-compare {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-compare th {
+    background: #1e3a8a;
+    color: white;
+    padding: 25px;
+    text-align: left;
+}
+
+.table-compare td {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.highlight-cell {
+    background: #f0f9ff;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* ============================================
+   BOITE LICENCE (LA REFORMULATION)
+   ============================================ */
+.licence-box {
+    background: #f8fafc;
+    border-left: 5px solid var(--primary);
+    padding: 30px;
+    border-radius: 0 15px 15px 0;
+    margin: 20px 0;
+}
+
+.licence-item {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.licence-item strong { color: var(--primary-dark); }
+
+/* ============================================
+   CTA FINAUX
+   ============================================ */
+.cta-main {
+    display: inline-block;
+    background: var(--accent);
+    color: #1f2937;
+    padding: 20px 50px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.cta-main:hover { background: var(--accent-dark); transform: scale(1.02); }
 </style>
 
-<!-- ============================================
-     HERO SECTION
-     ============================================ -->
-<section class="licence-hero">
-    <div class="licence-hero-content">
-        
-        <!-- Badge Urgence -->
-        <div class="badge-urgence">
-            ⚡ OPÉRATION FONDATEURS : 3 LICENCES DISPONIBLES
-        </div>
-        
-        <!-- Titre Principal -->
-        <h1>
-            Lancez votre marketplace<br>
-            <span class="gradient-text">en semaines, pas en mois</span>
-        </h1>
-        
-        <!-- Sous-titre -->
-        <p class="licence-hero-subtitle">
-            <strong>Moteur PHP/PostgreSQL professionnel</strong> avec paiements Stripe Connect,<br>
-            dashboard multi-vendeurs et monitoring sécurité avancé.<br>
-            <em>✨ Démo live : marketflow.fr</em>
-        </p>
-        
-        <!-- Box Souveraineté -->
-        <div class="box-souverainete">
-            <h3>🎯 Souveraineté Tech 100% Française</h3>
-            <p>
-                Code source <strong>ouvert et commenté en français</strong>. Pas de boîte noire, pas de dépendances opaques.<br>
-                Une solution conçue et supportée en France, conforme RGPD par design.
-            </p>
-        </div>
-        
-        <!-- Prix -->
-        <div class="prix-container">
-            <div class="prix-principal">4 990€</div>
-            <p class="prix-ancien">Prix normal : 8 990€ • Économisez 4 000€</p>
-            <p class="prix-economie">⚠️ Limité à 3 licences fondateurs à ce tarif</p>
-        </div>
-        
-        <!-- CTA Principal -->
-        <a href="mailto:contact@marketflow.fr?subject=Licence Fondateur - 4990€&body=Bonjour,%0D%0A%0D%0AJe souhaite acquérir la Licence Fondateur MarketFlow Pro.%0D%0A%0D%0AMon projet : [Décrivez votre marketplace]%0D%0AUsage prévu : [Agence web / Startup / Autre]%0D%0ADate de lancement souhaitée : [JJ/MM/AAAA]%0D%0A%0D%0AMerci !" 
-           class="cta-primary">
-            🚀 RÉSERVER MA LICENCE FONDATEUR
-        </a>
-        
-        <!-- Info CTA -->
-        <p class="cta-info">
-            ⏱️ Réponse sous 24h • 💬 Démo personnalisée sur demande • ✓ Paiement sécurisé
-        </p>
-    </div>
-</section>
+<div class="marketflow-page">
 
-<!-- ============================================
-     PREUVES TECHNIQUES
-     ============================================ -->
-<section class="section-licence">
-    <div class="container">
-        <div class="box-preuves">
-            <h3>📊 Ce que vous obtenez VRAIMENT</h3>
-            <p style="color: #475569; margin-bottom: 20px;">
-                Pas de marketing bullshit. Voici les chiffres réels du code que vous allez recevoir :
-            </p>
-            
-            <div class="preuves-grid">
-                <div class="preuve-item">
-                    <span class="preuve-number">21K</span>
-                    <span class="preuve-label">Lignes de code PHP</span>
+    <header class="licence-hero">
+        <div class="container">
+            <div class="badge-urgence">⚡ EXCLUSIVITÉ : PLUS QUE 3 LICENCES FONDATEURS</div>
+            <h1>Propulsez votre Marketplace avec un <span class="gradient-gold">Code Source Souverain</span></h1>
+            <p class="hero-subtitle">
+    <span class="highlight-green">Fini les commissions sur CA et les boîtes noires.
+    Acquérez le moteur PHP/PostgreSQL professionnel pour lancer votre plateforme en 15 jours.
+</span><br></p>
+
+            <div class="prix-card">
+                <span class="prix-old">Prix standard : 8 990€</span>
+                <span class="prix-current">4 990€</span>
+                <p style="color:var(--accent); font-weight:700;">Économie immédiate de 4 000€</p>
+            </div>
+
+            <a href="#contact" class="cta-main">🚀 RÉSERVER MON ACCÈS FONDATEUR</a>
+            <p style="margin-top:20px; opacity:0.8; font-size:0.9rem;">Livraison du code sous 24h après validation</p>
+        </div>
+    </header>
+
+    <section class="section-padding">
+        <div class="container">
+            <h2 style="text-align:center; margin-bottom:50px;">L'excellence technique au service de votre business</h2>
+            <div class="grid-features">
+                <div class="card">
+                    <span class="card-icon">🚀</span>
+                    <h3>Performance Native</h3>
+                    <p>Architecture PHP 8.2+ et PostgreSQL optimisée pour des milliers de transactions simultanées sans latence.</p>
                 </div>
-                <div class="preuve-item">
-                    <span class="preuve-number">16</span>
-                    <span class="preuve-label">Contrôleurs MVC</span>
+                <div class="card">
+                    <span class="card-icon">🛡️</span>
+                    <h3>Sécurité Bancaire</h3>
+                    <p>Intégration Stripe Connect (KYC, TVA, Split de paiements) et dashboard de monitoring des menaces inclus.</p>
                 </div>
-                <div class="preuve-item">
-                    <span class="preuve-number">5</span>
-                    <span class="preuve-label">Modèles de données</span>
-                </div>
-                <div class="preuve-item">
-                    <span class="preuve-number">100%</span>
-                    <span class="preuve-label">Commenté en français</span>
+                <div class="card">
+                    <span class="card-icon">🏗️</span>
+                    <h3>Dev-Ready</h3>
+                    <p>Code 100% commenté en français, typage strict, PSR-12, et suite de tests PHPUnit pour évoluer sans peur.</p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background:var(--bg-light);">
+        <div class="container">
+            <h2 style="text-align:center; margin-bottom:50px;">Pourquoi choisir MarketFlow Pro ?</h2>
+            <div class="table-wrapper">
+                <table class="table-compare">
+                    <thead>
+                        <tr>
+                            <th>Critères</th>
+                            <th>MarketFlow Pro</th>
+                            <th>Développement Sur-mesure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Investissement</strong></td>
+                            <td class="highlight-cell">4 990€ (Payé une fois)</td>
+                            <td>25 000€ à 60 000€</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Time-to-market</strong></td>
+                            <td class="highlight-cell">1 à 2 semaines</td>
+                            <td>6 à 9 mois</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Propriété du code</strong></td>
+                            <td class="highlight-cell">Totale (Dépôt Git privé)</td>
+                            <td>Souvent limitée ou complexe</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frais récurrents</strong></td>
+                            <td class="highlight-cell">0€ (Souveraineté totale)</td>
+                            <td>Maintenance coûteuse</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container" style="max-width: 800px;">
+            <h2 style="text-align:center;">Une Licence Commerciale "Full Access"</h2>
+            <p style="text-align:center; color:var(--text-light); margin-bottom:30px;">
+                Nous avons conçu une licence qui protège votre investissement tout en vous offrant une liberté totale d'exploitation.
+            </p>
             
-            <p style="margin-top: 25px; color: #475569; font-weight: 600;">
-                ✓ Architecture MVC professionnelle (PSR-4)<br>
-                ✓ PostgreSQL avec migrations incluses<br>
-                ✓ Stripe Connect FR (multi-vendeurs + TVA française)<br>
-                ✓ Dashboard sécurité avec détection d'attaques en temps réel<br>
-                ✓ Tests PHPUnit + PHPStan niveau 5<br>
-                ✓ Docker compose production-ready
+            <div class="licence-box">
+                <div class="licence-item">
+                    <span>✅</span>
+                    <div>
+                        <strong>Accès Intégral :</strong>
+                        <p>Livraison de l'intégralité du code source via un dépôt Git privé pour une autonomie technique complète.</p>
+                    </div>
+                </div>
+                <div class="licence-item">
+                    <span>✅</span>
+                    <div>
+                        <strong>Déploiement Illimité :</strong>
+                        <p>Modifiez, personnalisez et installez la solution pour l'ensemble de vos clients sans aucune limite de licence.</p>
+                    </div>
+                </div>
+                <div class="licence-item">
+                    <span>✅</span>
+                    <div>
+                        <strong>Confidentialité & Exclusivité :</strong>
+                        <p>Une licence conçue pour sécuriser votre avantage concurrentiel et conserver la primeur de la solution au sein de votre entreprise.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background:#10b981; color:white; text-align:center;">
+        <div class="container">
+            <h2>🛡️ Garantie Transparence Totale</h2>
+            <p style="font-size:1.2rem; max-width:700px; margin: 20px auto;">
+                <strong>Testez avant d'acheter.</strong> Accédez à la démo live et demandez un accès "lecture seule" au dépôt Git pour auditer la qualité du code avant de finaliser votre commande.
             </p>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ============================================
-     POUR QUI ?
-     ============================================ -->
-<section class="section-licence" style="background: #f9fafb;">
-    <div class="container">
-        <h2>Pour les <span style="color: #3b82f6;">agences web</span> et <span style="color: #10b981;">entrepreneurs</span> français</h2>
-        
-        <div class="grid-2col">
-            <!-- Agences Web -->
-            <div class="feature-box">
-                <h3>🏢 Agences Web</h3>
-                <ul>
-                    <li>Livrez des projets clients en <strong>15 jours au lieu de 6 mois</strong></li>
-                    <li>Facturez 15-25k€ pour une marketplace sur mesure</li>
-                    <li>Code white-label : rebrandez pour chaque client</li>
-                    <li>Support technique en français (email + Slack)</li>
-                    <li>ROI dès le 1er projet client</li>
-                </ul>
-            </div>
-            
-            <!-- Entrepreneurs -->
-            <div class="feature-box" style="border-color: #10b981;">
-                <h3 style="color: #059669;">🚀 Entrepreneurs</h3>
-                <ul>
-                    <li>Testez votre idée de marketplace <strong>sans investir 30k€ en dev</strong></li>
-                    <li>Paiements Stripe FR avec gestion automatique de la TVA</li>
-                    <li>Conforme RGPD dès le départ (cookies, CNIL, opt-in)</li>
-                    <li>Documentation technique complète en français</li>
-                    <li>Lancez en production en 2 semaines max</li>
-                </ul>
-            </div>
+    <section class="section-padding">
+        <div class="container" style="max-width: 800px;">
+            <h2 style="text-align:center; margin-bottom:40px;">Questions Fréquentes</h2>
+            <details style="padding:20px; border-bottom:1px solid #eee;">
+                <summary style="font-weight:700; cursor:pointer;">Puis-je l'utiliser pour mes clients en agence ?</summary>
+                <p style="padding-top:10px; color:var(--text-light);">Oui, c'est l'atout majeur de cette licence. Vous pouvez facturer des prestations entre 15k€ et 30k€ à vos clients en utilisant MarketFlow comme socle technique.</p>
+            </details>
+            <details style="padding:20px; border-bottom:1px solid #eee;">
+                <summary style="font-weight:700; cursor:pointer;">Ai-je besoin de Docker ?</summary>
+                <p style="padding-top:10px; color:var(--text-light);">Docker est recommandé pour un déploiement en 15 minutes, mais le code est compatible avec n'importe quel environnement Linux standard (Apache/Nginx).</p>
+            </details>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ============================================
-     COMPARAISON
-     ============================================ -->
-<section class="section-licence">
-    <div class="container">
-        <h2>MarketFlow vs Développement sur mesure</h2>
-        
-        <table class="table-compare">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th style="text-align: center;">MarketFlow Pro</th>
-                    <th style="text-align: center;">Dev sur mesure</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Coût</strong></td>
-                    <td class="highlight" style="text-align: center;">4 990€ une fois</td>
-                    <td style="text-align: center; color: #6b7280;">25 000€ - 60 000€</td>
-                </tr>
-                <tr>
-                    <td><strong>Délai de lancement</strong></td>
-                    <td class="highlight" style="text-align: center;">1-2 semaines</td>
-                    <td style="text-align: center; color: #6b7280;">4-8 mois</td>
-                </tr>
-                <tr>
-                    <td><strong>Code source</strong></td>
-                    <td class="highlight" style="text-align: center;">21K lignes, commenté FR</td>
-                    <td style="text-align: center; color: #6b7280;">À développer</td>
-                </tr>
-                <tr>
-                    <td><strong>Conformité RGPD/TVA</strong></td>
-                    <td class="highlight" style="text-align: center;">✓ Intégrée</td>
-                    <td style="text-align: center; color: #6b7280;">À facturer en plus</td>
-                </tr>
-                <tr>
-                    <td><strong>Monitoring sécurité</strong></td>
-                    <td class="highlight" style="text-align: center;">✓ Dashboard inclus</td>
-                    <td style="text-align: center; color: #6b7280;">Option à 5k€+</td>
-                </tr>
-                <tr>
-                    <td><strong>Tests unitaires</strong></td>
-                    <td class="highlight" style="text-align: center;">✓ PHPUnit intégré</td>
-                    <td style="text-align: center; color: #6b7280;">Rarement inclus</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<!-- ============================================
-     GARANTIE
-     ============================================ -->
-<section class="section-licence">
-    <div class="container">
-        <div class="garantie-box">
-            <h3>🛡️ Garantie Transparence Totale</h3>
-            <p>
-                <strong>Testez la démo live sur marketflow.fr</strong><br>
-                Explorez toutes les fonctionnalités en conditions réelles.<br>
-                Code source visible sur GitHub privé AVANT paiement (accès lecture).<br><br>
-                
-                <em>Vous savez exactement ce que vous achetez. Zéro surprise.</em>
-            </p>
+    <section id="contact" class="section-padding" style="text-align:center; background: #1e293b; color:white;">
+        <div class="container">
+            <h2>Prêt à posséder votre propre technologie ?</h2>
+            <p style="margin-bottom:30px; opacity:0.8;">Contactez-nous pour une démo personnalisée ou pour réserver votre licence.</p>
+            <a href="mailto:contact@marketflow.fr?subject=Réservation Licence Fondateur" class="cta-main">📩 CONTACTER L'ÉQUIPE MARKETFLOW</a>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ============================================
-     FAQ
-     ============================================ -->
-<section class="section-licence">
-    <div class="container">
-        <h2>Questions fréquentes</h2>
-        
-        <div style="max-width: 800px; margin: 40px auto;">
-            
-            <div class="faq-item">
-                <h3>Puis-je l'utiliser pour mes clients (agence) ?</h3>
-                <p>
-                    <strong>Oui, c'est même l'usage principal.</strong> Licence commerciale illimitée incluse. 
-                    Installez MarketFlow pour autant de clients que vous voulez, rebrandez le design, 
-                    facturez 15-25k€ par projet. Zéro restriction.
-                </p>
-            </div>
-            
-            <div class="faq-item">
-                <h3>L'installation est-elle complexe ?</h3>
-                <p>
-                    <strong>Non.</strong> Avec Docker : 15 minutes chrono (commande unique). 
-                    Sans Docker : 1-2 heures max. Documentation complète en français fournie + 
-                    support email inclus pendant 30 jours.
-                </p>
-            </div>
-            
-            <div class="faq-item">
-                <h3>Pourquoi seulement 3 licences à ce prix ?</h3>
-                <p>
-                    Stratégie "Early Adopters". Les 3 premiers bénéficient du tarif fondateur (4 990€) 
-                    et d'un accès prioritaire au support. Après ça, le prix passe à 8 990€ 
-                    (valeur réelle du code). C'est maintenant ou jamais.
-                </p>
-            </div>
-            
-            <div class="faq-item">
-                <h3>Ai-je accès au code source ?</h3>
-                <p>
-                    <strong>100% open source.</strong> Vous recevez le code complet (21 408 lignes PHP) 
-                    via dépôt Git privé. Vous pouvez modifier, étendre, revendre. Aucune limite. 
-                    C'est VOTRE code après achat.
-                </p>
-            </div>
-            
-            <div class="faq-item">
-                <h3>Le support est-il inclus ?</h3>
-                <p>
-                    Oui : <strong>30 jours de support email</strong> inclus (réponse sous 24h). 
-                    Pour un support étendu (Slack, visio, développement custom), contactez-nous 
-                    pour un devis sur mesure.
-                </p>
-            </div>
-            
-        </div>
-    </div>
-</section>
-
-<!-- ============================================
-     CTA FINAL
-     ============================================ -->
-<section class="cta-final">
-    <h2>Prêt à économiser 20 000€ de développement ?</h2>
-    <p>
-        Rejoignez les 3 fondateurs qui lancent leur marketplace en février 2026.<br>
-        Places limitées. Accès au code sous 24h après validation.
-    </p>
-    
-    <a href="mailto:contact@marketflow.fr?subject=Licence Fondateur - 4990€&body=Bonjour,%0D%0A%0D%0AJe souhaite réserver ma Licence Fondateur MarketFlow Pro.%0D%0A%0D%0A📋 MON PROJET :%0D%0AType de marketplace : [Décrivez en 2-3 lignes]%0D%0AUsage prévu : [ ] Agence web  [ ] Startup  [ ] Autre%0D%0ADate de lancement : [JJ/MM/AAAA]%0D%0A%0D%0A💬 QUESTIONS :%0D%0A[Vos questions éventuelles]%0D%0A%0D%0AMerci !" 
-       class="cta-secondary">
-        📩 Réserver ma licence fondateur
-    </a>
-</section>
+</div>
