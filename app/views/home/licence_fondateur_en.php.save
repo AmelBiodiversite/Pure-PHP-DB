@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -138,21 +138,11 @@
     </style>
 </head>
 <body>
-<script>
-// Countdown 7 days
-const endDate = new Date('2026-02-23T23:59:59');
-setInterval(() => {
-    const now = new Date();
-    const diff = endDate - now;
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    document.getElementById('countdown').textContent = 
-        `${days}d ${hours}h left`;
-}, 1000);
-</script>
+
 <div class="flash-banner">
-    🎯 EARLY ACCESS: €97 instead of €997 • First 10 licenses • <span id="countdown"></span>
+    🚨 FLASH SALE: €97 for next 3 hours only (Normally €4,990) → Then back to full price
 </div>
+
 <header>
     <h1>MarketFlow Pro</h1>
     <p class="subtitle">Production-Ready PHP Marketplace Platform<br> No Framework. Full Control.</p>
@@ -166,10 +156,9 @@ setInterval(() => {
         <p style="text-align: center; font-size: 1.2em; margin: 20px 0;">Get a battle-tested, production-ready marketplace platform with security dashboard, multi-vendor support, and full source code.</p>
         
         <div class="price">
-            <div class="price-old">€997</div>
+            <div class="price-old">€4,990</div>
             <div class="price-new">€97</div>
-            <p style="color: #666;">Early Access • <span id="licenses-left">10</span> licenses left</p>
-
+            <p style="color: #666;">Flash Sale • 3 Founder Licenses Only</p>
         </div>
 
         <div style="text-align: center;">

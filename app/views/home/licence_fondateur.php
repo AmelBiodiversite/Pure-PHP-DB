@@ -137,10 +137,23 @@
         li { margin: 10px 0; }
     </style>
 </head>
-<body>
+	<body>
+	<script>
+// Compte à rebours 7 jours
+const endDate = new Date('2026-02-23T23:59:59');
+setInterval(() => {
+    const now = new Date();
+    const diff = endDate - now;
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    document.getElementById('countdown').textContent = 
+        `${days}j ${hours}h restantes`;
+}, 1000);
+</script>
+
 
 <div class="flash-banner">
-    🚨 VENTE FLASH : 97€ pendant 3 heures seulement (Prix normal : 4 990€) → Puis retour au prix normal
+    🎯 EARLY ACCESS : 97€ au lieu de 997€ • 10 premières licences • <span id="countdown"></span>
 </div>
 
 <header>
@@ -156,9 +169,10 @@
         <p style="text-align: center; font-size: 1.2em; margin: 20px 0;">Obtenez une plateforme marketplace testée en production, avec dashboard sécurité, multi-vendeurs et code source complet.</p>
         
         <div class="price">
-            <div class="price-old">4 990€</div>
+            <div class="price-old">997€</div>
             <div class="price-new">97€</div>
-            <p style="color: #666;">Vente Flash • 3 Licences Fondateur Uniquement</p>
+            <p style="color: #666;">Early Access • <span id="licenses-left">10</span> licences restantes</p>
+
         </div>
 
         <div style="text-align: center;">
