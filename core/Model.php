@@ -58,11 +58,22 @@ abstract class Model {
             // Enforce maximum limit to prevent DoS attacks
             $maxLimit = 1000;
             $limit = min($limit, $maxLimit);
-            $sql .= " LIMIT " . $limit;
+            $sql .= " LIMIT :limit";
         }
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($conditions);
+        
+        // Bind condition parameters
+        foreach ($conditions as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        
+        // Bind limit parameter if set
+        if ($limit) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 

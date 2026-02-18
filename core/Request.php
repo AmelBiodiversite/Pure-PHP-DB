@@ -127,12 +127,12 @@ class Request {
      * Get a validated integer from GET parameters
      * 
      * @param string $key Parameter key
-     * @param int $default Default value if not set or invalid
+     * @param int|null $default Default value if not set or invalid (null returns null)
      * @param int $min Minimum value (default: 1)
      * @param int|null $max Maximum value (default: null)
-     * @return int
+     * @return int|null
      */
-    public static function getInt(string $key, int $default = 1, int $min = 1, ?int $max = null): int {
+    public static function getInt(string $key, ?int $default = 1, int $min = 1, ?int $max = null): ?int {
         if (!isset($_GET[$key])) {
             return $default;
         }
@@ -146,11 +146,11 @@ class Request {
      * Get a validated string from GET parameters
      * 
      * @param string $key Parameter key
-     * @param string $default Default value
+     * @param string|null $default Default value
      * @param int $maxLength Maximum length
-     * @return string
+     * @return string|null
      */
-    public static function getString(string $key, string $default = '', int $maxLength = 1000): string {
+    public static function getString(string $key, ?string $default = '', int $maxLength = 1000): ?string {
         if (!isset($_GET[$key])) {
             return $default;
         }
