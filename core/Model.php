@@ -13,6 +13,11 @@ abstract class Model {
     protected $db;
     protected $table;
     protected $primaryKey = 'id';
+    
+    // Constants for query limits to prevent DoS attacks
+    private const MAX_QUERY_LIMIT = 1000;
+    private const MAX_PER_PAGE = 100;
+    private const MAX_PAGE = 10000;
 
     public function __construct() {
         $this->db = Database::getInstance();
@@ -56,8 +61,7 @@ abstract class Model {
 
         if ($limit) {
             // Enforce maximum limit to prevent DoS attacks
-            $maxLimit = 1000;
-            $limit = min($limit, $maxLimit);
+            $limit = min($limit, self::MAX_QUERY_LIMIT);
             $sql .= " LIMIT :limit";
         }
 
@@ -166,11 +170,8 @@ abstract class Model {
      */
     public function paginate(int $page = 1, int $perPage = 20, array $conditions = []): array {
         // Enforce maximum limits to prevent DoS attacks
-        $maxPerPage = 100;
-        $maxPage = 10000;
-        
-        $page = max(1, min($page, $maxPage));
-        $perPage = max(1, min($perPage, $maxPerPage));
+        $page = max(1, min($page, self::MAX_PAGE));
+        $perPage = max(1, min($perPage, self::MAX_PER_PAGE));
         
         $offset = ($page - 1) * $perPage;
 
