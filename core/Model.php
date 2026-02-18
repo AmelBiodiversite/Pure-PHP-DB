@@ -47,7 +47,10 @@ abstract class Model {
         }
 
         if ($limit) {
-            $sql .= " LIMIT $limit";
+            // Enforce maximum limit to prevent DoS attacks
+            $maxLimit = 1000;
+            $limit = min((int)$limit, $maxLimit);
+            $sql .= " LIMIT " . (int)$limit;
         }
 
         $stmt = $this->db->prepare($sql);
@@ -125,6 +128,13 @@ abstract class Model {
      * Trouver avec pagination
      */
     public function paginate($page = 1, $perPage = 20, $conditions = []) {
+        // Enforce maximum limits to prevent DoS attacks
+        $maxPerPage = 100;
+        $maxPage = 10000;
+        
+        $page = max(1, min((int)$page, $maxPage));
+        $perPage = max(1, min((int)$perPage, $maxPerPage));
+        
         $offset = ($page - 1) * $perPage;
 
         $sql = "SELECT * FROM {$this->table}";
@@ -145,8 +155,8 @@ abstract class Model {
             $stmt->bindValue(":$key", $value);
         }
 
-        $stmt->bindValue(':limit', (int)$perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
 

@@ -22,17 +22,24 @@ class ProductController extends Controller {
      * Page catalogue de produits
      */
     public function index() {
-        // Récupérer les filtres depuis l'URL
+        // Récupérer et valider les filtres depuis l'URL avec sécurité
         $filters = [
-            'category_id' => $_GET['category'] ?? null,
-            'min_price' => $_GET['min_price'] ?? null,
-            'max_price' => $_GET['max_price'] ?? null,
-            'search' => $_GET['q'] ?? null,
-            'tag' => $_GET['tag'] ?? null,
-            'sort' => $_GET['sort'] ?? 'newest'
+            'category_id' => \Core\Request::getInt('category', null, 1, 10000),
+            'min_price' => \Core\Request::sanitizeFloat($_GET['min_price'] ?? null, 0, 999999),
+            'max_price' => \Core\Request::sanitizeFloat($_GET['max_price'] ?? null, 0, 999999),
+            'search' => \Core\Request::getString('q', null, 200),
+            'tag' => \Core\Request::getString('tag', null, 100),
+            'sort' => \Core\Request::getString('sort', 'newest', 50)
         ];
+        
+        // Validate sort parameter against allowed values
+        $allowedSorts = ['newest', 'oldest', 'price_asc', 'price_desc', 'popular', 'rating'];
+        if (!in_array($filters['sort'], $allowedSorts, true)) {
+            $filters['sort'] = 'newest';
+        }
 
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        // Validate and sanitize page number
+        $page = \Core\Request::getInt('page', 1, 1, 1000);
         $perPage = 24;
 
         // Récupérer les produits

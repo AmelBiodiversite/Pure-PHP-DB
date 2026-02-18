@@ -20,7 +20,13 @@ class Controller {
      * @param array $data Données à passer à la vue
      */
     protected function render($view, $data = []) {
-        extract($data);
+        // Safer alternative to extract(): only extract keys that don't overwrite critical variables
+        // This prevents malicious data from overwriting $this, $viewFile, $view, etc.
+        $allowedKeys = array_diff(array_keys($data), ['this', 'view', 'data', 'viewFile', 'allowedKeys']);
+        foreach ($allowedKeys as $key) {
+            $$key = $data[$key];
+        }
+        
         $viewFile = __DIR__ . '/../app/views/' . $view . '.php';
         if (file_exists($viewFile)) {
             require_once __DIR__ . '/../app/views/layouts/header.php';
