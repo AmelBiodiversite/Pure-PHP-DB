@@ -14,7 +14,7 @@ class Request {
      * @param int $maxLength Maximum length (default: 10000)
      * @return string|null Sanitized string or null if invalid
      */
-    public static function sanitizeString($input, $minLength = 0, $maxLength = 10000) {
+    public static function sanitizeString($input, int $minLength = 0, int $maxLength = 10000): ?string {
         if ($input === null || $input === '') {
             return $minLength > 0 ? null : '';
         }
@@ -37,7 +37,7 @@ class Request {
      * @param int|null $max Maximum value (null for no maximum)
      * @return int|null Validated integer or null if invalid
      */
-    public static function sanitizeInt($input, $min = null, $max = null) {
+    public static function sanitizeInt($input, ?int $min = null, ?int $max = null): ?int {
         if ($input === null || $input === '') {
             return null;
         }
@@ -69,7 +69,7 @@ class Request {
      * @param float|null $max Maximum value
      * @return float|null Validated float or null if invalid
      */
-    public static function sanitizeFloat($input, $min = null, $max = null) {
+    public static function sanitizeFloat($input, ?float $min = null, ?float $max = null): ?float {
         if ($input === null || $input === '') {
             return null;
         }
@@ -97,7 +97,7 @@ class Request {
      * @param string|null $input Email to validate
      * @return string|null Validated email or null if invalid
      */
-    public static function sanitizeEmail($input) {
+    public static function sanitizeEmail($input): ?string {
         if ($input === null || $input === '') {
             return null;
         }
@@ -113,7 +113,7 @@ class Request {
      * @param string|null $input URL to validate
      * @return string|null Validated URL or null if invalid
      */
-    public static function sanitizeUrl($input) {
+    public static function sanitizeUrl($input): ?string {
         if ($input === null || $input === '') {
             return null;
         }
@@ -132,7 +132,7 @@ class Request {
      * @param int|null $max Maximum value (default: null)
      * @return int
      */
-    public static function getInt($key, $default = 1, $min = 1, $max = null) {
+    public static function getInt(string $key, int $default = 1, int $min = 1, ?int $max = null): int {
         if (!isset($_GET[$key])) {
             return $default;
         }
@@ -150,7 +150,7 @@ class Request {
      * @param int $maxLength Maximum length
      * @return string
      */
-    public static function getString($key, $default = '', $maxLength = 1000) {
+    public static function getString(string $key, string $default = '', int $maxLength = 1000): string {
         if (!isset($_GET[$key])) {
             return $default;
         }
@@ -169,7 +169,7 @@ class Request {
      * @param int|null $max Maximum value
      * @return int|null
      */
-    public static function postInt($key, $default = null, $min = null, $max = null) {
+    public static function postInt(string $key, ?int $default = null, ?int $min = null, ?int $max = null): ?int {
         if (!isset($_POST[$key])) {
             return $default;
         }
@@ -186,7 +186,7 @@ class Request {
      * @param int $maxLength Maximum length
      * @return string|null
      */
-    public static function postString($key, $default = null, $minLength = 0, $maxLength = 10000) {
+    public static function postString(string $key, ?string $default = null, int $minLength = 0, int $maxLength = 10000): ?string {
         if (!isset($_POST[$key])) {
             return $default;
         }
@@ -200,7 +200,7 @@ class Request {
      * @param int $maxPerPage Maximum items per page (default: 100)
      * @return array ['page' => int, 'limit' => int, 'offset' => int]
      */
-    public static function getPagination($maxPerPage = 100) {
+    public static function getPagination(int $maxPerPage = 100): array {
         $page = self::getInt('page', 1, 1, 10000);
         $perPage = self::getInt('per_page', 12, 1, $maxPerPage);
         
@@ -219,7 +219,7 @@ class Request {
      * @param int $maxSize Maximum file size in bytes (default: 5MB)
      * @return array|null File info or null if invalid ['name', 'tmp_name', 'size', 'type']
      */
-    public static function validateFile($fieldName, $allowedMimeTypes, $maxSize = 5242880) {
+    public static function validateFile(string $fieldName, array $allowedMimeTypes, int $maxSize = 5242880): ?array {
         if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
             return null;
         }

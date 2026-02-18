@@ -23,7 +23,7 @@ class Controller {
     protected function render(string $view, array $data = []): void {
         // Safer alternative to extract(): only extract keys that don't overwrite critical variables
         // This prevents malicious data from overwriting $this, $viewFile, $view, etc.
-        $allowedKeys = array_diff(array_keys($data), ['this', 'view', 'data', 'viewFile', 'allowedKeys']);
+        $allowedKeys = array_diff(array_keys($data), ['this', 'view', 'data', 'viewFile']);
         foreach ($allowedKeys as $key) {
             $$key = $data[$key];
         }

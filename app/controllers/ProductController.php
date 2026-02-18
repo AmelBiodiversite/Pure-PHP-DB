@@ -12,6 +12,11 @@ use App\Models\Product;
 
 class ProductController extends Controller {
     private $productModel;
+    
+    // Constants for validation limits
+    private const MAX_PRICE_FILTER = 999999;
+    private const MAX_CATEGORY_ID = 10000;
+    private const MAX_PAGE = 1000;
 
     public function __construct() {
         parent::__construct();
@@ -24,9 +29,9 @@ class ProductController extends Controller {
     public function index() {
         // Récupérer et valider les filtres depuis l'URL avec sécurité
         $filters = [
-            'category_id' => \Core\Request::getInt('category', null, 1, 10000),
-            'min_price' => \Core\Request::sanitizeFloat($_GET['min_price'] ?? null, 0, 999999),
-            'max_price' => \Core\Request::sanitizeFloat($_GET['max_price'] ?? null, 0, 999999),
+            'category_id' => \Core\Request::getInt('category', null, 1, self::MAX_CATEGORY_ID),
+            'min_price' => \Core\Request::sanitizeFloat($_GET['min_price'] ?? null, 0, self::MAX_PRICE_FILTER),
+            'max_price' => \Core\Request::sanitizeFloat($_GET['max_price'] ?? null, 0, self::MAX_PRICE_FILTER),
             'search' => \Core\Request::getString('q', null, 200),
             'tag' => \Core\Request::getString('tag', null, 100),
             'sort' => \Core\Request::getString('sort', 'newest', 50)
@@ -39,7 +44,7 @@ class ProductController extends Controller {
         }
 
         // Validate and sanitize page number
-        $page = \Core\Request::getInt('page', 1, 1, 1000);
+        $page = \Core\Request::getInt('page', 1, 1, self::MAX_PAGE);
         $perPage = 24;
 
         // Récupérer les produits
