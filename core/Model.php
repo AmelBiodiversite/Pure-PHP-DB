@@ -20,8 +20,11 @@ abstract class Model {
 
     /**
      * Trouver par ID
+     * 
+     * @param int $id
+     * @return array|false
      */
-    public function find($id) {
+    public function find(int $id) {
         $sql = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
@@ -30,8 +33,13 @@ abstract class Model {
 
     /**
      * Trouver tous
+     * 
+     * @param array $conditions
+     * @param string|null $order
+     * @param int|null $limit
+     * @return array
      */
-    public function findAll($conditions = [], $order = null, $limit = null) {
+    public function findAll(array $conditions = [], ?string $order = null, ?int $limit = null): array {
         $sql = "SELECT * FROM {$this->table}";
 
         if (!empty($conditions)) {
@@ -49,8 +57,8 @@ abstract class Model {
         if ($limit) {
             // Enforce maximum limit to prevent DoS attacks
             $maxLimit = 1000;
-            $limit = min((int)$limit, $maxLimit);
-            $sql .= " LIMIT " . (int)$limit;
+            $limit = min($limit, $maxLimit);
+            $sql .= " LIMIT " . $limit;
         }
 
         $stmt = $this->db->prepare($sql);
@@ -60,8 +68,11 @@ abstract class Model {
 
     /**
      * Créer
+     * 
+     * @param array $data
+     * @return int
      */
-    public function create($data) {
+    public function create(array $data): int {
         $fields = array_keys($data);
         $placeholders = array_map(function($field) {
             return ":$field";
@@ -80,8 +91,12 @@ abstract class Model {
 
     /**
      * Mettre à jour
+     * 
+     * @param int $id
+     * @param array $data
+     * @return bool
      */
-    public function update($id, $data) {
+    public function update(int $id, array $data): bool {
         $fields = [];
         foreach (array_keys($data) as $field) {
             $fields[] = "$field = :$field";
@@ -98,8 +113,11 @@ abstract class Model {
 
     /**
      * Supprimer
+     * 
+     * @param int $id
+     * @return bool
      */
-    public function delete($id) {
+    public function delete(int $id): bool {
         $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['id' => $id]);
@@ -107,8 +125,11 @@ abstract class Model {
 
     /**
      * Compter
+     * 
+     * @param array $conditions
+     * @return int
      */
-    public function count($conditions = []) {
+    public function count(array $conditions = []): int {
         $sql = "SELECT COUNT(*) FROM {$this->table}";
 
         if (!empty($conditions)) {
@@ -121,19 +142,24 @@ abstract class Model {
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($conditions);
-        return $stmt->fetchColumn();
+        return (int)$stmt->fetchColumn();
     }
 
     /**
      * Trouver avec pagination
+     * 
+     * @param int $page
+     * @param int $perPage
+     * @param array $conditions
+     * @return array
      */
-    public function paginate($page = 1, $perPage = 20, $conditions = []) {
+    public function paginate(int $page = 1, int $perPage = 20, array $conditions = []): array {
         // Enforce maximum limits to prevent DoS attacks
         $maxPerPage = 100;
         $maxPage = 10000;
         
-        $page = max(1, min((int)$page, $maxPage));
-        $perPage = max(1, min((int)$perPage, $maxPerPage));
+        $page = max(1, min($page, $maxPage));
+        $perPage = max(1, min($perPage, $maxPerPage));
         
         $offset = ($page - 1) * $perPage;
 
