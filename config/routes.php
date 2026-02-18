@@ -1,4 +1,4 @@
-<?php
+++++<?php
 /**
  * MARKETFLOW PRO - ROUTES
  * Toutes les routes AVANT $router->dispatch() !
@@ -83,9 +83,6 @@ $router->get('/cart/remove-promo', 'CartController@removePromo');
 // Checkout
 $router->get('/checkout', 'CartController@checkout');
 $router->post('/checkout/create-session', 'CartController@processCheckout');
-$router->get('/checkout/success', 'PaymentController@success');
-$router->get('/checkout/success', 'StripeController@success');
-$router->post('/checkout/create-session', 'StripeController@createCheckoutSession');
 $router->post('/stripe/create-checkout-session', 'StripeController@createCheckoutSession');
 $router->get('/checkout/cancel', 'CartController@index');
 
