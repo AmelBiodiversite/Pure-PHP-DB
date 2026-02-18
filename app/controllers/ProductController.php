@@ -12,6 +12,11 @@ use App\Models\Product;
 
 class ProductController extends Controller {
     private $productModel;
+    
+    // Constants for validation limits
+    private const MAX_PRICE_FILTER = 999999;
+    private const MAX_CATEGORY_ID = 10000;
+    private const MAX_PAGE = 1000;
 
     public function __construct() {
         parent::__construct();
@@ -22,17 +27,24 @@ class ProductController extends Controller {
      * Page catalogue de produits
      */
     public function index() {
-        // Récupérer les filtres depuis l'URL
+        // Récupérer et valider les filtres depuis l'URL avec sécurité
         $filters = [
-            'category_id' => $_GET['category'] ?? null,
-            'min_price' => $_GET['min_price'] ?? null,
-            'max_price' => $_GET['max_price'] ?? null,
-            'search' => $_GET['q'] ?? null,
-            'tag' => $_GET['tag'] ?? null,
-            'sort' => $_GET['sort'] ?? 'newest'
+            'category_id' => \Core\Request::getInt('category', null, 1, self::MAX_CATEGORY_ID),
+            'min_price' => \Core\Request::sanitizeFloat($_GET['min_price'] ?? null, 0, self::MAX_PRICE_FILTER),
+            'max_price' => \Core\Request::sanitizeFloat($_GET['max_price'] ?? null, 0, self::MAX_PRICE_FILTER),
+            'search' => \Core\Request::getString('q', null, 200),
+            'tag' => \Core\Request::getString('tag', null, 100),
+            'sort' => \Core\Request::getString('sort', 'newest', 50)
         ];
+        
+        // Validate sort parameter against allowed values
+        $allowedSorts = ['newest', 'oldest', 'price_asc', 'price_desc', 'popular', 'rating'];
+        if (!in_array($filters['sort'], $allowedSorts, true)) {
+            $filters['sort'] = 'newest';
+        }
 
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        // Validate and sanitize page number
+        $page = \Core\Request::getInt('page', 1, 1, self::MAX_PAGE);
         $perPage = 24;
 
         // Récupérer les produits
