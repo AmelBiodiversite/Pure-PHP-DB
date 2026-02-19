@@ -1,4 +1,4 @@
-++++<?php
+<?php
 /**
  * MARKETFLOW PRO - ROUTES
  * Toutes les routes AVANT $router->dispatch() !
