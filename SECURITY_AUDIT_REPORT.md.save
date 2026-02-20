@@ -170,7 +170,6 @@ app/views/**/*.php (22 fichiers)       # Échappement XSS automatique
 - [x] Rate limiting connexion
 - [x] SQL injection (PDO + requêtes préparées)
 - [x] Paiements sécurisés (Stripe)
-
 ### Configuration Serveur (À faire en production)
 - [ ] **HTTPS activé** (certificat SSL/TLS)
 - [ ] **display_errors = 0** dans php.ini
@@ -314,7 +313,6 @@ rm -rf app/views && mv app/views.backup_xss app/views
 
 ---
 
-**Audit réalisé le :** 26 janvier 2026  
-**Par :** Assistant Claude (Anthropic)  
+**Audit réalisé le :** 26 janvier 2026    
 **Niveau de sécurité final :** 🟢 PRODUCTION-READY
 
