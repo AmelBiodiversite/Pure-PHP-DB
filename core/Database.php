@@ -82,11 +82,11 @@ class Database {
         } catch (PDOException $e) {
             // Logger l'erreur dans les logs PHP
             error_log("Database Connection Error: " . $e->getMessage());
-            die("Erreur de connexion à la base de données : " . $e->getMessage());
+            die("Service temporairement indisponible.");
         } catch (Exception $e) {
             // Logger les autres erreurs
             error_log("Database Error: " . $e->getMessage());
-            die("Erreur de configuration : " . $e->getMessage());
+            die("Erreur de configuration. Veuillez réessayer.");
         }
     }
 

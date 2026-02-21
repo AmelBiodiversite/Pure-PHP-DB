@@ -246,7 +246,7 @@ class AuthController extends Controller {
             'password' => $_POST['password'] ?? '',
             'password_confirm' => $_POST['password_confirm'] ?? '',
             'full_name' => $_POST['full_name'] ?? '',
-            'role' => $_POST['role'] ?? 'buyer', // Par défaut : acheteur
+            'role' => in_array($_POST['role'] ?? '', ['buyer', 'seller']) ? $_POST['role'] : 'buyer',
             'shop_name' => $_POST['shop_name'] ?? null // Seulement pour sellers
         ];
 
