@@ -44,8 +44,9 @@
     <script src="<?= JS_URL ?>/wishlist.js" defer></script>
     <script src="<?= JS_URL ?>/animations.js" defer></script>  
 
-<link rel="icon" href="<?= IMG_URL ?>/favicon.ico">
-
+<link rel="icon" type="image/x-icon" href="<?= APP_URL ?>/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="<?= APP_URL ?>/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="<?= APP_URL ?>/apple-touch-icon.png">
 <style>
     /* Animation wishlist badge */
     .wishlist-count {
