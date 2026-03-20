@@ -28,9 +28,10 @@
      HERO SECTION - Section d'accueil
      ============================================================ -->
 <section class="hero-section">
-    <div class="container">
+    	<div class="hero-orbs"></div> 
+	<div class="container">
         <div class="hero-content">
-            <!-- Titre principal avec gradient -->
+	    <!-- Titre principal avec gradient -->
             <h1 class="hero-title animate-fade-in">
                 La marketplace pour les 
                 <span class="gradient-text">créateurs digitaux</span>
@@ -292,29 +293,33 @@
         </p>
 
         <!-- Grille de features -->
-        <div class="features-grid">
-            
-            <!-- Feature 1 : Vente instantanée -->
+
+<div class="features-grid">
+
             <div class="feature-card">
-                <div class="feature-icon">🚀</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
                 <h3 class="feature-title">Vente instantanée</h3>
                 <p class="feature-description">
                     Téléchargement automatique après paiement. Vos clients reçoivent leurs fichiers en quelques secondes.
                 </p>
             </div>
 
-            <!-- Feature 2 : Commission réduite -->
             <div class="feature-card">
-                <div class="feature-icon">💰</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 14.5c.5 1.5 2 2.5 3.5 2.5s3-1 3-2.5-1.5-2-3-2.5-3-1-3-2.5S10.5 7 12 7s3 1 3.5 2.5"/></svg>
+                </div>
                 <h3 class="feature-title">Commission réduite</h3>
                 <p class="feature-description">
                     Gardez la majorité de vos revenus. Les paiements sont automatiques et sécurisés via Stripe.
                 </p>
             </div>
 
-            <!-- Feature 3 : Dashboard complet -->
             <div class="feature-card">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
+                </div>
                 <h3 class="feature-title">Dashboard complet</h3>
                 <p class="feature-description">
                     Suivez vos ventes, analysez vos performances et gérez vos produits facilement.
@@ -322,7 +327,7 @@
             </div>
 
         </div>
-    </div>
+
 </section>
 
 <!-- ============================================================

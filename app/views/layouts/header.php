@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="MarketFlow Pro - La marketplace pour créateurs digitaux">
-
-<!-- Meta Keywords -->
     <meta name="keywords" content="marketplace php, plateforme ecommerce, vente produits numériques, templates, ui kits, code source marketplace, stripe multi-vendeurs, marketplace digitale, vendre en ligne">
+    <meta name="author" content="A. Devance - MarketFlow Pro">
 
-    <!-- Meta Author -->
-    <meta name="author" content="A. Devancé - MarketFlow Pro">
-
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?= APP_URL ?>">
     <meta property="og:title" content="<?= isset($title) ? e($title) . ' - MarketFlow Pro' : 'MarketFlow Pro - Marketplace pour créateurs digitaux' ?>">
@@ -27,437 +23,191 @@
     <meta name="twitter:description" content="Vendez et achetez des templates, designs, codes et ressources premium. Rejoignez des milliers de créateurs.">
     <meta name="twitter:image" content="<?= APP_URL ?>/img/twitter-card.jpg">
 
-    <!-- Canonical URL (pour éviter duplicate content) -->
+    <!-- SEO -->
     <link rel="canonical" href="<?= APP_URL . $_SERVER['REQUEST_URI'] ?>">
-
-    <!-- Robots Meta -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
-<title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
+    <title><?= isset($title) ? e($title) . ' - ' : '' ?>MarketFlow Pro</title>
 
-<link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
-<link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
-<link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">  
+    <!-- Polices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- CSS -->
+    <link rel="stylesheet" href="<?= CSS_URL ?>/style.css">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/dark-mode.css">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">
+
+    <!-- JS -->
     <script src="<?= JS_URL ?>/app.js" defer></script>
     <script src="<?= JS_URL ?>/notifications.js" defer></script>
     <script src="<?= JS_URL ?>/wishlist.js" defer></script>
-    <script src="<?= JS_URL ?>/animations.js" defer></script>  
+    <script src="<?= JS_URL ?>/animations.js" defer></script>
 
-<link rel="icon" type="image/x-icon" href="<?= APP_URL ?>/favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="<?= APP_URL ?>/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="<?= APP_URL ?>/apple-touch-icon.png">
-<style>
-    /* Animation wishlist badge */
-    .wishlist-count {
-        animation: pulse-badge 2s infinite;
-    }
-    @keyframes pulse-badge {
-        0%,100% { box-shadow:0 0 0 0 rgba(239,68,68,.6); }
-        50% { box-shadow:0 0 0 6px rgba(239,68,68,0); }
-    }
-
-    /* Animation dropdown */
-   .dropdown-menu {
-    opacity:0;
-    transform: translateY(10px);
-    pointer-events:none;
-    transition: all 180ms ease;
-    transition-delay: 0s;
-}
-
-[data-dropdown]:hover .dropdown-menu,
-.dropdown-menu:hover {
-    opacity:1;
-    transform: translateY(0);
-    pointer-events:auto;
-    transition-delay: 0s;
-}
-
-[data-dropdown]:not(:hover) .dropdown-menu:not(:hover) {
-    transition-delay: 150ms;
-}
-
-/* NOUVEAU : Bouton Licence Fondateur animé */
-@keyframes shimmer {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-}
-
-.btn-licence-fondateur {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.2rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
-    background-size: 200% auto;
-    color: #1f2937;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
-    transition: all 0.3s ease;
-    animation: shimmer 3s linear infinite;
-}
-
-.btn-licence-fondateur:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
-}
-
-.btn-licence-fondateur .rocket {
-    font-size: 1.1rem;
-    animation: rocket-shake 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes rocket-shake {
-    0% { transform: rotate(-5deg); }
-    100% { transform: rotate(5deg); }
-}
-
-.btn-licence-fondateur .badge-urgent {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ef4444;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 0.15rem 0.4rem;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-}
-</style>
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="<?= APP_URL ?>/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?= APP_URL ?>/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= APP_URL ?>/apple-touch-icon.png">
 </head>
-
 <body <?php if (isLoggedIn()): ?>data-user-logged-in="true"<?php endif; ?>>
 
 <nav>
     <div class="container">
-        <div class="flex flex-between" style="height:70px;">
-        <!-- LOGO -->
-        <a href="/" class="flex gap-4" style="align-items:center;">
-            <div style="
-    width:42px;height:42px;
-    border-radius:12px;
-    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-weight:900;
-    box-shadow: var(--shadow-md);
-">
-    M
-</div>
-            <span style="font-size:1.2rem;font-weight:800;">
-                MarketFlow
-            </span>
-        </a>
+        <div class="nav-inner">
 
-        <!-- NAV LINKS -->
-        <div class="flex gap-4" style="align-items:center;">
-            <a href="/">Accueil</a>
-            <a href="/products">Produits</a>
-            <a href="/category">Catégories</a>
-            
-            <!-- 🔥 Boutons Licence Fondateur (FR + EN) -->
-<a href="/licence-fondateur" class="btn-licence-fondateur">
-    <span class="rocket">🚀</span>
-    Licence Fondateur
-    <span class="badge-urgent">3</span>
-</a>
-<a href="/licence-fondateur-en" class="btn-licence-fondateur" style="background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 50%, #3b82f6 100%);">
-    <span class="rocket">🚀</span>
-    Founder License
-    <span class="badge-urgent">3</span>
-</a>
-
-        <!-- SEARCH --
-        <form action="/search" method="GET" style="position:relative;max-width:280px;width:100%;">
-            <input type="text" name="q" placeholder="Rechercher..."
-                   style="
-                    width:100%;
-                    padding:.6rem 2.2rem .6rem 1rem;
-                    border-radius: var(--radius-lg);
-                    border:1px solid var(--gray-200);
-                    background: var(--bg-primary);
-                   ">
-            <button type="submit" style="
-                position:absolute;
-                right:.6rem;top:50%;
-                transform:translateY(-50%);
-                background:none;border:none;
-                cursor:pointer;
-                color:var(--text-secondary);
-            ">
-                🔍
-            </button>
-        </form>   -->
-
-        <!-- ACTIONS -->
-        <div class="flex gap-4" style="align-items:center;">
-
-            <?php if (isLoggedIn()): ?>
-                <?php 
-                $wishlistModel = new \App\Models\Wishlist();
-                $wishlistCount = $wishlistModel->getCount($_SESSION["user_id"]);
-                ?>
-
-                <!-- Wishlist -->
-                <a href="/wishlist" style="position:relative;">
-                    ❤️
-                    <?php if ($wishlistCount > 0): ?>
-                    <span class="wishlist-count" style="
-                        position:absolute;
-                        top:-8px;right:-10px;
-                        background:#ef4444;
-                        color:white;
-                        font-size:.65rem;
-                        font-weight:700;
-                        width:18px;height:18px;
-                        border-radius:50%;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                    ">
-                        <?= e($wishlistCount) ?>
-                    </span>
-                    <?php endif; ?>
-                </a>
-            <?php endif; ?>
-
-            <!-- Cart -->
-            <a href="/cart" style="position:relative;">🛒
-                <?php $cartCount = $_SESSION['cart_count'] ?? 0; ?>
-                <?php if ($cartCount > 0): ?>
-                <span style="
-                    position:absolute;
-                    top:-8px;right:-10px;
-                    background:#ef4444;
-                    color:white;
-                    font-size:.65rem;
-                    font-weight:700;
-                    width:18px;height:18px;
-                    border-radius:50%;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                ">
-                    <?= e($cartCount) ?>
-                </span>
-                <?php endif; ?>
+            <!-- Logo -->
+            <a href="/" class="nav-logo">
+                <div class="nav-logo-icon">M</div>
+                <span class="nav-logo-text">MarketFlow</span>
             </a>
 
-            <!-- USER -->
-            <?php if (isLoggedIn()): ?>
-                <?php $currentUser = getCurrentUser(); ?>
+            <!-- Liens principaux -->
+            <ul class="nav-links">
+                <li>
+                    <a href="/" <?= ($_SERVER['REQUEST_URI'] === '/') ? 'class="active"' : '' ?>>
+                        Accueil
+                    </a>
+                </li>
+                <li>
+                    <a href="/products" <?= str_starts_with($_SERVER['REQUEST_URI'], '/products') ? 'class="active"' : '' ?>>
+                        Produits
+                    </a>
+                </li>
+                <li>
+                    <a href="/category" <?= str_starts_with($_SERVER['REQUEST_URI'], '/category') ? 'class="active"' : '' ?>>
+                        Catégories
+                    </a>
+                </li>
+            </ul>
 
-                <div class="relative" data-dropdown>
-    <button class="flex gap-4" style="
-        align-items:center;
-        padding: 0.5rem 1rem;
-        border-radius: 12px;
-        transition: all 0.3s;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-        <div style="
-            width:40px;
-            height:40px;
-            border-radius:50%;
-            background:<?= $currentUser['role']==='admin' ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)' ?>;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:white;
-            font-weight:800;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px <?= $currentUser['role']==='admin' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)' ?>;
-            position: relative;
-        ">
-            <?= strtoupper(substr($currentUser['username'],0,1)) ?>
-            <?php if ($currentUser['role']==='admin'): ?>
-                <span style="
-                    position: absolute;
-                    bottom: -2px;
-                    right: -2px;
-                    background: #fbbf24;
-                    width: 16px;
-                    height: 16px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 0.6rem;
-                    border: 2px solid white;
-                ">👑</span>
-            <?php endif; ?>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">
-                <?= e($currentUser['username']) ?>
-            </span>
-            <?php if ($currentUser['role']==='admin'): ?>
-                <span style="
-                    font-size: 0.7rem;
-                    color: white;
-                    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-                    padding: 0.1rem 0.5rem;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    margin-top: 2px;
-                ">ADMIN</span>
-            <?php endif; ?>
-        </div>
-        <span style="margin-left: 0.25rem; color: var(--text-tertiary); font-size: 0.8rem;">▼</span>
-    </button>
-                    <div class="dropdown-menu" style="
-                    position: absolute;
-                    right: 0;
-                    top: 100%;
-                    min-width: 220px;
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-                    padding: 0.5rem;
-                    border: 1px solid rgba(0, 0, 0, 0.05);
-                    
-                ">
-                    <a href="/account" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        👤 Mon compte
-                    </a>
-                    
-                    <a href="/orders" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        📦 Mes commandes
-                    </a>
-                    
-                    <a href="/wishlist" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: var(--text-primary);
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                    " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                        ❤️ Mes favoris
-                    </a>
+            <!-- Partie droite -->
+            <div class="nav-right">
 
-                    <?php if ($currentUser['role']==='seller'): ?>
-                        <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-                        <a href="/seller/dashboard" style="
-                            display: block;
-                            padding: 0.75rem 1rem;
-                            border-radius: 8px;
-                            color: var(--text-primary);
-                            text-decoration: none;
-                            transition: all 0.2s;
-                            font-size: 0.95rem;
-                        " onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                            🏪 Dashboard vendeur
-                        </a>
+                <!-- Wishlist -->
+                <?php
+                $wishlistCount = 0;
+                if (isLoggedIn()) {
+                    $wishlistModel = new \App\Models\Wishlist();
+                    $wishlistCount = $wishlistModel->getCount($_SESSION['user_id']);
+                }
+                ?>
+                <a href="/wishlist" class="icon-btn icon-btn--wishlist" title="Ma liste de souhaits">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <?php if ($wishlistCount > 0): ?>
+                        <span class="icon-badge wishlist-count"><?= e($wishlistCount) ?></span>
                     <?php endif; ?>
+                </a>
 
-                    <?php if ($currentUser['role']==='admin'): ?>
-    <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-    
-    <a href="/admin" style="
-        display: block;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        color: white;
-        text-decoration: none;
-        transition: all 0.2s;
-        font-weight: 600;
-        font-size: 0.95rem;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-    " onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(59, 130, 246, 0.3)'">
-        👑 Administration
-    </a>
-    
-    <?php $criticalCount = getSecurityAlerts(); ?>
-    
-    <a href="/admin/security" style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        <?= $criticalCount > 0 ? 'background: rgba(245, 87, 108, 0.1);' : '' ?>
-        color: <?= $criticalCount > 0 ? '#f5576c' : 'var(--text-primary)' ?>;
-        text-decoration: none;
-        transition: all 0.2s;
-        font-size: 0.95rem;
-        <?= $criticalCount > 0 ? 'font-weight: 600;' : '' ?>
-    " onmouseover="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.15)' : 'var(--bg-secondary)' ?>'" onmouseout="this.style.background='<?= $criticalCount > 0 ? 'rgba(245, 87, 108, 0.1)' : 'transparent' ?>'">
-        <span>🔒 Monitoring Sécurité</span>
-        <?php if ($criticalCount > 0): ?>
-            <span style="
-                background: #f5576c;
-                color: white;
-                font-size: 0.7rem;
-                font-weight: 700;
-                padding: 0.15rem 0.5rem;
-                border-radius: 12px;
-                margin-left: 0.5rem;
-            "><?= $criticalCount ?></span>
-        <?php endif; ?>
-    </a>
-<?php endif; ?>
+                <!-- Panier -->
+                <a href="/cart" class="icon-btn icon-btn--cart" title="Mon panier">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    <?php $cartCount = $_SESSION['cart_count'] ?? 0; ?>
+                    <?php if ($cartCount > 0): ?>
+                        <span class="icon-badge"><?= e($cartCount) ?></span>
+                    <?php endif; ?>
+                </a>
 
-                    <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
-                    
-                    <a href="/logout" style="
-                        display: block;
-                        padding: 0.75rem 1rem;
-                        border-radius: 8px;
-                        color: #ef4444;
-                        text-decoration: none;
-                        transition: all 0.2s;
-                        font-size: 0.95rem;
-                        font-weight: 500;
-                    " onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='transparent'">
-                        🚪 Déconnexion
-                    </a>
-                </div>
-            </div>
+                <div class="nav-sep"></div>
 
-            <?php else: ?>
-                <a href="/login">Connexion</a>
-                <a href="/register" class="btn btn-primary">Inscription</a>
-            <?php endif; ?>
+                <?php if (isLoggedIn()): ?>
+                    <?php $currentUser = getCurrentUser(); ?>
 
-        </div>
-    </div>
-</div>
+                    <!-- Menu utilisateur connecté -->
+                    <div class="nav-dropdown" data-dropdown>
 
+                        <button class="nav-user-btn">
+                            <div class="nav-avatar <?= $currentUser['role'] === 'admin' ? 'nav-avatar--admin' : '' ?>">
+                                <?= strtoupper(substr($currentUser['username'], 0, 1)) ?>
+                                <?php if ($currentUser['role'] === 'admin'): ?>
+                                    <span class="nav-avatar-crown">👑</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="nav-user-info">
+                                <span class="nav-username"><?= e($currentUser['username']) ?></span>
+                                <?php if ($currentUser['role'] === 'admin'): ?>
+                                    <span class="nav-role-badge">ADMIN</span>
+                                <?php endif; ?>
+                            </div>
+                            <svg class="nav-chevron" viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+
+                        <div class="dropdown-menu">
+
+                            <a href="/account" class="dropdown-item">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                Mon compte
+                            </a>
+
+                            <a href="/orders" class="dropdown-item">
+                                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                Mes commandes
+                            </a>
+
+                            <a href="/wishlist" class="dropdown-item">
+                                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                Mes favoris
+                            </a>
+
+                            <?php if ($currentUser['role'] === 'seller'): ?>
+                                <div class="dropdown-sep"></div>
+                                <a href="/seller/dashboard" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
+                                    Dashboard vendeur
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($currentUser['role'] === 'admin'): ?>
+                                <div class="dropdown-sep"></div>
+                                <a href="/admin" class="dropdown-item dropdown-item--admin">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                    Administration
+                                </a>
+                                <?php $criticalCount = getSecurityAlerts(); ?>
+                                <a href="/admin/security" class="dropdown-item <?= $criticalCount > 0 ? 'dropdown-item--alert' : '' ?>">
+                                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Monitoring Sécurité
+                                    <?php if ($criticalCount > 0): ?>
+                                        <span class="dropdown-item-badge"><?= $criticalCount ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            <?php endif; ?>
+
+                            <div class="dropdown-sep"></div>
+
+                            <a href="/logout" class="dropdown-item dropdown-item--danger">
+                                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Déconnexion
+                            </a>
+
+                        </div>
+                    </div>
+
+                <?php else: ?>
+
+                    <a href="/login" class="btn-login">Connexion</a>
+                    <a href="/register" class="btn-register">S'inscrire</a>
+
+                <?php endif; ?>
+
+            </div><!-- /nav-right -->
+        </div><!-- /nav-inner -->
+    </div><!-- /container -->
 </nav>
 
 <!-- Flash message -->
 <?php if ($flash = getFlashMessage()): ?>
-<div data-flash-message="<?= e($flash['message']) ?>"
-     data-flash-type="<?= e($flash['type']) ?>" style="display:none;"></div>
+    <div data-flash-message="<?= e($flash['message']) ?>"
+         data-flash-type="<?= e($flash['type']) ?>"
+         style="display:none;"></div>
 <?php endif; ?>
 
 <!-- CONTENU PRINCIPAL -->

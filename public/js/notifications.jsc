@@ -1,0 +1,1 @@
+window.showNotification = NotificationSystem.show.bind(NotificationSystem);

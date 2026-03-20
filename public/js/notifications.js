@@ -217,3 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // EXPORT GLOBAL
 // =====================================================
 window.NotificationSystem = NotificationSystem;
+// Alias pour compatibilité avec wishlist.js et show.php
+window.showNotification = NotificationSystem.show.bind(NotificationSystem);
+

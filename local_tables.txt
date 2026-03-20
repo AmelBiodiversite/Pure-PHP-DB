@@ -1,0 +1,21 @@
+              List of relations
+ Schema |      Name       | Type  |  Owner   
+--------+-----------------+-------+----------
+ public | activity_logs   | table | postgres
+ public | blocked_ips     | table | postgres
+ public | categories      | table | postgres
+ public | order_items     | table | postgres
+ public | orders          | table | postgres
+ public | product_gallery | table | postgres
+ public | product_tags    | table | postgres
+ public | products        | table | postgres
+ public | promo_codes     | table | postgres
+ public | rate_limits     | table | postgres
+ public | reviews         | table | postgres
+ public | security_logs   | table | postgres
+ public | tags            | table | postgres
+ public | users           | table | postgres
+ public | whitelisted_ips | table | postgres
+ public | wishlist        | table | postgres
+(16 rows)
+
