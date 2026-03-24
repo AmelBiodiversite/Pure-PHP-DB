@@ -45,10 +45,12 @@
     <script src="<?= JS_URL ?>/wishlist.js" defer></script>
     <script src="<?= JS_URL ?>/animations.js" defer></script>
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="<?= APP_URL ?>/favicon.ico">
-    <link rel="icon" type="image/png" sizes="192x192" href="<?= APP_URL ?>/favicon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?= APP_URL ?>/apple-touch-icon.png">
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/favicon.svg">
+<link rel="icon" type="image/x-icon" href="<?= APP_URL ?>/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="<?= APP_URL ?>/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="<?= APP_URL ?>/apple-touch-icon.png">
+
 <!-- Google Analytics GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FEB5D7C9F"></script>
 <script>
