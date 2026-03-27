@@ -140,6 +140,7 @@ $router->get('/admin/export/orders', 'ExportController@orders');
 $router->get('/api', 'ApiController@index');
 $router->get('/api/products', 'ApiController@products');
 $router->get('/api/products/{slug}', 'ApiController@product');
+$router->get('/api/search/suggestions', 'ProductController@searchSuggestions');
 $router->get('/api/categories', 'ApiController@categories');
 
 // ================================================================

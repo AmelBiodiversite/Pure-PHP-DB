@@ -1,0 +1,252 @@
+/* ============================================================
+   MARKETFLOW PRO - STYLES BARRE DE RECHERCHE AUTOCOMPLETE
+   Fichier : public/css/search.css
+   ============================================================ */
+
+/* Conteneur principal de la barre de recherche dans la nav */
+.nav-search {
+    position: relative;           /* Ancre le dropdown en absolu */
+    display: flex;
+    align-items: center;
+    flex: 1;                      /* Prend l'espace disponible entre nav-links et nav-right */
+    max-width: 420px;
+    margin: 0 var(--space-6);
+}
+
+/* Champ de saisie */
+.nav-search-input {
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-full, 999px);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.nav-search-input:focus {
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.15);
+    background: var(--bg-primary);
+}
+
+/* Bouton loupe superposé à droite du champ */
+.nav-search-btn {
+    position: absolute;
+    right: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.nav-search-btn:hover {
+    color: var(--primary-600);
+}
+
+/* ============================================================
+   DROPDOWN DES SUGGESTIONS
+   ============================================================ */
+
+.search-dropdown {
+    display: none;               /* Caché par défaut, affiché par JS */
+    position: absolute;
+    top: calc(100% + 8px);       /* Juste sous le champ */
+    left: 0;
+    width: 100%;
+    min-width: 320px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    overflow: hidden;
+    animation: searchDropIn 0.18s ease-out;
+}
+
+/* Dropdown visible quand la classe .open est ajoutée par JS */
+.search-dropdown.open {
+    display: block;
+}
+
+@keyframes searchDropIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Section du dropdown (Produits / Tags) */
+.search-section-title {
+    padding: 0.5rem 1rem 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    border-top: 1px solid var(--border-color);
+}
+
+.search-section-title:first-child {
+    border-top: none;
+}
+
+/* Ligne d'un résultat produit */
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.search-result-item:hover,
+.search-result-item.highlighted {
+    background: var(--bg-secondary);
+}
+
+/* Miniature produit dans le dropdown */
+.search-result-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+}
+
+/* Infos texte du produit */
+.search-result-info {
+    flex: 1;
+    min-width: 0;              /* Empêche le débordement */
+}
+
+.search-result-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Le terme recherché mis en évidence */
+.search-result-title mark {
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.2);
+    color: var(--primary-600);
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+.search-result-price {
+    font-size: 0.8rem;
+    color: var(--primary-600);
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+/* Ligne d'un résultat tag */
+.search-tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full, 999px);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.search-tag-item:hover {
+    background: var(--primary-100);
+    color: var(--primary-600);
+}
+
+/* Conteneur des tags dans le dropdown */
+.search-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+}
+
+/* Message "Aucun résultat" */
+.search-no-result {
+    padding: 1.25rem 1rem;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+/* Lien "Voir tous les résultats" en bas du dropdown */
+.search-view-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-600);
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.search-view-all:hover {
+    background: var(--primary-50);
+}
+
+/* Spinner de chargement */
+.search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+.search-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--primary-600);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablette : on réduit */
+@media (max-width: 1024px) {
+    .nav-search {
+        max-width: 260px;
+        margin: 0 var(--space-4);
+    }
+}
+
+/* Mobile : on cache la barre dans la nav, on peut l'ouvrir via un bouton */
+@media (max-width: 768px) {
+    .nav-search {
+        display: none;          /* Caché sur mobile, gérable via un bouton dédié si besoin */
+    }
+}

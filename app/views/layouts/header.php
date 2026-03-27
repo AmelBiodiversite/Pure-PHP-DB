@@ -38,6 +38,8 @@
     <link rel="stylesheet" href="<?= CSS_URL ?>/dark-mode.css">
     <link rel="stylesheet" href="<?= CSS_URL ?>/notifications.css">
     <link rel="stylesheet" href="<?= CSS_URL ?>/animations.css">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/search.css">
+<script src="<?= JS_URL ?>/search.js" defer></script>
 
     <!-- JS -->
     <script src="<?= JS_URL ?>/app.js" defer></script>
@@ -95,6 +97,20 @@
                 </li>
             </ul>
 
+<!-- BARRE DE RECHERCHE AUTOCOMPLETE -->
+<div class="nav-search" id="navSearch">
+    <input type="text" id="searchInput" class="nav-search-input"
+        placeholder="Rechercher un produit..." autocomplete="off"
+        aria-label="Rechercher" aria-expanded="false"
+        aria-controls="searchDropdown" aria-haspopup="listbox">
+    <button class="nav-search-btn" id="searchSubmitBtn" aria-label="Lancer la recherche">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+    </button>
+    <div class="search-dropdown" id="searchDropdown" role="listbox"></div>
+</div>
             <!-- Partie droite -->
             <div class="nav-right">
 
