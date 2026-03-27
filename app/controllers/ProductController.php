@@ -261,7 +261,7 @@ if (isset($_SESSION['user_id'])) {
      */
     public function toggleWishlist() {
         if (!isset($_SESSION['user_id'])) {
-            $this->json(['success' => false, 'message' => 'Connexion requise'], 401);
+            $this->jsonResponse(['success' => false, 'message' => 'Connexion requise'], 401);
         }
 
         $productId = $_POST['product_id'] ?? 0;
@@ -287,7 +287,7 @@ if (isset($_SESSION['user_id'])) {
                 'user_id' => $_SESSION['user_id'],
                 'product_id' => $productId
             ]);
-            $this->json(['success' => true, 'action' => 'removed']);
+            $this->jsonResponse(['success' => true, 'action' => 'removed']);
         } else {
             // Ajouter à la wishlist
             $stmt = $this->db->prepare("
@@ -298,7 +298,7 @@ if (isset($_SESSION['user_id'])) {
                 'user_id' => $_SESSION['user_id'],
                 'product_id' => $productId
             ]);
-            $this->json(['success' => true, 'action' => 'added']);
+            $this->jsonResponse(['success' => true, 'action' => 'added']);
         }
     }
 
@@ -334,7 +334,7 @@ if (isset($_SESSION['user_id'])) {
         $query = $_GET['q'] ?? '';
 
         if (strlen($query) < 2) {
-            $this->json(['suggestions' => []]);
+$this->jsonResponse(['products' => [], 'tags' => []]);
         }
 
         // Rechercher dans les titres de produits
@@ -359,7 +359,7 @@ if (isset($_SESSION['user_id'])) {
         $stmt->execute(['query' => '%' . $query . '%']);
         $tags = $stmt->fetchAll();
 
-        $this->json([
+        $this->jsonResponse([
             'products' => $products,
             'tags' => $tags
         ]);
