@@ -10,6 +10,7 @@ namespace App\Controllers;
 use Core\Controller;
 use App\Models\Order;
 use App\Models\Cart;
+use Core\BrevoMailer;
 
 class PaymentController extends Controller {
     private $orderModel;
@@ -208,6 +209,25 @@ class PaymentController extends Controller {
                 $orderId,
                 ['order_number' => $order['order_number']]
             );
+// 📧 EMAIL CONFIRMATION COMMANDE
+            $buyer = $this->db->prepare("SELECT email, username, full_name FROM users WHERE id = ?");
+            $buyer->execute([$order['buyer_id']]);
+            $buyerData = $buyer->fetch(PDO::FETCH_ASSOC);
+
+            $rawItems = $this->orderModel->getOrderItems($orderId);
+            $items = array_map(fn($i) => [
+                'title' => $i['product_title'],
+                'price' => $i['product_price']
+            ], $rawItems);
+
+            BrevoMailer::sendOrderConfirmation(
+                $buyerData['email'],
+                $buyerData['full_name'] ?: $buyerData['username'],
+                $order['order_number'],
+                (float) $order['total_amount'],
+                $items
+            );
+
         } else {
             error_log('Failed to confirm order: ' . $orderId . ' - ' . ($result['error'] ?? 'Unknown error'));
         }

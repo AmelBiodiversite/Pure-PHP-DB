@@ -23,6 +23,7 @@ namespace App\Controllers;
 use Core\Controller;
 use Core\SecurityLogger;
 use App\Models\User;
+use Core\BrevoMailer;
 
 class AuthController extends Controller {
     private $securityLogger;
@@ -321,6 +322,9 @@ class AuthController extends Controller {
             // ✅ INSCRIPTION RÉUSSIE
 
             $this->securityLogger->logRegister($data['email'], $userId);
+
+            // 📧 EMAIL DE BIENVENUE
+            BrevoMailer::sendWelcome($data['email'], $data['full_name'] ?: $data['username']);
 
             // Récupérer l'utilisateur créé
             $user = $this->userModel->find($userId);
