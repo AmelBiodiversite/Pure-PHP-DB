@@ -2,699 +2,498 @@
 /**
  * MARKETFLOW PRO - DASHBOARD VENDEUR
  * Fichier : app/views/seller/dashboard.php
+ *
+ * Variables reçues depuis SellerController@dashboard :
+ *   $stats          → total_products, approved_products, pending_products,
+ *                     total_downloads, total_revenue
+ *   $revenue_by_day → tableau [{date, revenue, orders}, ...]  (30 derniers jours)
+ *   $top_products   → tableau [{id, title, price, downloads, sales_count, revenue}, ...]
+ *   $recent_products→ tableau des 5 derniers produits créés
+ *   $recent_sales   → tableau des 10 dernières commandes (30 jours)
+ *
+ * Corrections apportées :
+ *   - Chart.js chargé en tête de fichier (était absent du header global)
+ *   - Code dupliqué supprimé (deux dashboards étaient concaténés)
+ *   - Variable $sales_chart remplacée par $revenue_by_day (correcte)
+ *   - Variable $pending_products remplacée par $stats['pending_products']
+ *   - seller_amount absent de recent_sales → remplacé par total_amount
+ *   - Double axe Y (revenus + commandes) sur le graphique principal
+ *   - Boutons 7j / 30j / 90j branchés via AJAX sur /seller/analytics
  */
-?>
-<?php
-/**
- * Dashboard Vendeur avec Graphiques
- */
+
+// ── Chargement de Chart.js (local, déjà présent dans public/js/libs/) ──────────
+// On le charge ici et non dans le header car seules les pages vendeur en ont besoin
+echo '<script src="' . JS_URL . '/libs/chart.min.js"></script>' . "\n";
 ?>
 
 <div class="container mt-8 mb-16">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="mb-2">📊 Dashboard Vendeur</h1>
-        <p style="color: var(--text-secondary);">Suivez vos performances en temps réel</p>
+
+    <!-- ═══════════════════════════════════════════════
+         HEADER PAGE
+    ═══════════════════════════════════════════════ -->
+    <div class="flex-between mb-8">
+        <div>
+            <h1 class="mb-2">📊 Dashboard Vendeur</h1>
+            <p style="color: var(--text-secondary);">Suivez vos performances en temps réel</p>
+        </div>
+        <a href="/seller/products/create" class="btn btn-primary">
+            ➕ Nouveau produit
+        </a>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- ═══════════════════════════════════════════════
+         CARTES STATS (4 colonnes)
+         Source : $stats retourné par SellerController
+    ═══════════════════════════════════════════════ -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Produits -->
+
+        <!-- Revenus totaux -->
         <div class="card hover-lift">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                    📦
-                </div>
-                <div style="flex: 1;">
-                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Produits</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= e($stats['total_products']) ?></h3>
-                    <p style="font-size: 0.75rem; color: var(--success); margin: 0;">
-                        <?= e($stats['approved_products']) ?> approuvés
-                    </p>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div style="width:48px; height:48px; background:linear-gradient(135deg,#43e97b,#38f9d7);
+                            border-radius:12px; display:flex; align-items:center;
+                            justify-content:center; font-size:24px;">💰</div>
+                <div style="flex:1;">
+                    <p style="color:var(--text-secondary); font-size:.875rem; margin-bottom:.25rem;">Revenus totaux</p>
+                    <h3 style="margin:0; font-size:1.75rem;"><?= formatPrice($stats['total_revenue'] ?? 0) ?></h3>
                 </div>
             </div>
         </div>
 
-        <!-- Revenus -->
+        <!-- Produits -->
         <div class="card hover-lift">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                    💰
-                </div>
-                <div style="flex: 1;">
-                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Revenus</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= formatPrice($stats['total_revenue']) ?></h3>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div style="width:48px; height:48px; background:linear-gradient(135deg,#667eea,#764ba2);
+                            border-radius:12px; display:flex; align-items:center;
+                            justify-content:center; font-size:24px;">📦</div>
+                <div style="flex:1;">
+                    <p style="color:var(--text-secondary); font-size:.875rem; margin-bottom:.25rem;">Produits</p>
+                    <h3 style="margin:0; font-size:1.75rem;"><?= e($stats['total_products'] ?? 0) ?></h3>
+                    <p style="font-size:.75rem; color:var(--success); margin:0;">
+                        <?= e($stats['approved_products'] ?? 0) ?> approuvés
+                        <?php if (($stats['pending_products'] ?? 0) > 0): ?>
+                            · <span style="color:var(--warning);"><?= e($stats['pending_products']) ?> en attente</span>
+                        <?php endif; ?>
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- Téléchargements -->
         <div class="card hover-lift">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                    📥
-                </div>
-                <div style="flex: 1;">
-                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">Téléchargements</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= number_format($stats['total_downloads']) ?></h3>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div style="width:48px; height:48px; background:linear-gradient(135deg,#f093fb,#f5576c);
+                            border-radius:12px; display:flex; align-items:center;
+                            justify-content:center; font-size:24px;">📥</div>
+                <div style="flex:1;">
+                    <p style="color:var(--text-secondary); font-size:.875rem; margin-bottom:.25rem;">Téléchargements</p>
+                    <h3 style="margin:0; font-size:1.75rem;"><?= number_format($stats['total_downloads'] ?? 0) ?></h3>
                 </div>
             </div>
         </div>
 
-        <!-- En attente -->
+        <!-- Ventes récentes (30j) -->
         <div class="card hover-lift">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                    ⏳
-                </div>
-                <div style="flex: 1;">
-                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.25rem;">En attente</p>
-                    <h3 style="margin: 0; font-size: 1.75rem;"><?= e($stats['pending_products']) ?></h3>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div style="width:48px; height:48px; background:linear-gradient(135deg,#fa709a,#fee140);
+                            border-radius:12px; display:flex; align-items:center;
+                            justify-content:center; font-size:24px;">🛍️</div>
+                <div style="flex:1;">
+                    <p style="color:var(--text-secondary); font-size:.875rem; margin-bottom:.25rem;">Ventes (30j)</p>
+                    <h3 style="margin:0; font-size:1.75rem;"><?= number_format(count($recent_sales ?? [])) ?></h3>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- Graphiques -->
+    <!-- ═══════════════════════════════════════════════
+         GRAPHIQUES
+         - Gauche  : courbe revenus + commandes (30j)
+         - Droite  : barres top 5 produits
+    ═══════════════════════════════════════════════ -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Graphique Revenus -->
+
+        <!-- ── Graphique revenus ── -->
         <div class="card">
-            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                <h2 style="margin: 0;">📈 Revenus (30 derniers jours)</h2>
+            <div style="padding:1.5rem; border-bottom:1px solid var(--border-color);
+                        display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">📈 Revenus (30 derniers jours)</h2>
+                <!-- Boutons période : appellent changeChartPeriod() défini en JS ci-dessous -->
+                <div style="display:flex; gap:.5rem;">
+                    <button class="btn btn-sm btn-ghost period-btn" data-days="7"  onclick="changeChartPeriod(7)">7j</button>
+                    <button class="btn btn-sm btn-ghost period-btn active-period" data-days="30" onclick="changeChartPeriod(30)">30j</button>
+                    <button class="btn btn-sm btn-ghost period-btn" data-days="90" onclick="changeChartPeriod(90)">90j</button>
+                </div>
             </div>
-            <div style="padding: 1.5rem;">
-                <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+            <div style="padding:1.5rem;">
+                <!-- height fixe pour que Chart.js respecte la hauteur max -->
+                <div style="position:relative; height:280px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Top Produits -->
+        <!-- ── Top 5 produits ── -->
         <div class="card">
-            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                <h2 style="margin: 0;">🏆 Top 5 Produits</h2>
+            <div style="padding:1.5rem; border-bottom:1px solid var(--border-color);">
+                <h2 style="margin:0;">🏆 Top 5 produits</h2>
             </div>
-            <div style="padding: 1.5rem;">
-                <canvas id="topProductsChart" style="max-height: 300px;"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Actions rapides -->
-    <div class="card mb-8">
-        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-            <h2 style="margin: 0;">⚡ Actions rapides</h2>
-        </div>
-        <div style="padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <a href="/seller/products/create" class="btn btn-primary hover-lift">
-                ➕ Nouveau produit
-            </a>
-            <a href="/seller/products" class="btn btn-outline hover-lift">
-                📦 Mes produits
-            </a>
-            <a href="/seller/orders" class="btn btn-outline hover-lift">
-                🛍️ Commandes
-            </a>
-        </div>
-    </div>
-
-    <!-- Produits récents -->
-    <div class="card">
-        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-            <h2 style="margin: 0;">🕒 Produits récents</h2>
-        </div>
-        <div style="overflow-x: auto;">
-            <?php if (empty($recent_products)): ?>
-                <div style="padding: 3rem; text-align: center; color: var(--text-secondary);">
-                    <p style="font-size: 3rem; margin-bottom: 1rem;">📦</p>
-                    <p>Aucun produit pour le moment</p>
-                    <a href="/seller/products/create" class="btn btn-primary" style="margin-top: 1rem;">
-                        Créer mon premier produit
-                    </a>
-                </div>
-            <?php else: ?>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
-                            <th style="padding: 1rem;">Produit</th>
-                            <th style="padding: 1rem;">Prix</th>
-                            <th style="padding: 1rem;">Statut</th>
-                            <th style="padding: 1rem;">Téléchargements</th>
-                            <th style="padding: 1rem;">Date</th>
-                            <th style="padding: 1rem;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recent_products as $product): ?>
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <?php if ($product['thumbnail_url']): ?>
-                                        <img src="<?= e($product['thumbnail_url']) ?>" 
-                                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;">
-                                    <?php endif; ?>
-                                    <span style="font-weight: 500;"><?= e($product['title']) ?></span>
-                                </div>
-                            </td>
-                            <td style="padding: 1rem; font-weight: 600;">
-                                <?= formatPrice($product['price']) ?>
-                            </td>
-                            <td style="padding: 1rem;">
-                                <span class="badge badge-<?= $product['status'] === 'approved' ? 'success' : 'warning' ?>">
-                                    <?= e($product['status']) ?>
-                                </span>
-                            </td>
-                            <td style="padding: 1rem;">
-                                <?= $product['downloads'] ?? 0 ?>
-                            </td>
-                            <td style="padding: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
-                                <?= date('d/m/Y', strtotime($product['created_at'])) ?>
-                            </td>
-                            <td style="padding: 1rem;">
-                                <a href="/seller/products/<?= e($product['id']) ?>/edit" class="btn btn-sm btn-outline">
-                                    ✏️ Modifier
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-<script>
-// Données PHP vers JS
-const revenueData = <?= json_encode($revenue_by_day) ?>;
-const topProducts = <?= json_encode($top_products) ?>;
-
-// Graphique Revenus
-const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-        labels: revenueData.map(d => new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })),
-        datasets: [{
-            label: 'Revenus (€)',
-            data: revenueData.map(d => parseFloat(d.revenue)),
-            borderColor: 'rgb(67, 233, 123)',
-            backgroundColor: 'rgba(67, 233, 123, 0.1)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return value + '€';
-                    }
-                }
-            }
-        }
-    }
-});
-
-// Graphique Top Produits
-const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
-new Chart(topProductsCtx, {
-    type: 'bar',
-    data: {
-        labels: topProducts.map(p => p.title.length > 20 ? p.title.substring(0, 20) + '...' : p.title),
-        datasets: [{
-            label: 'Revenus (€)',
-            data: topProducts.map(p => parseFloat(p.revenue)),
-            backgroundColor: [
-                'rgba(102, 126, 234, 0.8)',
-                'rgba(118, 75, 162, 0.8)',
-                'rgba(240, 147, 251, 0.8)',
-                'rgba(245, 87, 108, 0.8)',
-                'rgba(250, 112, 154, 0.8)'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return value + '€';
-                    }
-                }
-            }
-        }
-    }
-});
-</script>
-
-<div class="container mt-8 mb-16">
-    
-    <!-- Header -->
-    <div class="mb-8">
-        <h1>Dashboard Vendeur</h1>
-        <p style="color: var(--text-secondary); margin-top: var(--space-2);">
-            Vue d'ensemble de vos performances
-        </p>
-    </div>
-
-    <div class="flex-between mb-8">
-        <h1>Dashboard Vendeur</h1>
-        <a href="/seller/products/create" class="btn btn-primary">
-            + Ajouter un produit
-        </a>
-    </div>
-
-    <!-- Stats principales -->
-    <div class="grid grid-4 mb-8">
-        
-        <!-- Revenus totaux -->
-        <div class="card" style="padding: var(--space-6); background: var(--gradient-primary); color: white;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
-                <div style="
-                    width: 50px;
-                    height: 50px;
-                    background: rgba(255,255,255,0.2);
-                    border-radius: var(--radius-lg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                ">
-                    💰
-                </div>
-                <span style="font-size: 0.875rem; opacity: 0.9;">Total</span>
-            </div>
-            <div style="font-size: 2rem; font-weight: 700; margin-bottom: var(--space-1);">
-                <?= formatPrice($stats['total_sales'] ?? 0) ?>
-            </div>
-            <div style="font-size: 0.875rem; opacity: 0.8;">
-                Revenus générés
-            </div>
-        </div>
-
-        <!-- Ventes -->
-        <div class="card" style="padding: var(--space-6);">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
-                <div style="
-                    width: 50px;
-                    height: 50px;
-                    background: var(--success-light);
-                    border-radius: var(--radius-lg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                ">
-                    📦
-                </div>
-                <span style="font-size: 0.875rem; color: var(--text-tertiary);">30j</span>
-            </div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--success); margin-bottom: var(--space-1);">
-                <?= number_format(count($recent_sales)) ?>
-            </div>
-            <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                Ventes récentes
-            </div>
-        </div>
-
-        <!-- Produits -->
-        <div class="card" style="padding: var(--space-6);">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
-                <div style="
-                    width: 50px;
-                    height: 50px;
-                    background: var(--primary-100);
-                    border-radius: var(--radius-lg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                ">
-                    🎨
-                </div>
-                <a href="/seller/products" style="font-size: 0.875rem; color: var(--primary-600);">Voir →</a>
-            </div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--primary-600); margin-bottom: var(--space-1);">
-                <?= $stats['total_products'] ?? 0 ?>
-            </div>
-            <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                Produits actifs
-            </div>
-        </div>
-
-        <!-- Note moyenne -->
-        <div class="card" style="padding: var(--space-6);">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-4);">
-                <div style="
-                    width: 50px;
-                    height: 50px;
-                    background: var(--warning-light);
-                    border-radius: var(--radius-lg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.5rem;
-                ">
-                    ⭐
-                </div>
-                <span style="font-size: 0.875rem; color: var(--text-tertiary);">
-                    <?= $stats['rating_count'] ?? 0 ?> avis
-                </span>
-            </div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--warning); margin-bottom: var(--space-1);">
-                <?= number_format($stats['rating_average'] ?? 0, 1) ?>/5
-            </div>
-            <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                Note moyenne
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Graphiques et données -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-8); margin-bottom: var(--space-8);">
-        
-        <!-- Graphique des ventes -->
-        <div class="card" style="padding: var(--space-8);">
-            <div class="flex-between mb-6">
-                <h2 style="font-size: 1.5rem;">📈 Ventes des 30 derniers jours</h2>
-                <div style="display: flex; gap: var(--space-2);">
-                    <button class="btn btn-ghost btn-sm" onclick="changeChartPeriod(7)">7j</button>
-                    <button class="btn btn-ghost btn-sm" onclick="changeChartPeriod(30)" style="background: var(--primary-100);">30j</button>
-                    <button class="btn btn-ghost btn-sm" onclick="changeChartPeriod(90)">90j</button>
-                </div>
-            </div>
-            <canvas id="salesChart" style="max-height: 300px;"></canvas>
-        </div>
-
-        <!-- Produits en attente -->
-        <div class="card" style="padding: var(--space-6);">
-            <h3 style="font-size: 1.25rem; margin-bottom: var(--space-6);">
-                ⏳ En attente de validation
-            </h3>
-            
-            <?php if (empty($pending_products)): ?>
-                <div style="text-align: center; padding: var(--space-8); color: var(--text-tertiary);">
-                    <div style="font-size: 3rem; margin-bottom: var(--space-3);">✓</div>
-                    <p>Tous vos produits sont validés</p>
-                </div>
-            <?php else: ?>
-                <div style="display: flex; flex-direction: column; gap: var(--space-4);">
-                    <?php foreach (array_slice($pending_products, 0, 3) as $product): ?>
-                    <div style="
-                        padding: var(--space-3);
-                        background: var(--bg-secondary);
-                        border-radius: var(--radius);
-                        font-size: 0.875rem;
-                    ">
-                        <div style="font-weight: 600; margin-bottom: var(--space-1);">
-                            <?= e(truncate($product['title'], 40)) ?>
-                        </div>
-                        <div style="color: var(--text-tertiary); font-size: 0.75rem;">
-                            Soumis le <?= date('d/m/Y', strtotime($product['created_at'])) ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                    
-                    <?php if (count($pending_products) > 3): ?>
-                    <a href="/seller/products?status=pending" style="font-size: 0.875rem; color: var(--primary-600);">
-                        Voir les <?= count($pending_products) - 3 ?> autres →
-                    </a>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-    </div>
-
-    <!-- Ventes récentes et Top produits -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8);">
-        
-        <!-- Ventes récentes -->
-        <div class="card" style="padding: var(--space-8);">
-            <h2 style="font-size: 1.5rem; margin-bottom: var(--space-6);">
-                💳 Ventes récentes
-            </h2>
-            
-            <?php if (empty($recent_sales)): ?>
-                <div style="text-align: center; padding: var(--space-12); color: var(--text-tertiary);">
-                    <div style="font-size: 3rem; margin-bottom: var(--space-3);">📦</div>
-                    <p>Aucune vente pour le moment</p>
-                </div>
-            <?php else: ?>
-                <div style="display: flex; flex-direction: column; gap: var(--space-4);">
-                    <?php foreach (array_slice($recent_sales, 0, 5) as $sale): ?>
-                    <div style="
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: var(--space-4);
-                        background: var(--bg-secondary);
-                        border-radius: var(--radius);
-                    ">
-                        <div>
-                            <div style="font-weight: 600; margin-bottom: var(--space-1);">
-                                <?= e(truncate($sale['product_title'], 35)) ?>
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                <?= timeAgo($sale['order_date']) ?> • <?= e($sale['buyer_name']) ?>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; color: var(--success);">
-                            +<?= formatPrice($sale['seller_amount']) ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                    
-                    <a href="/seller/sales" class="btn btn-ghost" style="margin-top: var(--space-2);">
-                        Voir toutes les ventes →
-                    </a>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Top produits -->
-        <div class="card" style="padding: var(--space-8);">
-            <h2 style="font-size: 1.5rem; margin-bottom: var(--space-6);">
-                🏆 Produits les plus vendus
-            </h2>
-            
-            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
-                
-                            
-                <?php if (empty($topProducts)): ?>
-                    
-                    <div style="text-align: center; padding: var(--space-12); color: var(--text-tertiary);">
-                        <div style="font-size: 3rem; margin-bottom: var(--space-3);">🎯</div>
+            <div style="padding:1.5rem;">
+                <?php if (empty($top_products)): ?>
+                    <div style="text-align:center; padding:3rem; color:var(--text-secondary);">
+                        <p style="font-size:3rem; margin-bottom:1rem;">🎯</p>
                         <p>Vos meilleures ventes apparaîtront ici</p>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($top_products as $index => $product): ?>
-                    <div style="
-                        display: grid;
-                        grid-template-columns: 40px 60px 1fr auto;
-                        gap: var(--space-3);
-                        align-items: center;
-                    ">
-                        <!-- Rang -->
-                        <div style="
-                            width: 32px;
-                            height: 32px;
-                            background: <?= $index === 0 ? 'var(--warning)' : ($index === 1 ? 'var(--text-tertiary)' : 'var(--border-color)') ?>;
-                            color: white;
-                            border-radius: var(--radius-full);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-weight: 700;
-                            font-size: 0.875rem;
-                        ">
-                            <?= $index + 1 ?>
-                        </div>
-                        
-                        <!-- Image -->
-                        <img 
-                            src="<?= e($product['thumbnail_url']) ?>" 
-                            alt="<?= e($product['title']) ?>"
-                            style="width: 60px; height: 40px; object-fit: cover; border-radius: var(--radius-sm);"
-                        >
-                        
-                        <!-- Info -->
-                        <div>
-                            <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: var(--space-1);">
-                                <?= e(truncate($product['title'], 30)) ?>
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                <?= e($product['sales_count']) ?> vente<?= $product['sales_count'] > 1 ? 's' : '' ?>
-                            </div>
-                        </div>
-                        
-                        <!-- Prix -->
-                        <div style="font-weight: 700; color: var(--primary-600); font-size: 0.875rem;">
-                            <?= formatPrice($product['price']) ?>
-                        </div>
+                    <div style="position:relative; height:280px;">
+                        <canvas id="topProductsChart"></canvas>
                     </div>
-                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>
 
     </div>
 
-</div>
+    <!-- ═══════════════════════════════════════════════
+         VENTES RÉCENTES + PRODUITS RÉCENTS
+    ═══════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
-<!-- JavaScript -->
+        <!-- Ventes récentes -->
+        <div class="card">
+            <div style="padding:1.5rem; border-bottom:1px solid var(--border-color);">
+                <h2 style="margin:0;">💳 Ventes récentes</h2>
+            </div>
+            <div style="padding:1.5rem;">
+                <?php if (empty($recent_sales)): ?>
+                    <div style="text-align:center; padding:3rem; color:var(--text-secondary);">
+                        <p style="font-size:3rem; margin-bottom:1rem;">📭</p>
+                        <p>Aucune vente sur les 30 derniers jours</p>
+                    </div>
+                <?php else: ?>
+                    <div style="display:flex; flex-direction:column; gap:.75rem;">
+                        <?php foreach (array_slice($recent_sales, 0, 5) as $sale): ?>
+                        <div style="display:flex; justify-content:space-between; align-items:center;
+                                    padding:.75rem; background:var(--bg-secondary); border-radius:8px;">
+                            <div>
+                                <div style="font-weight:600; font-size:.875rem; margin-bottom:.25rem;">
+                                    <!-- Numéro de commande cliquable -->
+                                    <a href="/orders/<?= e($sale['order_number']) ?>"
+                                       style="color:var(--primary-600); text-decoration:none;">
+                                        <?= e($sale['order_number']) ?>
+                                    </a>
+                                </div>
+                                <div style="font-size:.75rem; color:var(--text-secondary);">
+                                    <?= date('d/m/Y', strtotime($sale['created_at'])) ?>
+                                    · <?= e($sale['buyer_name']) ?>
+                                    · <?= e($sale['items_count']) ?> article(s)
+                                </div>
+                            </div>
+                            <!-- Montant total de la commande -->
+                            <div style="font-weight:700; color:var(--success); white-space:nowrap;">
+                                +<?= formatPrice($sale['total_amount']) ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+
+                        <?php if (count($recent_sales) > 5): ?>
+                            <a href="/seller/sales" class="btn btn-ghost btn-sm" style="margin-top:.5rem;">
+                                Voir toutes les ventes →
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Produits récents -->
+        <div class="card">
+            <div style="padding:1.5rem; border-bottom:1px solid var(--border-color);
+                        display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">🕒 Produits récents</h2>
+                <a href="/seller/products" style="font-size:.875rem; color:var(--primary-600);">Voir tout →</a>
+            </div>
+            <div style="padding:1.5rem;">
+                <?php if (empty($recent_products)): ?>
+                    <div style="text-align:center; padding:3rem; color:var(--text-secondary);">
+                        <p style="font-size:3rem; margin-bottom:1rem;">📦</p>
+                        <p>Aucun produit pour le moment</p>
+                        <a href="/seller/products/create" class="btn btn-primary" style="margin-top:1rem;">
+                            Créer mon premier produit
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div style="display:flex; flex-direction:column; gap:.75rem;">
+                        <?php foreach ($recent_products as $product): ?>
+                        <div style="display:flex; align-items:center; gap:1rem;
+                                    padding:.75rem; background:var(--bg-secondary); border-radius:8px;">
+                            <!-- Miniature -->
+                            <?php if ($product['thumbnail_url']): ?>
+                                <img src="<?= e($product['thumbnail_url']) ?>"
+                                     style="width:40px; height:40px; object-fit:cover;
+                                            border-radius:6px; flex-shrink:0;">
+                            <?php endif; ?>
+                            <!-- Titre + statut -->
+                            <div style="flex:1; min-width:0;">
+                                <div style="font-weight:600; font-size:.875rem;
+                                            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    <?= e($product['title']) ?>
+                                </div>
+                                <div style="font-size:.75rem; color:var(--text-secondary); margin-top:.2rem;">
+                                    <?= formatPrice($product['price']) ?>
+                                    · <span class="badge badge-<?= $product['status'] === 'approved' ? 'success' : 'warning' ?>">
+                                        <?= e($product['status']) ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Lien modifier -->
+                            <a href="/seller/products/<?= e($product['id']) ?>/edit"
+                               class="btn btn-sm btn-outline" style="flex-shrink:0;">✏️</a>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         ACTIONS RAPIDES
+    ═══════════════════════════════════════════════ -->
+    <div class="card">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border-color);">
+            <h2 style="margin:0;">⚡ Actions rapides</h2>
+        </div>
+        <div style="padding:1.5rem; display:grid;
+                    grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem;">
+            <a href="/seller/products/create" class="btn btn-primary hover-lift">➕ Nouveau produit</a>
+            <a href="/seller/products"         class="btn btn-outline hover-lift">📦 Mes produits</a>
+            <a href="/seller/sales"            class="btn btn-outline hover-lift">🛍️ Mes ventes</a>
+            <a href="/seller/analytics"        class="btn btn-outline hover-lift">📊 Analytics</a>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT — Graphiques Chart.js
+     Chart.js est chargé en haut de ce fichier via JS_URL/libs/chart.min.js
+═══════════════════════════════════════════════ -->
 <script>
-// Données pour le graphique (30 derniers jours)
-const salesData = <?= json_encode($sales_chart) ?>;
+(function () {
+    'use strict';
 
-// Préparer les données pour Chart.js
-const labels = salesData.map(item => {
-    const date = new Date(item.date);
-    return date.getDate() + '/' + (date.getMonth() + 1);
-});
+    // ── 1. Données PHP → JS ─────────────────────────────────────────────────
+    // $revenue_by_day : [{date:"2025-01-10", revenue:"49.99", orders:"2"}, ...]
+    // $top_products   : [{title:"...", revenue:"149.97", sales_count:3}, ...]
 
-const revenues = salesData.map(item => parseFloat(item.revenue || 0));
-const orders = salesData.map(item => parseInt(item.orders || 0));
+    const rawRevenue  = <?= json_encode($revenue_by_day  ?? []) ?>;
+    const rawProducts = <?= json_encode($top_products    ?? []) ?>;
 
-// Configuration du graphique
-const ctx = document.getElementById('salesChart');
-const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: labels,
-        datasets: [
-            {
-                label: 'Revenus (€)',
-                data: revenues,
-                borderColor: '#0ea5e9',
-                backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                tension: 0.4,
-                fill: true,
-                yAxisID: 'y'
+    // ── 2. Couleurs adaptées au thème (CSS vars → valeurs hex/rgb) ──────────
+    // On lit la valeur réelle des variables CSS du thème courant
+    const style       = getComputedStyle(document.documentElement);
+    const colorBlue   = '#0ea5e9';   // Revenus
+    const colorGreen  = '#10b981';   // Commandes
+    const colorPurple = '#6366f1';   // Barres top produits
+    const gridColor   = 'rgba(0,0,0,0.06)';
+
+    // ── 3. Graphique 1 : Revenus + Commandes (double axe Y) ─────────────────
+    const revenueCtx = document.getElementById('revenueChart');
+
+    if (revenueCtx) {
+        // Formatage des labels de date : "10 jan", "11 jan"...
+        const labels   = rawRevenue.map(d =>
+            new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+        );
+        const revenues = rawRevenue.map(d => parseFloat(d.revenue  || 0));
+        const orders   = rawRevenue.map(d => parseInt(d.orders     || 0, 10));
+
+        window.revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label:           'Revenus (€)',
+                        data:            revenues,
+                        borderColor:     colorBlue,
+                        backgroundColor: 'rgba(14, 165, 233, 0.08)',
+                        tension:         0.4,   // courbe lisse
+                        fill:            true,
+                        yAxisID:         'yRevenue',
+                        pointRadius:     3,
+                        pointHoverRadius:6
+                    },
+                    {
+                        label:           'Commandes',
+                        data:            orders,
+                        borderColor:     colorGreen,
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        tension:         0.4,
+                        fill:            true,
+                        yAxisID:         'yOrders',
+                        pointRadius:     3,
+                        pointHoverRadius:6
+                    }
+                ]
             },
-            {
-                label: 'Commandes',
-                data: orders,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4,
-                fill: true,
-                yAxisID: 'y1'
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'index',
-            intersect: false,
-        },
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20
-                }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                padding: 12,
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                borderColor: '#334155',
-                borderWidth: 1,
-                callbacks: {
-                    label: function(context) {
-                        let label = context.dataset.label || '';
-                        if (label) {
-                            label += ': ';
+            options: {
+                responsive:          true,
+                maintainAspectRatio: false,     // respecte le div parent height:280px
+                interaction: {
+                    mode:      'index',          // tooltip groupé par colonne
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels:   { usePointStyle: true, padding: 16 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            // Formater le label selon le dataset
+                            label: function (ctx) {
+                                const v = ctx.parsed.y;
+                                return ctx.datasetIndex === 0
+                                    ? ' Revenus : ' + v.toFixed(2) + ' €'
+                                    : ' Commandes : ' + v;
+                            }
                         }
-                        if (context.datasetIndex === 0) {
-                            label += context.parsed.y.toFixed(2) + ' €';
-                        } else {
-                            label += context.parsed.y;
-                        }
-                        return label;
+                    }
+                },
+                scales: {
+                    yRevenue: {
+                        type:     'linear',
+                        display:  true,
+                        position: 'left',
+                        beginAtZero: true,
+                        grid:     { color: gridColor },
+                        ticks:    { callback: v => v + ' €' }
+                    },
+                    yOrders: {
+                        type:     'linear',
+                        display:  true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid:     { drawOnChartArea: false }, // évite double grille
+                        ticks:    { precision: 0 }            // entiers seulement
+                    },
+                    x: {
+                        grid: { display: false }
                     }
                 }
             }
-        },
-        scales: {
-            y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                title: {
-                    display: true,
-                    text: 'Revenus (€)'
-                },
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
-                }
+        });
+    }
+
+    // ── 4. Graphique 2 : Top 5 produits (barres horizontales) ───────────────
+    const topCtx = document.getElementById('topProductsChart');
+
+    if (topCtx && rawProducts.length > 0) {
+        // Tronquer les titres longs pour qu'ils tiennent sur l'axe
+        const truncate = (str, n) => str.length > n ? str.slice(0, n) + '…' : str;
+        const labels   = rawProducts.map(p => truncate(p.title, 22));
+        const revenues = rawProducts.map(p => parseFloat(p.revenue || 0));
+
+        // Dégradé de transparence sur les barres (la 1ère est la plus opaque)
+        const bgColors = rawProducts.map((_, i) =>
+            `rgba(99, 102, 241, ${1 - i * 0.15})`  // violet dégradé
+        );
+
+        new Chart(topCtx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label:           'Revenus (€)',
+                    data:            revenues,
+                    backgroundColor: bgColors,
+                    borderRadius:    6,     // coins arrondis sur les barres
+                    borderSkipped:   false
+                }]
             },
-            y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                    display: true,
-                    text: 'Commandes'
+            options: {
+                indexAxis:           'y',   // barres HORIZONTALES (meilleur affichage titres)
+                responsive:          true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ' + ctx.parsed.x.toFixed(2) + ' €'
+                        }
+                    }
                 },
-                grid: {
-                    drawOnChartArea: false
-                }
-            },
-            x: {
-                grid: {
-                    display: false
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid:  { color: gridColor },
+                        ticks: { callback: v => v + ' €' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
                 }
             }
-        }
+        });
     }
-});
 
-// Fonction pour changer la période (à implémenter)
-function changeChartPeriod(days) {
-    console.log('Charger les données pour ' + days + ' jours');
-    // TODO: Recharger les données via AJAX
-}
+    // ── 5. Boutons de période (7j / 30j / 90j) ───────────────────────────────
+    // Appelle /seller/analytics?period=N via AJAX et met à jour le graphique revenus
+    window.changeChartPeriod = function (days) {
+        // Mettre en évidence le bouton actif
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.classList.toggle('active-period', parseInt(btn.dataset.days, 10) === days);
+        });
 
-// Animation des cards au chargement
-document.querySelectorAll('.card').forEach((card, index) => {
-    card.style.animation = `fadeIn 0.6s ease-out ${index * 0.05}s both`;
-});
+        // Requête AJAX vers le contrôleur
+        fetch('/seller/analytics?period=' + days + '&format=json', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!window.revenueChart || !Array.isArray(data.revenue_by_day)) return;
+
+            const chart   = window.revenueChart;
+            const newData = data.revenue_by_day;
+
+            // Mettre à jour les labels et les deux datasets
+            chart.data.labels                    = newData.map(d =>
+                new Date(d.date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' })
+            );
+            chart.data.datasets[0].data = newData.map(d => parseFloat(d.revenue || 0));
+            chart.data.datasets[1].data = newData.map(d => parseInt(d.orders   || 0, 10));
+            chart.update(); // re-render avec animation
+        })
+        .catch(err => console.warn('[Dashboard] Erreur chargement période :', err));
+    };
+
+})();
 </script>
 
 <style>
-/* Responsive */
-@media (max-width: 1024px) {
-    .grid-4 {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-    
-    [style*="grid-template-columns: 2fr 1fr"],
-    [style*="grid-template-columns: 1fr 1fr"] {
-        grid-template-columns: 1fr !important;
-    }
+/* Bouton de période actif */
+.active-period {
+    background: var(--primary-100, rgba(99,102,241,.12)) !important;
+    color:      var(--primary-600, #4f46e5) !important;
+    font-weight: 600;
 }
 
-@media (max-width: 768px) {
-    .grid-4 {
+/* Responsive : une colonne sur mobile */
+@media (max-width: 1024px) {
+    [class*="lg:grid-cols-2"] {
+        grid-template-columns: 1fr !important;
+    }
+    [class*="lg:grid-cols-4"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+@media (max-width: 640px) {
+    [class*="md:grid-cols-2"],
+    [class*="lg:grid-cols-4"] {
         grid-template-columns: 1fr !important;
     }
 }
