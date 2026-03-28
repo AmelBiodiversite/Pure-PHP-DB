@@ -68,6 +68,18 @@ $router->post('/wishlist/remove', 'WishlistController@remove');
 $router->get('/wishlist/count', 'WishlistController@count');
 
 // ================================================================
+// AVIS PRODUITS
+// ================================================================
+
+$router->post('/reviews/create', 'ReviewController@create');
+$router->post('/reviews/{id}/delete', 'ReviewController@delete');
+
+// Admin modération
+$router->get('/admin/reviews', 'ReviewController@moderate');
+$router->post('/admin/reviews/{id}/approve', 'ReviewController@approve');
+$router->post('/admin/reviews/{id}/reject', 'ReviewController@reject');
+
+// ================================================================
 // PANIER & COMMANDES
 // ================================================================
 

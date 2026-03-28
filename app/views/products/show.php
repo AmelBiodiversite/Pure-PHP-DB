@@ -184,8 +184,7 @@
                                         <div>
                                             <div style="font-weight: 600;"><?= e($review['username']) ?></div>
                                             <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                                                <?= e($review['review_date']) ?>
-                                            </div>
+                                               <?= date('d/m/Y', strtotime($review['created_at'])) ?> </div>
                                         </div>
                                     </div>
                                     

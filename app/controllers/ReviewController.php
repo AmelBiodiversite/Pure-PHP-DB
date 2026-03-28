@@ -189,7 +189,7 @@ class ReviewController extends Controller {
         ");
         $pendingReviews = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $this->view('admin/reviews/index', [
+        $this->render('admin/reviews/index', [
             'title' => 'Modération des avis',
             'pending_reviews' => $pendingReviews
         ]);
