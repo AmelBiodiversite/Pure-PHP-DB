@@ -13,6 +13,11 @@ abstract class Model {
     protected $db;
     protected $table;
     protected $primaryKey = 'id';
+    
+    // Constants for query limits to prevent DoS attacks
+    private const MAX_QUERY_LIMIT = 1000;
+    private const MAX_PER_PAGE = 100;
+    private const MAX_PAGE = 10000;
 
     public function __construct() {
         $this->db = Database::getInstance();
@@ -20,8 +25,11 @@ abstract class Model {
 
     /**
      * Trouver par ID
+     * 
+     * @param int $id
+     * @return array|false
      */
-    public function find($id) {
+    public function find(int $id) {
         $sql = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
@@ -30,8 +38,13 @@ abstract class Model {
 
     /**
      * Trouver tous
+     * 
+     * @param array $conditions
+     * @param string|null $order
+     * @param int|null $limit
+     * @return array
      */
-    public function findAll($conditions = [], $order = null, $limit = null) {
+    public function findAll(array $conditions = [], ?string $order = null, ?int $limit = null): array {
         $sql = "SELECT * FROM {$this->table}";
 
         if (!empty($conditions)) {
@@ -47,18 +60,34 @@ abstract class Model {
         }
 
         if ($limit) {
-            $sql .= " LIMIT $limit";
+            // Enforce maximum limit to prevent DoS attacks
+            $limit = min($limit, self::MAX_QUERY_LIMIT);
+            $sql .= " LIMIT :limit";
         }
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($conditions);
+        
+        // Bind condition parameters
+        foreach ($conditions as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        
+        // Bind limit parameter if set
+        if ($limit) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
     /**
      * Créer
+     * 
+     * @param array $data
+     * @return int
      */
-    public function create($data) {
+    public function create(array $data): int {
         $fields = array_keys($data);
         $placeholders = array_map(function($field) {
             return ":$field";
@@ -77,8 +106,12 @@ abstract class Model {
 
     /**
      * Mettre à jour
+     * 
+     * @param int $id
+     * @param array $data
+     * @return bool
      */
-    public function update($id, $data) {
+    public function update(int $id, array $data): bool {
         $fields = [];
         foreach (array_keys($data) as $field) {
             $fields[] = "$field = :$field";
@@ -95,8 +128,11 @@ abstract class Model {
 
     /**
      * Supprimer
+     * 
+     * @param int $id
+     * @return bool
      */
-    public function delete($id) {
+    public function delete(int $id): bool {
         $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['id' => $id]);
@@ -104,8 +140,11 @@ abstract class Model {
 
     /**
      * Compter
+     * 
+     * @param array $conditions
+     * @return int
      */
-    public function count($conditions = []) {
+    public function count(array $conditions = []): int {
         $sql = "SELECT COUNT(*) FROM {$this->table}";
 
         if (!empty($conditions)) {
@@ -118,13 +157,22 @@ abstract class Model {
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($conditions);
-        return $stmt->fetchColumn();
+        return (int)$stmt->fetchColumn();
     }
 
     /**
      * Trouver avec pagination
+     * 
+     * @param int $page
+     * @param int $perPage
+     * @param array $conditions
+     * @return array
      */
-    public function paginate($page = 1, $perPage = 20, $conditions = []) {
+    public function paginate(int $page = 1, int $perPage = 20, array $conditions = []): array {
+        // Enforce maximum limits to prevent DoS attacks
+        $page = max(1, min($page, self::MAX_PAGE));
+        $perPage = max(1, min($perPage, self::MAX_PER_PAGE));
+        
         $offset = ($page - 1) * $perPage;
 
         $sql = "SELECT * FROM {$this->table}";
@@ -145,8 +193,8 @@ abstract class Model {
             $stmt->bindValue(":$key", $value);
         }
 
-        $stmt->bindValue(':limit', (int)$perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
 

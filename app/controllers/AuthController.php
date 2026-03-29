@@ -229,6 +229,17 @@ class AuthController extends Controller {
      * @return void
      */
     private function handleRegister() {
+        // 🔒 RATE LIMITING - Protection contre abus d'inscription
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if (!\Core\RateLimiter::attempt('register', $ip, 3, 60)) {
+            $this->render('auth/register', [
+                'title' => 'Inscription',
+                'errors' => ['Trop de tentatives d\'inscription. Veuillez réessayer dans 60 minutes.'],
+                'csrf_token' => \Core\CSRF::generateToken()
+            ]);
+            return;
+        }
+        
         // 🔒 VÉRIFIER LE TOKEN CSRF
         if (!\Core\CSRF::validateToken($_POST['csrf_token'] ?? '')) {
             $this->securityLogger->logCSRFViolation('register', $_POST); 
