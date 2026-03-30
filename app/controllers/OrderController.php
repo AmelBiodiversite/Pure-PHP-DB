@@ -20,86 +20,98 @@ class OrderController extends Controller {
     }
 
     /**
-     /**
- * Liste des commandes de l'utilisateur
- */
-public function index() {
-    $user = getCurrentUser();
-    $userId = $user['id'];
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $perPage = 10;
-    
-    // Vérifier le rôle
-    if ($user['role'] === 'seller') {
-        // Pour un vendeur : ses ventes
-        $orders = $this->orderModel->getSellerOrders($userId, $perPage * 10);
-        
-        // Statistiques vendeur
-        $stmt = $this->db->prepare("
-            SELECT 
-                COUNT(*) as total_orders,
-                SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_revenue,
-                COUNT(DISTINCT oi.product_id) as total_products
-            FROM orders o
-            LEFT JOIN order_items oi ON o.id = oi.order_id
-            WHERE o.seller_id = ?
-        ");
-        $stmt->execute([$userId]);
-        $stats = $stmt->fetch();
-        
-        $this->view('orders/index', [
-            'title' => 'Mes Ventes',
-            'orders' => $orders,
-            'stats' => $stats,
-            'current_page' => $page,
-            'is_seller' => true
-        ]);
-        
-    } else {
-        // Pour un acheteur : ses achats
-        $orders = $this->orderModel->getUserOrders($userId, $perPage * 10);
-        
-        // Statistiques acheteur
-        $stmt = $this->db->prepare("
-            SELECT 
-                COUNT(*) as total_orders,
-                SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_spent,
-                COUNT(DISTINCT oi.product_id) as total_products
-            FROM orders o
-            LEFT JOIN order_items oi ON o.id = oi.order_id
-            WHERE o.buyer_id = ?
-        ");
-        $stmt->execute([$userId]);
-        $stats = $stmt->fetch();
-        
-        $this->view('orders/index', [
-            'title' => 'Mes Commandes',
-            'orders' => $orders,
-            'stats' => $stats,
-            'current_page' => $page,
-            'is_seller' => false
-        ]);
+     * Liste des commandes de l'utilisateur
+     */
+    public function index() {
+        $user = getCurrentUser();
+        $userId = $user['id'];
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = 10;
+
+        // Vérifier le rôle
+        if ($user['role'] === 'seller') {
+            // Pour un vendeur : ses ventes
+            $orders = $this->orderModel->getSellerOrders($userId, $perPage * 10);
+
+            // Statistiques vendeur — seller_id est dans order_items (oi), pas dans orders (o)
+            $stmt = $this->db->prepare("
+                SELECT 
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_revenue,
+                    COUNT(DISTINCT oi.product_id) as total_products
+                FROM orders o
+                LEFT JOIN order_items oi ON o.id = oi.order_id
+                WHERE oi.seller_id = ?
+            ");
+            $stmt->execute([$userId]);
+            $stats = $stmt->fetch();
+
+            $this->render('orders/index', [
+                'title'        => 'Mes Ventes',
+                'orders'       => $orders,
+                'stats'        => $stats,
+                'current_page' => $page,
+                'is_seller'    => true
+            ]);
+
+        } else {
+            // Pour un acheteur (ou admin) : ses achats
+            $orders = $this->orderModel->getUserOrders($userId, $perPage * 10);
+
+            // Statistiques acheteur — buyer_id est dans orders (o)
+            $stmt = $this->db->prepare("
+                SELECT 
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN payment_status = 'completed' THEN total_amount ELSE 0 END) as total_spent,
+                    COUNT(DISTINCT oi.product_id) as total_products
+                FROM orders o
+                LEFT JOIN order_items oi ON o.id = oi.order_id
+                WHERE o.buyer_id = ?
+            ");
+            $stmt->execute([$userId]);
+            $stats = $stmt->fetch();
+
+            $this->render('orders/index', [
+                'title'        => 'Mes Commandes',
+                'orders'       => $orders,
+                'stats'        => $stats,
+                'current_page' => $page,
+                'is_seller'    => false
+            ]);
+        }
     }
-}
 
     /**
      * Détail d'une commande
+     * Seller et admin voient toutes les commandes
+     * Buyer ne voit que ses propres achats (filtré sur buyer_id)
      */
     public function show($orderNumber) {
-        $userId = $_SESSION['user_id'];
-        
-        // Récupérer la commande avec détails
-        $order = $this->orderModel->getOrderDetails($orderNumber, $userId);
+        $user = getCurrentUser();
+        $userId = $user['id'];
+
+        if ($user['role'] === 'seller' || $user['role'] === 'admin') {
+            // Seller/admin : récupère par numéro sans restriction buyer_id
+            $order = $this->orderModel->findByOrderNumber($orderNumber);
+            // Charger les items séparément car findByOrderNumber ne les inclut pas
+            if ($order) {
+                $order['items'] = $this->orderModel->getOrderItems($order['id']);
+            }
+        } else {
+            // Buyer : vérifie que la commande lui appartient
+            $order = $this->orderModel->getOrderDetails($orderNumber, $userId);
+        }
 
         if (!$order) {
             redirectWithMessage('/orders', 'Commande introuvable', 'error');
             return;
         }
 
-        $this->view('orders/show', [
-            'title' => 'Commande ' . $orderNumber,
-            'order' => $order,
-            'csrf_token' => generateCsrfToken()
+        $this->render('orders/show', [
+            'title'      => 'Commande ' . $orderNumber,
+            'order'      => $order,
+            'csrf_token' => generateCsrfToken(),
+            'db'         => $this->db  // nécessaire pour les requêtes dans la vue show.php
         ]);
     }
 
@@ -127,7 +139,7 @@ public function index() {
             return;
         }
 
-        // Trouver l'item
+        // Trouver l'item dans la liste des articles
         $item = null;
         foreach ($order['items'] as $orderItem) {
             if ($orderItem['id'] == $itemId) {
@@ -145,7 +157,7 @@ public function index() {
             return;
         }
 
-        // Enregistrer le téléchargement
+        // Enregistrer le téléchargement (vérifie aussi la limite)
         $result = $this->orderModel->recordDownload($itemId, $userId);
 
         if (!$result['success']) {
@@ -157,17 +169,17 @@ public function index() {
             return;
         }
 
-        // Servir le fichier
+        // Servir le fichier en téléchargement
         $this->serveFile($item);
     }
 
     /**
-     * Servir un fichier en téléchargement
+     * Servir un fichier en téléchargement sécurisé
      */
     private function serveFile($item) {
         $filePath = ROOT_PATH . $item['file_path'];
 
-        // Vérifier que le fichier existe
+        // Vérifier que le fichier existe sur le disque
         if (!file_exists($filePath)) {
             redirectWithMessage(
                 '/orders',
@@ -177,12 +189,12 @@ public function index() {
             return;
         }
 
-        // Définir les headers pour le téléchargement
-        $filename = sanitizeFilename($item['product_title']) . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-        $filesize = filesize($filePath);
-        $mimetype = mime_content_type($filePath);
+        // Construire le nom de fichier propre pour le téléchargement
+        $filename  = sanitizeFilename($item['product_title']) . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+        $filesize  = filesize($filePath);
+        $mimetype  = mime_content_type($filePath);
 
-        // Headers de téléchargement
+        // Headers HTTP pour forcer le téléchargement
         header('Content-Type: ' . $mimetype);
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Length: ' . $filesize);
@@ -190,11 +202,10 @@ public function index() {
         header('Pragma: public');
         header('Expires: 0');
 
-        // Nettoyer le buffer de sortie
+        // Vider le buffer de sortie avant d'envoyer le fichier
         ob_clean();
         flush();
 
-        // Lire et envoyer le fichier
         readfile($filePath);
         exit;
     }
@@ -207,13 +218,13 @@ public function index() {
             $this->redirect('/orders');
         }
 
-        // Vérifier CSRF
+        // Vérifier le token CSRF
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
-            $this->json(['success' => false, 'error' => 'Token invalide'], 403);
+            $this->jsonResponse(['success' => false, 'error' => 'Token invalide'], 403);
         }
 
         $orderNumber = $_POST['order_number'] ?? null;
-        $reason = $_POST['reason'] ?? '';
+        $reason      = $_POST['reason'] ?? '';
 
         if (!$orderNumber || empty($reason)) {
             redirectWithMessage('/orders', 'Veuillez fournir un motif', 'error');
@@ -221,14 +232,14 @@ public function index() {
         }
 
         $userId = $_SESSION['user_id'];
-        $order = $this->orderModel->getOrderDetails($orderNumber, $userId);
+        $order  = $this->orderModel->getOrderDetails($orderNumber, $userId);
 
         if (!$order) {
             redirectWithMessage('/orders', 'Commande introuvable', 'error');
             return;
         }
 
-        // Vérifier que la commande peut être remboursée
+        // La commande doit être payée pour être remboursée
         if ($order['payment_status'] !== 'completed') {
             redirectWithMessage(
                 "/orders/{$orderNumber}",
@@ -238,8 +249,8 @@ public function index() {
             return;
         }
 
-        // Vérifier le délai (par ex: 14 jours)
-        $orderDate = strtotime($order['paid_at']);
+        // Vérifier le délai légal de rétractation (14 jours)
+        $orderDate         = strtotime($order['paid_at']);
         $daysSincePurchase = (time() - $orderDate) / (60 * 60 * 24);
 
         if ($daysSincePurchase > 14) {
@@ -251,7 +262,7 @@ public function index() {
             return;
         }
 
-        // Créer la demande de remboursement
+        // Insérer la demande de remboursement
         $stmt = $this->db->prepare("
             INSERT INTO refund_requests (
                 order_id, buyer_id, reason, status, created_at
@@ -266,7 +277,7 @@ public function index() {
                 date('Y-m-d H:i:s')
             ]);
 
-            // Notifier l'admin (TODO: email)
+            // Logger l'activité pour le suivi admin
             $this->logActivity(
                 $userId,
                 'refund_requested',
@@ -291,24 +302,24 @@ public function index() {
     }
 
     /**
-     * Soumettre un avis sur un produit
+     * Soumettre un avis sur un produit acheté
      */
     public function submitReview() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/orders');
         }
 
-        // Vérifier CSRF
+        // Vérifier le token CSRF
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
-            $this->json(['success' => false, 'error' => 'Token invalide'], 403);
+            $this->jsonResponse(['success' => false, 'error' => 'Token invalide'], 403);
         }
 
         $orderItemId = $_POST['order_item_id'] ?? null;
-        $productId = $_POST['product_id'] ?? null;
-        $rating = $_POST['rating'] ?? null;
-        $comment = $_POST['comment'] ?? '';
+        $productId   = $_POST['product_id'] ?? null;
+        $rating      = $_POST['rating'] ?? null;
+        $comment     = $_POST['comment'] ?? '';
 
-        // Validation
+        // Validation des champs obligatoires
         if (!$orderItemId || !$productId || !$rating) {
             redirectWithMessage($_SERVER['HTTP_REFERER'] ?? '/orders', 'Données manquantes', 'error');
             return;
@@ -321,7 +332,7 @@ public function index() {
 
         $userId = $_SESSION['user_id'];
 
-        // Vérifier que l'utilisateur a bien acheté le produit
+        // Vérifier que l'utilisateur a bien acheté ce produit (achat vérifié)
         $stmt = $this->db->prepare("
             SELECT oi.seller_id, o.payment_status
             FROM order_items oi
@@ -336,7 +347,7 @@ public function index() {
             return;
         }
 
-        // Vérifier qu'il n'a pas déjà laissé un avis
+        // Vérifier qu'il n'a pas déjà laissé un avis sur cet article
         $stmt = $this->db->prepare("
             SELECT id FROM reviews WHERE order_item_id = ?
         ");
@@ -347,7 +358,7 @@ public function index() {
             return;
         }
 
-        // Créer l'avis
+        // Insérer l'avis
         $stmt = $this->db->prepare("
             INSERT INTO reviews (
                 product_id, order_item_id, buyer_id, seller_id,
@@ -366,7 +377,7 @@ public function index() {
                 date('Y-m-d H:i:s')
             ]);
 
-            // Mettre à jour les notes du produit et vendeur
+            // Recalculer les moyennes de notes produit et vendeur
             $this->updateProductRating($productId);
             $this->updateSellerRating($purchase['seller_id']);
 
@@ -386,30 +397,26 @@ public function index() {
     }
 
     /**
-     * Télécharger une facture (PDF)
+     * Télécharger une facture (HTML pour l'instant, PDF à intégrer)
      */
     public function downloadInvoice($orderNumber) {
         $userId = $_SESSION['user_id'];
-        $order = $this->orderModel->getOrderDetails($orderNumber, $userId);
+        $order  = $this->orderModel->getOrderDetails($orderNumber, $userId);
 
         if (!$order || $order['payment_status'] !== 'completed') {
             redirectWithMessage('/orders', 'Commande introuvable', 'error');
             return;
         }
 
-        // Générer le PDF de facture
         $this->generateInvoicePDF($order);
     }
 
     /**
-     * Générer une facture PDF (simplifié)
+     * Générer une facture en HTML (TODO: remplacer par TCPDF/FPDF/DomPDF)
      */
     private function generateInvoicePDF($order) {
-        // TODO: Intégrer une librairie PDF (TCPDF, FPDF, DomPDF)
-        // Pour l'instant, on génère un HTML simple
-
         header('Content-Type: text/html; charset=utf-8');
-        
+
         echo '<!DOCTYPE html>
         <html>
         <head>
@@ -429,11 +436,11 @@ public function index() {
             <div class="header">
                 <div class="invoice-title">FACTURE</div>
                 <div>N° ' . htmlspecialchars($order['order_number']) . '</div>
-                <div>Date: ' . date('d/m/Y', strtotime($order['paid_at'])) . '</div>
+                <div>Date : ' . date('d/m/Y', strtotime($order['paid_at'])) . '</div>
             </div>
-            
+
             <div style="margin-bottom: 30px;">
-                <strong>Client:</strong><br>
+                <strong>Client :</strong><br>
                 ' . htmlspecialchars($order['buyer_email']) . '
             </div>
 
@@ -459,7 +466,7 @@ public function index() {
             </table>
 
             <div class="total">
-                Total: ' . formatPrice($order['total_amount']) . '
+                Total : ' . formatPrice($order['total_amount']) . '
             </div>
 
             <div style="margin-top: 40px; font-size: 12px; color: #666;">
@@ -472,7 +479,7 @@ public function index() {
     }
 
     /**
-     * Mettre à jour la note d'un produit
+     * Recalculer la note moyenne d'un produit après un nouvel avis
      */
     private function updateProductRating($productId) {
         $stmt = $this->db->prepare("
@@ -489,7 +496,7 @@ public function index() {
     }
 
     /**
-     * Mettre à jour la note d'un vendeur
+     * Recalculer la note moyenne d'un vendeur après un nouvel avis
      */
     private function updateSellerRating($sellerId) {
         $stmt = $this->db->prepare("
@@ -506,7 +513,7 @@ public function index() {
     }
 
     /**
-     * Logger une activité
+     * Logger une activité utilisateur pour le suivi admin
      */
     private function logActivity($userId, $action, $entityType, $entityId, $details = null) {
         $stmt = $this->db->prepare("
@@ -525,7 +532,8 @@ public function index() {
 }
 
 /**
- * Helper: Nettoyer un nom de fichier
+ * Helper : Nettoyer un nom de fichier pour le téléchargement
+ * Remplace tout caractère non alphanumérique par un underscore
  */
 function sanitizeFilename($filename) {
     $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
