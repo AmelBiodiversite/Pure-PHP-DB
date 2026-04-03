@@ -426,23 +426,38 @@ $isBuyer = $user['role'] === 'buyer';
         </div>
     </div>
 </div>
-
 <style>
-/* Responsive */
-@media (max-width: 1024px) {
-    div[style*="grid-template-columns: 280px 1fr"] {
-        grid-template-columns: 1fr !important;
-    }
-    
-    aside div[style*="position: sticky"] {
-        position: relative !important;
-        top: 0 !important;
-    }
-}
-
-@media (max-width: 768px) {
-    div[style*="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))"] {
-        grid-template-columns: 1fr !important;
-    }
-}
+/* === DESIGN MAQUETTE2 — COMPTE === */
+div[style*="min-height: 100vh"][style*="linear-gradient"]{background:#faf9f5!important}
+.container{background:#faf9f5}
+h1,h2,h3{font-family:Georgia,serif;font-weight:400;color:#1e1208}
+/* Avatar */
+div[style*="border-radius: 50%"][style*="linear-gradient(135deg, #667eea"]{background:linear-gradient(135deg,#ede9fe,#c4baf8)!important;color:#534ab7!important;font-size:1.5rem!important;font-weight:500!important;box-shadow:none!important}
+/* Header card */
+div[style*="border-radius: 20px"][style*="box-shadow: 0 4px 20px"]{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+/* Sidebar nav */
+aside div[style*="border-radius: 20px"]{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+/* Lien actif sidebar */
+a[style*="linear-gradient(135deg, #667eea"]{background:#ede9fe!important;color:#534ab7!important;box-shadow:none!important;font-weight:500!important;border-radius:10px!important}
+/* Stats cards */
+div[style*="border-radius: 20px"][style*="text-align: center"]{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+/* Chiffre stat violet dégradé */
+div[style*="-webkit-text-fill-color: transparent"]{background:none!important;-webkit-text-fill-color:unset!important;color:#7c6cf0!important;font-family:Georgia,serif!important;font-size:2rem!important;font-weight:400!important}
+/* Chiffre stat vert */
+div[style*="color: #10b981"][style*="font-size: 2rem"]{color:#3a7d44!important;font-family:Georgia,serif!important;font-weight:400!important}
+/* Tableau commandes */
+div[style*="border-radius: 20px"][style*="overflow: hidden"]:not([style*="text-align: center"]){background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+thead tr[style*="background: var(--bg-secondary)"]{background:#faf9f5!important}
+/* Badge payé */
+span[style*="background: #d1fae5"]{background:#e4f1d8!important;color:#2d6a35!important;border-radius:6px!important;font-size:11px!important;font-weight:500!important}
+span[style*="background: #fef3c7"]{background:#fef9e7!important;color:#7d5a00!important;border-radius:6px!important;font-size:11px!important}
+/* Bouton paramètres */
+a[href="/account/settings"]{border:0.5px solid #ddd6c8!important;border-radius:10px!important;font-family:'Manrope',sans-serif!important;font-size:12px!important}
+/* Lien voir tout */
+a[style*="color: #667eea"]{color:#7c6cf0!important;font-family:'Manrope',sans-serif;font-size:12px!important}
+/* Section vendeur CTA */
+a[href="/seller/dashboard"][style*="linear-gradient(135deg, #667eea"]{background:#7c6cf0!important;color:#fff!important;border-radius:10px!important;box-shadow:none!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;transform:none!important}
+/* Fond blur décoratif → supprimé */
+div[style*="filter: blur"]{display:none!important}
+@media(max-width:1024px){div[style*="grid-template-columns: 280px 1fr"]{grid-template-columns:1fr!important}aside div[style*="position: sticky"]{position:relative!important;top:0!important}}
 </style>

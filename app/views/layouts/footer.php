@@ -1,126 +1,91 @@
-<!-- =====================================================
-         FIN DU CONTENU PRINCIPAL
-         ===================================================== -->
+<!-- FIN DU CONTENU PRINCIPAL -->
     </main>
 
-    <!-- =====================================================
-         FOOTER DU SITE
-         ===================================================== -->
-    <footer style="
-        background: var(--bg-secondary);
-        border-top: 1px solid var(--border-color);
-        margin-top: var(--space-16);
-        padding: var(--space-12) 0 var(--space-8);
-    ">
-        <div class="container">
-            <!-- Grille de 4 colonnes pour le footer -->
-            <div class="grid grid-4" style="margin-bottom: var(--space-8);">
-                
-                <!-- ==================== À PROPOS ==================== -->
-                <div>
-                    <h4 style="margin-bottom: var(--space-4);">MarketFlow Pro</h4>
-                    <p style="font-size: 0.875rem; color: var(--text-tertiary);">
-                        La marketplace premium pour créateurs digitaux. 
-                        Vendez et achetez des ressources de qualité.
-                    </p>
-                </div>
+    <footer class="ft">
+        <div class="ft-top">
 
-                <!-- ==================== PRODUITS ==================== -->
-                <div>
-                    <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Produits</h5>
-                    <ul style="list-style: none; font-size: 0.875rem;">
-                        <li style="margin-bottom: var(--space-2);"><a href="/products" style="color: var(--text-tertiary);">Catalogue</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/category/templates" style="color: var(--text-tertiary);">Templates</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/category/ui-kits" style="color: var(--text-tertiary);">UI Kits</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/category/icones" style="color: var(--text-tertiary);">Icônes</a></li>
-                    </ul>
+            <div>
+                <div class="ft-logo">
+                    <div class="ft-logo-ic">M</div>
+                    <span class="ft-logo-txt">MarketFlow</span>
                 </div>
-
-                <!-- ==================== ENTREPRISE ==================== -->
-                <div>
-                    <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Entreprise</h5>
-                    <ul style="list-style: none; font-size: 0.875rem;">
-                        <li style="margin-bottom: var(--space-2);"><a href="/about" style="color: var(--text-tertiary);">À propos</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/contact" style="color: var(--text-tertiary);">Contact</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/terms" style="color: var(--text-tertiary);">CGU</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/privacy" style="color: var(--text-tertiary);">Confidentialité</a></li>
-                    </ul>
+                <p class="ft-tagline">La marketplace pour le développement personnel et l'autonomie.</p>
+                <a class="ft-cta-vendeur" href="/register?type=seller">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#534ab7" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <span class="ft-cta-txt">Devenir vendeur sur MarketFlow</span>
+                    <span class="ft-cta-arrow">→</span>
+                </a>
+                <div class="ft-stripe">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0f6e56" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span class="ft-stripe-txt">Paiements sécurisés par <strong>Stripe</strong></span>
                 </div>
-
-                <!-- ==================== SUPPORT ==================== -->
-                <div>
-                    <h5 style="margin-bottom: var(--space-4); font-size: 1rem;">Support</h5>
-                    <ul style="list-style: none; font-size: 0.875rem;">
-                        <li style="margin-bottom: var(--space-2);"><a href="/help" style="color: var(--text-tertiary);">Centre d'aide</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/register?type=seller" style="color: var(--text-tertiary);">Devenir vendeur</a></li>
-                        <li style="margin-bottom: var(--space-2);"><a href="/contact" style="color: var(--text-tertiary);">Nous contacter</a></li>
-                    </ul>
-                </div>
-
             </div>
 
-            <!-- ==================== BAS DU FOOTER ==================== -->
-            <div style="
-                border-top: 1px solid var(--border-color);
-                padding-top: var(--space-6);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 0.875rem;
-                color: var(--text-tertiary);
-            ">
-                <!-- Copyright -->
-                <p>© <?= date('Y') ?> MarketFlow Pro. Tous droits réservés.</p>
-                
-                <!-- Réseaux sociaux -->
-                <div class="flex gap-6">
-                    <a href="#" style="color: var(--text-tertiary);">Twitter</a>
-                    <a href="#" style="color: var(--text-tertiary);">LinkedIn</a>
-                    <a href="#" style="color: var(--text-tertiary);">Instagram</a>
+            <div>
+                <div class="ft-col-title">Explorer</div>
+                <div class="ft-col">
+                    <a href="/products">Tous les produits <span>→</span></a>
+                    <a href="/category">Catégories <span>→</span></a>
+                    <a href="/products?sort=popular">Plus vendus <span>→</span></a>
+                    <a href="/products?sort=new">Nouveautés <span>→</span></a>
                 </div>
+            </div>
+
+            <div>
+                <div class="ft-col-title">Mon compte</div>
+                <div class="ft-col">
+                    <a href="/login">Connexion <span>→</span></a>
+                    <a href="/register">Inscription <span>→</span></a>
+                    <a href="/orders">Mes commandes <span>→</span></a>
+                    <a href="/wishlist">Mes favoris <span>→</span></a>
+                </div>
+            </div>
+
+            <div>
+                <div class="ft-col-title">Informations</div>
+                <div class="ft-col">
+                    <a href="/about">À propos <span>→</span></a>
+                    <a href="/contact">Contact <span>→</span></a>
+                    <a href="/terms">CGU <span>→</span></a>
+                    <a href="/privacy">Confidentialité <span>→</span></a>
+                    <a href="/mentions-legales">Mentions légales <span>→</span></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ft-bottom">
+            <span class="ft-copy">© <?= date('Y') ?> MarketFlow — Tous droits réservés</span>
+            <div class="ft-made">
+                <div class="ft-made-dot"></div>
+                <span class="ft-made-txt">Fait avec soin en France</span>
+            </div>
+            <div class="ft-socials">
+                <a class="ft-social" href="#" title="Twitter">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 16 2a4.48 4.48 0 0 0-4.48 4.48c0 .35.04.7.11 1.02A12.74 12.74 0 0 1 2 3.8a4.48 4.48 0 0 0 1.39 5.98 4.44 4.44 0 0 1-2.03-.56v.06a4.48 4.48 0 0 0 3.59 4.39 4.5 4.5 0 0 1-2.02.08 4.48 4.48 0 0 0 4.18 3.11A8.98 8.98 0 0 1 2 19.54 12.69 12.69 0 0 0 8.68 21.5c8.22 0 12.71-6.81 12.71-12.71l-.01-.58A9.1 9.1 0 0 0 23 6.07"/></svg>
+                </a>
+                <a class="ft-social" href="#" title="LinkedIn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                </a>
+                <a class="ft-social" href="#" title="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                </a>
             </div>
         </div>
     </footer>
 
-    <!-- =====================================================
-         SCRIPTS JAVASCRIPT
-         ===================================================== -->
-    
-  <!-- Chart.js Library v4.4.0 - Graphiques modernes pour dashboard vendeur -->
-<!-- Utilisé dans : app/views/seller/dashboard.php -->
-<!-- Documentation : https://www.chartjs.org/docs/latest/ -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <!-- =====================================================
-         MENU UTILISATEUR DROPDOWN
-         ===================================================== 
-         
-         Initialise le dropdown du menu utilisateur si connecté
-         Utilise le composant Dropdown de app.js
-         ===================================================== -->
     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
     <script>
-    /**
-     * Création du dropdown menu utilisateur
-     * Points d'accès selon le rôle :
-     * - Admin : Panel admin
-     * - Seller : Dashboard vendeur
-     * - Buyer : Compte acheteur
-     */
     const userMenuBtn = document.getElementById('userMenuBtn');
     if (userMenuBtn) {
         const dropdown = new MarketFlow.Dropdown('#userMenuBtn');
-        
-        // Menu pour tous les utilisateurs
         dropdown.addItem('Mon profil', () => window.location.href = '/profile');
         dropdown.addItem('Mes commandes', () => window.location.href = '/orders');
-        
-        // Menu spécifique vendeur
         <?php if ($_SESSION['user_type'] === 'seller'): ?>
         dropdown.addItem('Dashboard vendeur', () => window.location.href = '/seller/dashboard');
         <?php endif; ?>
-        
-        // Déconnexion
         dropdown.addItem('Déconnexion', () => window.location.href = '/logout');
     }
     </script>

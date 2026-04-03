@@ -77,3 +77,58 @@
         </div>
     </div>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — POLITIQUE DE CONFIDENTIALITÉ === */
+
+/* Titre principal */
+h1.mb-8 {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 26px !important;
+}
+
+/* Card principale */
+.card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Date de mise à jour */
+p[style*="color: var(--text-secondary)"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 11px !important;
+    color: #a0907e !important;
+}
+
+/* Titres h2 */
+h2[style*="margin-top"] {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 17px !important;
+    border-bottom: 0.5px solid #ede8df !important;
+    padding-bottom: 8px !important;
+}
+
+/* Paragraphes */
+p[style*="line-height: 1.8"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+    color: #6b5c4e !important;
+    line-height: 1.7 !important;
+}
+
+/* Listes */
+ul[style*="padding-left"] li {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+    color: #6b5c4e !important;
+    line-height: 1.7 !important;
+}
+
+/* Liens */
+a[style*="color: var(--primary-600)"] { color: #7c6cf0 !important; }
+</style>

@@ -31,3 +31,13 @@
         </div>
     <?php endif; ?>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — PRODUITS VENDEUR === */
+.container{background:#faf9f5;padding-top:32px!important}
+h1,h2,h3{font-family:Georgia,serif;font-weight:400;color:#1e1208}
+.card{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important;padding:18px!important}
+.badge{background:#ede9fe!important;color:#534ab7!important;border-radius:6px!important;font-size:11px!important;padding:3px 8px!important;font-family:'Manrope',sans-serif!important}
+.btn-primary{background:#7c6cf0!important;color:#fff!important;border:none!important;border-radius:8px!important;font-family:'Manrope',sans-serif!important;font-size:12px!important;font-weight:500!important}
+.btn-ghost.btn-sm{background:transparent!important;color:#6b5c4e!important;border:0.5px solid #ddd6c8!important;border-radius:7px!important;font-family:'Manrope',sans-serif!important;font-size:11px!important}
+.btn-outline.btn-sm{background:transparent!important;color:#7c6cf0!important;border:0.5px solid #7c6cf0!important;border-radius:7px!important;font-family:'Manrope',sans-serif!important;font-size:11px!important}
+</style>

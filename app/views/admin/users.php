@@ -169,15 +169,7 @@ $stats = $data['stats'] ?? [];
 
 </div>
 
-<style>
-.hover-lift {
-    transition: all 0.2s ease;
-}
 
-table tr:hover {
-    background: var(--bg-secondary);
-}
-</style>
 
 <script>
 function viewUser(userId) {
@@ -213,3 +205,109 @@ window.onclick = function(event) {
     }
 }
 </script>
+<style>
+/* === DESIGN MAQUETTE2 — GESTION UTILISATEURS === */
+
+/* En-tête de page */
+h1 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+p[style*="color: var(--text-secondary)"] { font-family: 'Manrope', sans-serif !important; font-size: 12px !important; color: #6b5c4e !important; }
+
+/* Bouton retour dashboard */
+a.btn.btn-secondary { 
+    background: #f5f1eb !important; 
+    color: #6b5c4e !important; 
+    border: 0.5px solid #ddd6c8 !important; 
+    border-radius: 8px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+
+/* Stats cards */
+.card { 
+    background: #fff !important; 
+    border: 0.5px solid #ede8df !important; 
+    border-radius: 14px !important; 
+    box-shadow: none !important; 
+}
+.card h2 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 26px !important; }
+/* Chiffre vendeurs (violet) */
+h2[style*="color: var(--primary)"] { color: #7c6cf0 !important; }
+/* Chiffre acheteurs (vert) */
+h2[style*="color: var(--success)"] { color: #3a7d44 !important; }
+
+/* Formulaire de filtres */
+input[type="text"].input, select.input {
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 10px !important;
+    background: #faf9f5 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+    color: #1e1208 !important;
+}
+input[type="text"].input:focus, select.input:focus {
+    border-color: #7c6cf0 !important;
+    box-shadow: 0 0 0 3px rgba(124,108,240,.1) !important;
+    background: #fff !important;
+}
+
+/* Bouton filtrer */
+button.btn.btn-primary, a.btn.btn-primary {
+    background: #7c6cf0 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+/* Bouton réinitialiser */
+a.btn.btn-secondary {
+    background: #f5f1eb !important;
+    color: #6b5c4e !important;
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+}
+
+/* En-tête tableau */
+thead tr { border-bottom: 0.5px solid #ede8df !important; }
+th[style*="padding: 1rem"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #a0907e !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+/* Lignes tableau */
+tr[style*="border-bottom: 1px solid var(--border)"] { border-bottom: 0.5px solid #f5f1eb !important; }
+table tr:hover { background: #faf9f5 !important; }
+td[style*="padding: 1rem"] { font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Avatar placeholder */
+div[style*="background: var(--primary)"][style*="border-radius: 50%"] {
+    background: #ede9fe !important;
+    color: #534ab7 !important;
+}
+/* Nom utilisateur */
+div[style*="font-weight: 600"] { color: #1e1208 !important; }
+/* @username / email */
+div[style*="color: var(--text-secondary)"], td[style*="color: var(--text-secondary)"] {
+    color: #a0907e !important;
+    font-size: 11px !important;
+}
+
+/* Badges rôle et statut */
+.badge.badge-primary { background: #ede9fe !important; color: #534ab7 !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; }
+.badge.badge-warning { background: #fef9e7 !important; color: #7d5a00 !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; }
+.badge.badge-secondary { background: #f5f1eb !important; color: #6b5c4e !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; }
+.badge.badge-success { background: #e4f1d8 !important; color: #2d6a35 !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; }
+.badge.badge-danger { background: #fce5df !important; color: #993c1d !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; }
+
+/* Boutons d'action (suspendre, activer, supprimer) */
+.btn.btn-sm.btn-warning { background: #fef9e7 !important; color: #7d5a00 !important; border: 0.5px solid #e8d89a !important; border-radius: 7px !important; font-size: 11px !important; }
+.btn.btn-sm.btn-success { background: #e4f1d8 !important; color: #2d6a35 !important; border: 0.5px solid #aed49b !important; border-radius: 7px !important; font-size: 11px !important; }
+.btn.btn-sm.btn-danger { background: #fce5df !important; color: #993c1d !important; border: 0.5px solid #e5b8a8 !important; border-radius: 7px !important; font-size: 11px !important; }
+</style>

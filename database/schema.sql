@@ -135,14 +135,10 @@ COMMENT ON TABLE categories IS 'Catégories produits (hiérarchie à 2 niveaux)'
 
 -- Catégories par défaut
 INSERT INTO categories (name, slug, description, icon, display_order) VALUES
-('Templates', 'templates', 'Templates web et design', '🎨', 1),
-('Graphics', 'graphics', 'Ressources graphiques', '🖼️', 2),
-('Code', 'code', 'Scripts et codes source', '💻', 3),
-('Courses', 'courses', 'Formations et tutoriels', '📚', 4),
-('Photos', 'photos', 'Photos stock', '📸', 5),
-('Audio', 'audio', 'Musiques et sons', '🎵', 6),
-('Fonts', 'fonts', 'Polices de caractères', '🔤', 7),
-('Other', 'other', 'Autres produits digitaux', '📦', 8)
+('Développement personnel', 'developpement-personnel', 'Ressources pour grandir, apprendre et évoluer', '📈', 1),
+('Santé & alimentation', 'sante-alimentation', 'Bien-être, nutrition et mode de vie sain', '🌿', 2),
+('Jardin & autonomie', 'jardin-autonomie', 'Permaculture, autonomie alimentaire et jardinage', '🌱', 3),
+('Maison & énergie', 'maison-energie', 'Habitat naturel, énergie et ressources', '🏡', 4)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ================================================================

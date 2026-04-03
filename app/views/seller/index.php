@@ -180,3 +180,123 @@
         </div>
     </div>
 </div>
+<style>
+/* =====================================================
+   SELLER INDEX — palette maquette2
+   Fond crème #faf9f5, violet #7c6cf0, Georgia + Manrope
+   ===================================================== */
+
+/* Header page */
+.container h1 {
+    font-family: Georgia, serif;
+    color: #1a1a2e;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 700;
+}
+
+/* Bouton principal → violet */
+.btn.btn-primary {
+    background: #7c6cf0;
+    border-color: #7c6cf0;
+    color: #fff;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background .2s, transform .15s;
+}
+.btn.btn-primary:hover {
+    background: #6558d4;
+    transform: translateY(-1px);
+}
+
+/* Card filtre */
+.container > .card:first-of-type {
+    background: #fff;
+    border: 1px solid #e8e4f3;
+    border-radius: 12px;
+}
+
+/* Input + select */
+.input {
+    border: 1px solid #e2ddf5;
+    border-radius: 8px;
+    background: #faf9f5;
+    font-family: 'Manrope', sans-serif;
+    transition: border-color .2s, box-shadow .2s;
+}
+.input:focus {
+    border-color: #7c6cf0;
+    box-shadow: 0 0 0 3px rgba(124,108,240,.12);
+    outline: none;
+}
+
+/* Cards vendeurs */
+.grid .card {
+    background: #fff;
+    border: 1px solid #eeeaf7;
+    border-radius: 14px;
+    padding: 1.75rem;
+    transition: box-shadow .2s, transform .2s;
+}
+.grid .card:hover {
+    box-shadow: 0 6px 24px rgba(124,108,240,.10);
+    transform: translateY(-2px);
+}
+
+/* Avatar initiale */
+.grid .card > div:first-child > div {
+    background: #ede9fe !important;
+    color: #7c6cf0 !important;
+    font-family: 'Manrope', sans-serif;
+}
+
+/* Nom vendeur */
+.grid .card .card-title {
+    font-family: Georgia, serif;
+    color: #1a1a2e;
+    font-size: 1.05rem;
+}
+
+/* Stats internes : fond crème */
+.grid .card > div[style*="grid-template-columns"] {
+    background: #faf9f5 !important;
+    border-radius: 8px;
+}
+
+/* Nombre produits → violet */
+.grid .card > div[style*="grid-template-columns"] > div:first-child > div:first-child {
+    color: #7c6cf0 !important;
+}
+
+/* Étoile note */
+.grid .card span[style*="warning"] {
+    color: #f59e0b !important;
+}
+
+/* Bouton ghost pagination */
+.btn.btn-ghost {
+    border: 1px solid #e2ddf5;
+    color: #7c6cf0;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    transition: background .2s;
+}
+.btn.btn-ghost:hover {
+    background: #f0eeff;
+}
+
+/* CTA lavande en bas */
+.container > .card[style*="gradient"],
+.container > .card[style*="gradient-primary"] {
+    background: linear-gradient(135deg, #7c6cf0 0%, #9d91f5 100%) !important;
+    border-radius: 16px;
+    border: none;
+}
+
+/* État vide */
+.card.text-center .btn.btn-primary.btn-lg {
+    font-size: 1rem;
+    padding: .875rem 2rem;
+}
+</style>

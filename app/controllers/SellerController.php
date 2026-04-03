@@ -191,7 +191,7 @@ class SellerController extends Controller {
 
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
             file_put_contents('/tmp/start.log', "CSRF invalide\n", FILE_APPEND);
-            $this->json(['success' => false, 'error' => 'Token invalide'], 403);
+            $this->jsonResponse(['success' => false, 'error' => 'Token invalide'], 403);
         }
 
         file_put_contents('/tmp/start.log', "CSRF OK\n", FILE_APPEND);
@@ -201,7 +201,7 @@ class SellerController extends Controller {
             'description' => $_POST['description'] ?? '',
             'category_id' => $_POST['category_id'] ?? '',
             'price' => $_POST['price'] ?? 0,
-            'original_price' => $_POST['original_price'] ?? null,
+            'original_price' => !empty($_POST['original_price']) ? $_POST['original_price'] : null,
             'file_type' => $_POST['file_type'] ?? '',
             'demo_url' => $_POST['demo_url'] ?? '',
             'tags' => $_POST['tags'] ?? ''
@@ -210,6 +210,7 @@ class SellerController extends Controller {
         file_put_contents('/tmp/start.log', "Data préparé\n", FILE_APPEND);
 
         // Validation des uploads
+        file_put_contents('/tmp/files_debug.log', print_r($_FILES, true));
         $uploadErrors = $this->validateUploads($_FILES);
         
         file_put_contents('/tmp/start.log', "Validation: " . print_r($uploadErrors, true) . "\n", FILE_APPEND);
@@ -302,7 +303,7 @@ class SellerController extends Controller {
         }
 
         if (!isset($_POST['csrf_token']) || !verifyCsrfToken($_POST['csrf_token'])) {
-            $this->json(['success' => false, 'error' => 'Token invalide'], 403);
+            $this->jsonResponse(['success' => false, 'error' => 'Token invalide'], 403);
         }
 
         $data = [
@@ -310,7 +311,7 @@ class SellerController extends Controller {
             'description' => $_POST['description'] ?? '',
             'category_id' => $_POST['category_id'] ?? '',
             'price' => $_POST['price'] ?? 0,
-            'original_price' => $_POST['original_price'] ?? null,
+            'original_price' => !empty($_POST['original_price']) ? $_POST['original_price'] : null,
             'demo_url' => $_POST['demo_url'] ?? '',
             'tags' => $_POST['tags'] ?? ''
         ];
@@ -338,7 +339,7 @@ class SellerController extends Controller {
      */
     public function deleteProduct($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->json(['success' => false, 'error' => 'Méthode non autorisée'], 405);
+            $this->jsonResponse(['success' => false, 'error' => 'Méthode non autorisée'], 405);
         }
 
         $result = $this->productModel->deleteProduct($id, $_SESSION['user_id']);

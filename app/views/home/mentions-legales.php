@@ -81,3 +81,15 @@ $pageTitle = 'Mentions Légales - MarketFlow';
     <?php require_once __DIR__ . '/../layouts/footer.php'; ?>
 </body>
 </html>
+<style>
+/* === DESIGN MAQUETTE2 — MENTIONS LÉGALES === */
+body,main{background:#faf9f5!important}
+.legal-page{padding:40px 0}
+.container{max-width:800px;margin:0 auto;padding:0 20px}
+h1{font-family:Georgia,serif;font-weight:400;color:#1e1208;font-size:26px;margin-bottom:32px}
+h2{font-family:Georgia,serif;font-weight:400;color:#1e1208;font-size:18px;margin:28px 0 12px;padding-bottom:8px;border-bottom:0.5px solid #ede8df}
+p,li{font-family:'Manrope',sans-serif;font-size:13px;color:#6b5c4e;line-height:1.7}
+section{background:#fff;border:0.5px solid #ede8df;border-radius:14px;padding:22px 26px;margin-bottom:14px}
+a{color:#7c6cf0;text-decoration:none}
+a:hover{text-decoration:underline}
+</style>

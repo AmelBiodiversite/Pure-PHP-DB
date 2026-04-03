@@ -71,9 +71,79 @@
     </div>
 
 </div>
-
 <style>
-.card {
-    animation: fadeIn 0.6s ease-out;
+/* === DESIGN MAQUETTE2 — PAIEMENT ANNULÉ === */
+body { background: #faf9f5 !important; }
+
+/* Icône cercle */
+div[style*="background: var(--error-light)"] {
+    background: #fce5df !important;
+    border-radius: 50% !important;
 }
+
+/* Titre */
+h1[style*="font-size: 2rem"] {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 26px !important;
+}
+
+/* Sous-titre */
+p[style*="font-size: 1.125rem; color: var(--text-secondary)"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 14px !important;
+    color: #6b5c4e !important;
+}
+
+/* Card */
+.card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+h3[style*="margin-bottom"] {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 17px !important;
+}
+
+/* Boutons */
+.btn.btn-primary.btn-lg {
+    background: #7c6cf0 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+.btn.btn-secondary {
+    background: #f5f1eb !important;
+    color: #6b5c4e !important;
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 10px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+    box-shadow: none !important;
+}
+
+/* Bloc info panier */
+div[style*="background: var(--primary-50)"] {
+    background: #f5f3ff !important;
+    border-radius: 12px !important;
+    color: #534ab7 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+}
+
+/* Support */
+div[style*="font-size: 0.875rem; color: var(--text-tertiary)"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    color: #a0907e !important;
+}
+a[href="/contact"] { color: #7c6cf0 !important; }
 </style>

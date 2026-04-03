@@ -54,3 +54,15 @@
     </div>
     <?php endif; ?>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — TÉLÉCHARGEMENTS === */
+.container{background:#faf9f5;padding-top:32px!important}
+h1,h2,h3{font-family:Georgia,serif;font-weight:400;color:#1e1208}
+h1[style]{font-size:26px!important;font-weight:400!important}
+a[style*="color: var(--text-tertiary)"]{font-family:'Manrope',sans-serif;font-size:12px;color:#a0907e!important}
+.card{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+.btn,.btn-primary{background:#7c6cf0!important;color:#fff!important;border:none!important;border-radius:8px!important;font-family:'Manrope',sans-serif!important;font-size:12px!important;font-weight:500!important;padding:8px 16px!important;transition:background 0.15s!important}
+.btn:hover,.btn-primary:hover{background:#6558d4!important}
+h3[style]{font-family:Georgia,serif!important;font-size:15px!important;font-weight:400!important;color:#1e1208!important}
+p[style*="font-size: 0.875rem"][style*="color: var(--text-tertiary)"]{font-family:'Manrope',sans-serif;font-size:11px;color:#a0907e!important}
+</style>

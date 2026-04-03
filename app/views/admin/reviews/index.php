@@ -67,3 +67,98 @@
     <?php endif; ?>
 
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — MODÉRATION DES AVIS === */
+
+/* Titre */
+h1 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 24px !important; }
+
+/* Bouton retour */
+.btn.btn-ghost {
+    background: transparent !important;
+    color: #6b5c4e !important;
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 8px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+.btn.btn-ghost:hover { border-color: #7c6cf0 !important; color: #7c6cf0 !important; background: #f5f3ff !important; }
+
+/* Card état vide */
+.card.text-center p { font-family: 'Manrope', sans-serif !important; color: #a0907e !important; font-size: 13px !important; }
+
+/* Cards avis */
+.card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Lien titre produit */
+a[style*="font-weight: 600"] {
+    color: #7c6cf0 !important;
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    text-decoration: none !important;
+}
+a[style*="font-weight: 600"]:hover { text-decoration: underline !important; }
+
+/* Méta auteur + date */
+div[style*="color: var(--text-tertiary)"][style*="margin-top"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 11px !important;
+    color: #a0907e !important;
+}
+
+/* Étoiles — remplies */
+span[style*="color: var(--warning)"] { color: #c99a27 !important; font-size: 1.1rem !important; }
+/* Étoiles — vides */
+span[style*="color: var(--border-color)"] { color: #ddd6c8 !important; font-size: 1.1rem !important; }
+
+/* Titre de l'avis */
+p[style*="font-weight: 600"] {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 14px !important;
+}
+
+/* Corps de l'avis */
+p[style*="color: var(--text-secondary)"][style*="line-height"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+    color: #6b5c4e !important;
+    line-height: 1.7 !important;
+}
+
+/* Bouton approuver */
+.btn.btn-primary.btn-sm {
+    background: #3a7d44 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 7px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    padding: 6px 14px !important;
+}
+.btn.btn-primary.btn-sm:hover { background: #2d6235 !important; }
+
+/* Bouton rejeter */
+.btn.btn-danger.btn-sm {
+    background: #fce5df !important;
+    color: #993c1d !important;
+    border: 0.5px solid #e5b8a8 !important;
+    border-radius: 7px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    padding: 6px 14px !important;
+}
+.btn.btn-danger.btn-sm:hover { background: #f8d4cb !important; }
+</style>

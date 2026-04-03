@@ -365,32 +365,77 @@ document.querySelectorAll('.card').forEach((card, index) => {
     card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
 });
 </script>
-
 <style>
-/* Animation des étapes */
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+/* === DESIGN MAQUETTE2 — CHECKOUT === */
+h1 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 26px !important; }
+p[style*="color: var(--text-secondary)"] { font-family: 'Manrope', sans-serif !important; font-size: 13px !important; color: #6b5c4e !important; }
+
+/* Breadcrumb steps */
+div[style*="background: var(--success)"] { background: #3a7d44 !important; }
+span[style*="font-weight: 600"][style*="color: var(--success)"] { color: #3a7d44 !important; }
+div[style*="background: var(--primary-600)"] { background: #7c6cf0 !important; }
+span[style*="color: var(--primary-600)"] { color: #7c6cf0 !important; font-family: 'Manrope', sans-serif !important; font-weight: 500 !important; }
+div[style*="width: 60px; height: 2px; background: var(--primary-600)"] { background: #7c6cf0 !important; }
+div[style*="background: var(--border-color)"][style*="height: 2px"] { background: #ddd6c8 !important; }
+div[style*="background: var(--bg-tertiary)"] { background: #f5f1eb !important; }
+span[style*="color: var(--text-tertiary)"] { color: #a0907e !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Cards */
+.card { background: #fff !important; border: 0.5px solid #ede8df !important; border-radius: 14px !important; box-shadow: none !important; }
+
+/* Infos client */
+h2[style*="font-size: 1.5rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 18px !important; }
+label[style*="font-size: 0.875rem"] { font-family: 'Manrope', sans-serif !important; font-size: 11px !important; color: #a0907e !important; font-weight: 500 !important; }
+div[style*="font-size: 1rem; font-weight: 600"] { font-family: 'Manrope', sans-serif !important; font-size: 13px !important; color: #1e1208 !important; }
+a[style*="color: var(--primary-600)"][style*="margin-top"] { color: #7c6cf0 !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Items commande */
+div[style*="font-weight: 600; margin-bottom"] { font-family: 'Manrope', sans-serif !important; font-size: 13px !important; color: #1e1208 !important; }
+div[style*="color: var(--text-tertiary)"][style*="0.875rem"] { color: #a0907e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; }
+div[style*="font-weight: 700; color: var(--primary-600)"] { color: #7c6cf0 !important; font-family: Georgia, serif !important; font-weight: 400 !important; font-size: 15px !important; }
+
+/* Résumé montants */
+h2[style*="font-size: 1.25rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 16px !important; }
+span[style*="color: var(--text-secondary)"] { color: #6b5c4e !important; font-family: 'Manrope', sans-serif !important; font-size: 13px !important; }
+span[style*="font-weight: 600"] { font-family: 'Manrope', sans-serif !important; color: #1e1208 !important; }
+div[style*="border-top: 2px solid var(--border-color)"] { border-top: 0.5px solid #ede8df !important; }
+span[style*="font-weight: 700; color: var(--primary-600)"] { color: #7c6cf0 !important; font-family: Georgia, serif !important; font-weight: 400 !important; font-size: 22px !important; }
+span[style*="font-weight: 700"][style*="font-size: 1.5rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+div[style*="color: var(--success)"] span { color: #3a7d44 !important; font-size: 13px !important; }
+
+/* Stripe element */
+div#card-element { border: 0.5px solid #ddd6c8 !important; border-radius: 10px !important; background: #faf9f5 !important; }
+div#card-errors { color: #993c1d !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Bouton payer */
+.btn.btn-primary {
+    background: #7c6cf0 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
 }
+.btn.btn-primary:hover { background: #6558d4 !important; }
+
+/* Logos stripe */
+div[style*="font-size: 0.75rem"][style*="color: var(--text-tertiary)"] span { color: #a0907e !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Bloc sécurité */
+div[style*="background: var(--success-light)"] {
+    background: #e4f1d8 !important;
+    border-radius: 12px !important;
+}
+div[style*="color: #065f46"] { color: #2d6235 !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+div[style*="font-weight: 600; margin-bottom: var(--space-2)"] { font-family: 'Manrope', sans-serif !important; font-size: 12px !important; font-weight: 600 !important; }
 
 /* Responsive */
 @media (max-width: 1024px) {
-    [style*="grid-template-columns: 1fr 450px"] {
-        grid-template-columns: 1fr !important;
-    }
+    [style*="grid-template-columns: 1fr 450px"] { grid-template-columns: 1fr !important; }
 }
-
 @media (max-width: 768px) {
-    [style*="grid-template-columns: 1fr 1fr"] {
-        grid-template-columns: 1fr !important;
-    }
-}
-
-/* Style Stripe Element en dark mode */
-@media (prefers-color-scheme: dark) {
-    .StripeElement {
-        background-color: var(--bg-secondary) !important;
-    }
+    [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
 }
 </style>
-

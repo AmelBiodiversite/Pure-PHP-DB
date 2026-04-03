@@ -336,93 +336,7 @@ $total_pages = ceil(($stats['total'] ?? 0) / $per_page);
     </div>
 </div>
 
-<style>
-/* Modals */
-.modal { 
-    transition: opacity 300ms ease-in-out; 
-}
-.modal.open { 
-    opacity: 1; 
-    pointer-events: auto; 
-}
-.modal.open .modal-content { 
-    transform: scale(1); 
-}
 
-/* Spinner de chargement */
-.spinner { 
-    border: 4px solid #e5e7eb; 
-    border-top: 4px solid var(--primary-500, #3b82f6); 
-    border-radius: 50%; 
-    width: 40px; 
-    height: 40px; 
-    animation: spin 1s linear infinite; 
-    margin: 2rem auto; 
-}
-
-@keyframes spin { 
-    0% { transform: rotate(0deg); } 
-    100% { transform: rotate(360deg); } 
-}
-
-/* Tableau optimisé */
-table { 
-    table-layout: auto; 
-}
-
-th, td { 
-    white-space: nowrap; 
-    vertical-align: middle;
-}
-
-/* Amélioration des boutons compacts */
-.btn-sm { 
-    padding: 0.375rem 0.75rem; 
-    font-size: 0.875rem; 
-    line-height: 1.25rem;
-}
-
-/* Hover sur les lignes du tableau */
-tbody tr:hover {
-    background: var(--bg-secondary, #f8fafc);
-    cursor: pointer;
-}
-
-/* Amélioration mobile */
-@media (max-width: 768px) {
-    .overflow-x-auto { 
-        -webkit-overflow-scrolling: touch; 
-    }
-    
-    td, th { 
-        padding: 0.75rem 0.5rem !important; 
-        font-size: 0.875rem; 
-    }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-    
-    h1 {
-        font-size: 1.5rem;
-    }
-}
-
-/* Badges plus compacts */
-.badge {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    border-radius: 9999px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-error { background: #fee2e2; color: #991b1b; }
-.badge-secondary { background: #e5e7eb; color: #1f2937; }
-</style>
 
 <script>
 // Gestion des modals
@@ -582,3 +496,95 @@ async function applyBulkAction() {
     }
 }
 </script>
+<style>
+/* === DESIGN MAQUETTE2 — GESTION PRODUITS ADMIN === */
+
+/* Titres */
+h1 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+.text-text-secondary { color: #6b5c4e !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Cards stats */
+.card { 
+    background: #fff !important; 
+    border: 0.5px solid #ede8df !important; 
+    border-radius: 14px !important; 
+    box-shadow: none !important; 
+}
+/* Chiffres stats */
+.text-3xl.font-bold { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+.text-3xl.font-bold.text-warning { color: #ba7517 !important; }
+.text-3xl.font-bold.text-success { color: #3a7d44 !important; }
+.text-3xl.font-bold.text-error { color: #993c1d !important; }
+
+/* Filtres */
+input.input, select.input {
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 10px !important;
+    background: #faf9f5 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    color: #1e1208 !important;
+}
+input.input:focus, select.input:focus {
+    border-color: #7c6cf0 !important;
+    box-shadow: 0 0 0 3px rgba(124,108,240,.1) !important;
+    background: #fff !important;
+}
+.btn.btn-primary { background: #7c6cf0 !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; box-shadow: none !important; }
+.btn.btn-ghost { background: transparent !important; color: #6b5c4e !important; border: 0.5px solid #ddd6c8 !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Tableau header */
+.bg-bg-tertiary.sticky { background: #faf9f5 !important; }
+thead th { font-family: 'Manrope', sans-serif !important; font-size: 10px !important; font-weight: 600 !important; color: #a0907e !important; text-transform: uppercase !important; }
+/* Prix produit */
+.text-primary-600.font-semibold { color: #7c6cf0 !important; font-family: Georgia, serif !important; font-weight: 400 !important; font-size: 14px !important; }
+/* Lignes hover */
+tr:hover { background: #faf9f5 !important; }
+/* Catégorie / ID / dates */
+.text-text-secondary.text-xs, .text-text-secondary.text-sm { color: #a0907e !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Badges statut produit */
+.badge.badge-warning { background: #fef9e7 !important; color: #7d5a00 !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; font-weight: 500 !important; }
+.badge.badge-success { background: #e4f1d8 !important; color: #2d6a35 !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; font-weight: 500 !important; }
+.badge.badge-error { background: #fce5df !important; color: #993c1d !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; font-weight: 500 !important; }
+.badge.badge-secondary { background: #f5f1eb !important; color: #6b5c4e !important; border-radius: 6px !important; font-size: 10px !important; padding: 2px 8px !important; font-weight: 500 !important; }
+
+/* Boutons d'action compacts */
+.btn.btn-sm.btn-ghost { background: transparent !important; color: #6b5c4e !important; border: 0.5px solid #ddd6c8 !important; border-radius: 6px !important; font-size: 11px !important; }
+.btn.btn-sm.btn-success { background: #e4f1d8 !important; color: #2d6a35 !important; border: 0.5px solid #aed49b !important; border-radius: 6px !important; font-size: 11px !important; }
+.btn.btn-sm.btn-error { background: #fce5df !important; color: #993c1d !important; border: 0.5px solid #e5b8a8 !important; border-radius: 6px !important; font-size: 11px !important; }
+.btn.btn-sm.btn-warning { background: #fef9e7 !important; color: #7d5a00 !important; border: 0.5px solid #e8d89a !important; border-radius: 6px !important; font-size: 11px !important; }
+
+/* Pagination */
+.border-t.border-gray-200 { border-top: 0.5px solid #ede8df !important; }
+
+/* Bulk actions bar */
+.bg-bg-tertiary.rounded-b-lg { background: #faf9f5 !important; border-top: 0.5px solid #ede8df !important; }
+
+/* Spinner */
+.spinner { border-color: #ede8df !important; border-top-color: #7c6cf0 !important; }
+
+/* Modals */
+.modal-content {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 40px rgba(30,18,8,.12) !important;
+}
+.modal-content h2 { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 20px !important; }
+.border-b.border-gray-200 { border-bottom: 0.5px solid #ede8df !important; }
+label.block.mb-2 { font-family: 'Manrope', sans-serif !important; font-size: 12px !important; font-weight: 500 !important; color: #1e1208 !important; }
+select.input.w-full, textarea.input.w-full {
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 10px !important;
+    background: #faf9f5 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13px !important;
+}
+/* Bouton rejeter (modal) */
+button.btn.btn-error { background: #993c1d !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+button.btn.btn-secondary { background: #f5f1eb !important; color: #6b5c4e !important; border: 0.5px solid #ddd6c8 !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Checkbox */
+input[type="checkbox"] { accent-color: #7c6cf0 !important; }
+</style>

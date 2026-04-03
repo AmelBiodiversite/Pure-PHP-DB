@@ -81,3 +81,22 @@
         </div>
     </div>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — À PROPOS === */
+.container{background:#faf9f5;padding-top:32px!important}
+h1,h2,h3{font-family:Georgia,serif;font-weight:400;color:#1e1208}
+h1.mb-8{font-size:28px}
+.card{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+p[style*="line-height: 1.8"]{font-family:'Manrope',sans-serif;font-size:13px;color:#6b5c4e;line-height:1.7}
+p[style*="color: var(--text-secondary)"]{font-family:'Manrope',sans-serif;font-size:13px;color:#6b5c4e!important}
+/* Titres avantages avec icône */
+h3[style*="color: var(--primary-600)"]{color:#534ab7!important;font-family:Georgia,serif!important;font-size:16px!important;font-weight:400!important}
+/* Valeurs checkmarks */
+span[style*="color: var(--primary-600)"]{color:#7c6cf0!important}
+/* CTA banner */
+.card[style*="background: var(--gradient-primary)"]{background:#ede9fe!important;border-color:#c9c4f5!important}
+h2[style*="color: white"]{color:#534ab7!important;font-family:Georgia,serif!important;font-weight:400!important}
+p[style*="color: rgba(255,255,255,0.9)"]{color:#6b5c4e!important}
+/* Bouton CTA */
+a.btn.btn-lg[style*="background: white"]{background:#7c6cf0!important;color:#fff!important;border:none!important;border-radius:8px!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;padding:10px 22px!important}
+</style>

@@ -57,670 +57,7 @@ for ($i = 6; $i >= 0; $i--) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - MarketFlow Pro</title>
     
-    <style>
-        /* ================================================
-           VARIABLES CSS - DESIGN SYSTEM
-           ================================================ */
-        :root {
-            /* Hauteur du header */
-            --header-height: 70px;
-            
-            /* Couleurs principales */
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #06b6d4;
-            
-            /* Gradients modernes */
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            
-            /* Ombres */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-            
-            /* Espacements */
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
-        }
-
-        /* ================================================
-           RESET & BASE
-           ================================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-
-        /* ================================================
-           LAYOUT - MAIN CONTENT PLEINE LARGEUR
-           ================================================ */
-        .admin-layout {
-            min-height: 100vh;
-            width: 100%;
-        }
-
-        /* MAIN CONTENT AREA - Pleine largeur */
-        .main-content {
-            width: 100%;
-            min-height: 100vh;
-            background: #f8fafc;
-        }
-
-        /* ================================================
-           HEADER - En-tête de la page
-           ================================================ */
-        .content-header {
-            background: white;
-            padding: var(--space-xl) var(--space-2xl);
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .content-header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-lg);
-        }
-
-        /* Titre de la page avec gradient */
-        .page-title {
-            font-size: 2rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-        }
-
-        /* Boutons d'actions rapides */
-        .quick-actions {
-            display: flex;
-            gap: var(--space-sm);
-        }
-
-        .btn-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.25rem;
-        }
-
-        .btn-icon:hover {
-            background: #f8fafc;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* ================================================
-           BREADCRUMB - Fil d'ariane
-           ================================================ */
-        .breadcrumb {
-            display: flex;
-            gap: var(--space-sm);
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .breadcrumb-separator {
-            color: #cbd5e1;
-        }
-
-        /* ================================================
-           CONTENT BODY - Zone de contenu principale
-           ================================================ */
-        .content-body {
-            padding: var(--space-2xl);
-        }
-
-        /* ================================================
-           COMPONENTS - STATS CARDS
-           ================================================ */
-        /* Grille responsive pour les cartes de stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--space-lg);
-            margin-bottom: var(--space-2xl);
-        }
-
-        /* Carte de statistique individuelle */
-        .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Barre de couleur en haut au survol */
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-
-        /* Animation au survol */
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .stat-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        /* En-tête de la carte de stat */
-        .stat-card-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: var(--space-lg);
-        }
-
-        /* Icône avec gradient */
-        .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            background: var(--gradient-primary);
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
-        }
-
-        /* Variantes de couleur pour les icônes */
-        .stat-card.success .stat-icon {
-            background: var(--gradient-success);
-        }
-
-        .stat-card.warning .stat-icon {
-            background: var(--gradient-warning);
-        }
-
-        .stat-card.info .stat-icon {
-            background: var(--gradient-info);
-        }
-
-        /* Indicateur de tendance (hausse/baisse) */
-        .stat-trend {
-            display: flex;
-            align-items: center;
-            gap: var(--space-xs);
-            font-size: 0.875rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 8px;
-        }
-
-        .stat-trend.up {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .stat-trend.down {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Label de la statistique */
-        .stat-label {
-            color: #64748b;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: var(--space-xs);
-        }
-
-        /* Valeur principale de la stat */
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1;
-        }
-
-        /* Footer de la carte avec info supplémentaire */
-        .stat-footer {
-            margin-top: var(--space-md);
-            padding-top: var(--space-md);
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            align-items: center;
-            gap: var(--space-xs);
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        /* ================================================
-           COMPONENTS - ALERT BANNER
-           ================================================ */
-        /* Bannière d'alerte */
-        .alert-banner {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            border-radius: 12px;
-            padding: var(--space-xl);
-            margin-bottom: var(--space-2xl);
-            display: flex;
-            align-items: center;
-            gap: var(--space-lg);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Variante danger (rouge) */
-        .alert-banner.danger {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border-left-color: var(--danger);
-        }
-
-        /* Icône de l'alerte */
-        .alert-icon {
-            font-size: 2rem;
-            flex-shrink: 0;
-        }
-
-        /* Contenu textuel de l'alerte */
-        .alert-content {
-            flex: 1;
-        }
-
-        .alert-title {
-            font-weight: 700;
-            font-size: 1.125rem;
-            margin-bottom: var(--space-xs);
-        }
-
-        .alert-description {
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        /* Boutons d'action de l'alerte */
-        .alert-actions {
-            display: flex;
-            gap: var(--space-sm);
-            flex-shrink: 0;
-        }
-
-        /* ================================================
-           COMPONENTS - CARDS
-           ================================================ */
-        /* Carte générique */
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            margin-bottom: var(--space-xl);
-        }
-
-        /* En-tête de carte */
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-lg);
-            padding-bottom: var(--space-lg);
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        /* Badge pour compteurs ou statuts */
-        .card-badge {
-            background: #f1f5f9;
-            color: #64748b;
-            font-size: 0.875rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-        }
-
-        /* Variantes de couleur pour badges */
-        .card-badge.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .card-badge.danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .card-badge.success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        /* ================================================
-           COMPONENTS - CHART CONTAINER
-           ================================================ */
-        /* Conteneur pour les graphiques Chart.js */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: var(--space-lg);
-        }
-
-        /* ================================================
-           COMPONENTS - LIST ITEMS
-           ================================================ */
-        /* Item de liste (utilisateurs, produits, etc.) */
-        .list-item {
-            padding: var(--space-md);
-            background: #f8fafc;
-            border-radius: 12px;
-            display: flex;
-            gap: var(--space-md);
-            align-items: center;
-            margin-bottom: var(--space-sm);
-            transition: all 0.2s ease;
-        }
-
-        .list-item:hover {
-            background: #f1f5f9;
-            transform: translateX(4px);
-        }
-
-        /* Avatar image */
-        .list-item-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        /* Avatar placeholder avec initiale */
-        .list-item-avatar-placeholder {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        /* Contenu textuel de l'item */
-        .list-item-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .list-item-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .list-item-subtitle {
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        /* Boutons d'action de l'item */
-        .list-item-actions {
-            display: flex;
-            gap: var(--space-xs);
-            flex-shrink: 0;
-        }
-
-        /* ================================================
-           COMPONENTS - BUTTONS
-           ================================================ */
-        /* Bouton générique */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-sm);
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        /* Variantes de boutons */
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-outline {
-            background: white;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* Taille réduite de bouton */
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-
-        /* ================================================
-           COMPONENTS - TABLE
-           ================================================ */
-        /* Conteneur responsive pour tableau */
-        .table-container {
-            overflow-x: auto;
-            margin-top: var(--space-lg);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        /* En-tête de tableau */
-        thead tr {
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        th {
-            padding: var(--space-md);
-            text-align: left;
-            font-weight: 600;
-            color: #64748b;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Lignes du tableau */
-        tbody tr {
-            border-bottom: 1px solid #f1f5f9;
-            transition: background 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background: #f8fafc;
-        }
-
-        td {
-            padding: var(--space-md);
-        }
-
-        /* ================================================
-           UTILITIES
-           ================================================ */
-        /* Grille 2 colonnes responsive */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: var(--space-xl);
-        }
-
-        /* État vide (no data) */
-        .empty-state {
-            text-align: center;
-            padding: var(--space-2xl);
-            color: #64748b;
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: var(--space-md);
-            opacity: 0.5;
-        }
-
-        /* ================================================
-           RESPONSIVE
-           ================================================ */
-        @media (max-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            /* Espacement réduit sur mobile */
-            .content-header {
-                padding: var(--space-lg);
-            }
-
-            .content-body {
-                padding: var(--space-lg);
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ================================================
-           ANIMATIONS
-           ================================================ */
-        /* Animation d'entrée par le bas */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Animation de pulsation */
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        /* Classes utilitaires d'animation */
-        .animate-slide-in {
-            animation: slideInUp 0.4s ease-out;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s infinite;
-        }
-    </style>
+    
 </head>
 <body>
     <div class="admin-layout">
@@ -1168,3 +505,173 @@ for ($i = 6; $i >= 0; $i--) {
     </script>
 </body>
 </html>
+<style>
+/* === DESIGN MAQUETTE2 — DASHBOARD ADMIN === */
+
+/* Fond général : beige chaud au lieu du gris froid #f8fafc */
+body { background: #faf9f5 !important; color: #1e1208 !important; }
+
+/* Header sticky : fond blanc, bordure fine au lieu de box-shadow prononcé */
+.content-header {
+    background: #fff !important;
+    border-bottom: 0.5px solid #ede8df !important;
+    box-shadow: none !important;
+}
+
+/* Titre de page : Georgia serif au lieu du dégradé bleu -webkit-clip */
+.page-title {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    font-size: 24px !important;
+    background: none !important;
+    -webkit-text-fill-color: unset !important;
+    color: #1e1208 !important;
+}
+
+/* Boutons icônes du header */
+.btn-icon {
+    border: 0.5px solid #ede8df !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+.btn-icon:hover {
+    border-color: #7c6cf0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    background: #f5f3ff !important;
+}
+
+/* Fil d'ariane */
+.breadcrumb { color: #a0907e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Zone de contenu : pas de fond gris */
+.main-content, .content-body { background: #faf9f5 !important; }
+
+/* === STAT CARDS === */
+.stat-card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+/* Barre couleur au survol : remplace le dégradé bleu */
+.stat-card::before { background: #7c6cf0 !important; }
+.stat-card:hover { transform: translateY(-2px) !important; box-shadow: none !important; }
+
+/* Icônes de stats : dégradés vivifiants → pastels maquette2 */
+.stat-icon { box-shadow: none !important; }
+/* Icône bleue par défaut → violet pastel */
+.stat-card .stat-icon { background: #ede9fe !important; }
+/* Icône verte (success) → vert naturel */
+.stat-card.success .stat-icon { background: #e4f1d8 !important; }
+/* Icône rose (warning) → abricot doux */
+.stat-card.warning .stat-icon { background: #fef3e0 !important; }
+/* Icône cyan (info) → bleu lavande */
+.stat-card.info .stat-icon { background: #dbeafe !important; }
+
+/* Valeur principale de la stat */
+.stat-value {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 28px !important;
+}
+
+/* Indicateur tendance hausse */
+.stat-trend.up { background: #e4f1d8 !important; color: #2d6a35 !important; }
+.stat-trend.down { background: #fce5df !important; color: #993c1d !important; }
+
+/* Pied de carte stat */
+.stat-footer { border-top: 0.5px solid #ede8df !important; color: #a0907e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; }
+
+/* Label de stat */
+.stat-label { color: #6b5c4e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; }
+
+/* === BANNIÈRE D'ALERTE === */
+.alert-banner {
+    background: #fef9e7 !important;
+    border-left-color: #c99a27 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+}
+.alert-banner.danger {
+    background: #fce5df !important;
+    border-left-color: #993c1d !important;
+}
+.alert-title { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+.alert-description { color: #6b5c4e !important; font-size: 12px !important; font-family: 'Manrope', sans-serif !important; }
+
+/* === CARDS GÉNÉRIQUES === */
+.card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+.card-header { border-bottom: 0.5px solid #ede8df !important; }
+.card-title { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 16px !important; }
+
+/* Badges carte */
+.card-badge { background: #f5f1eb !important; color: #6b5c4e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; border-radius: 8px !important; }
+.card-badge.warning { background: #fef9e7 !important; color: #7d5a00 !important; }
+.card-badge.danger { background: #fce5df !important; color: #993c1d !important; }
+.card-badge.success { background: #e4f1d8 !important; color: #2d6a35 !important; }
+
+/* === ITEMS DE LISTE === */
+.list-item { background: #faf9f5 !important; border-radius: 10px !important; }
+.list-item:hover { background: #f0ece4 !important; transform: none !important; }
+
+/* Avatar placeholder : remplace le dégradé bleu */
+.list-item-avatar-placeholder { background: #ede9fe !important; color: #534ab7 !important; border-radius: 10px !important; font-weight: 500 !important; }
+
+/* Sous-titre item liste */
+.list-item-subtitle { color: #a0907e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; }
+
+/* === BOUTONS === */
+.btn-primary {
+    background: #7c6cf0 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    border: none !important;
+}
+.btn-primary:hover { background: #6558d4 !important; box-shadow: none !important; transform: none !important; }
+
+.btn-success { background: #3a7d44 !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+.btn-success:hover { background: #2d6235 !important; }
+
+.btn-danger { background: #993c1d !important; border-radius: 8px !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+.btn-danger:hover { background: #7a2e14 !important; }
+
+.btn-outline {
+    background: #fff !important;
+    color: #6b5c4e !important;
+    border: 0.5px solid #ddd6c8 !important;
+    border-radius: 8px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+.btn-outline:hover { border-color: #7c6cf0 !important; color: #7c6cf0 !important; }
+
+/* === TABLEAU COMMANDES RÉCENTES === */
+thead tr { border-bottom: 0.5px solid #ede8df !important; }
+th { color: #a0907e !important; font-size: 11px !important; font-family: 'Manrope', sans-serif !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; font-weight: 500 !important; }
+tbody tr { border-bottom: 0.5px solid #faf9f5 !important; }
+tbody tr:hover { background: #faf9f5 !important; }
+td { font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+
+/* Lien n° commande */
+a[style*="color: var(--primary)"] { color: #7c6cf0 !important; }
+/* Montant commande */
+td[style*="font-weight: 600"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+/* Date commande */
+td[style*="color: #64748b"] { color: #a0907e !important; }
+
+/* === GRILLE CHART.JS === */
+/* Les canvas Chart.js restent inchangés, juste le fond de la card */
+.chart-container { background: transparent !important; }
+</style>

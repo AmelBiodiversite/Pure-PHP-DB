@@ -82,3 +82,16 @@
         </div>
     </div>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — CONTACT === */
+.container{background:#faf9f5;padding-top:32px!important}
+h1{font-family:Georgia,serif;font-weight:400;color:#1e1208;font-size:26px}
+.card{background:#fff!important;border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+.form-label{font-family:'Manrope',sans-serif;font-size:12px;font-weight:500;color:#1e1208}
+.input{width:100%;padding:9px 14px;border:0.5px solid #ddd6c8!important;border-radius:10px!important;background:#faf9f5;font-family:'Manrope',sans-serif;font-size:13px;color:#1e1208;outline:none;box-sizing:border-box;transition:border-color 0.15s}
+.input:focus{border-color:#7c6cf0!important;background:#fff;box-shadow:0 0 0 3px rgba(124,108,240,.1)}
+.btn-primary{background:#7c6cf0!important;color:#fff!important;border:none!important;border-radius:8px!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;font-weight:500!important;padding:10px 20px!important}
+.btn-primary:hover{background:#6558d4!important}
+.alert-success{background:#e4f1d8;border-radius:10px;padding:12px 16px;font-family:'Manrope',sans-serif;font-size:13px;color:#2d6a35;margin-bottom:16px}
+a[style*="color: var(--primary-600)"]{color:#7c6cf0!important}
+</style>

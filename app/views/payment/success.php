@@ -247,32 +247,122 @@ document.querySelectorAll('[data-license]').forEach(el => {
     });
 });
 </script>
-
 <style>
-@keyframes successPulse {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+/* === DESIGN MAQUETTE2 — PAIEMENT SUCCESS === */
+body { background: #faf9f5 !important; }
+
+/* Cercle succès */
+div[style*="background: var(--gradient-success)"] {
+    background: #3a7d44 !important;
+    box-shadow: none !important;
 }
+
+/* Titre principal */
+h1[style*="font-size: 2.5rem"] {
+    font-family: Georgia, serif !important;
+    font-weight: 400 !important;
+    color: #1e1208 !important;
+    font-size: 28px !important;
+}
+
+/* N° commande inline */
+p[style*="font-size: 1.25rem; color: var(--text-secondary)"] {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 14px !important;
+    color: #6b5c4e !important;
+}
+strong[style*="color: var(--primary-600)"] { color: #7c6cf0 !important; }
+
+/* Cards */
+.card {
+    background: #fff !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Titres h2 h3 dans cards */
+h2[style*="font-size: 1.5rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 18px !important; }
+h3[style*="margin-bottom: var(--space-6)"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 16px !important; }
+h3[style*="margin-bottom: var(--space-4)"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 15px !important; }
+
+/* Produits — titre */
+h3[style*="font-size: 1.125rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; font-size: 15px !important; }
+
+/* Vendeur */
+p[style*="font-size: 0.875rem; color: var(--text-tertiary)"] { font-family: 'Manrope', sans-serif !important; font-size: 11px !important; color: #a0907e !important; }
+
+/* Badge disponible */
+div[style*="background: var(--success-light)"][style*="color: #065f46"] {
+    background: #e4f1d8 !important;
+    color: #2d6235 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+}
+
+/* Bouton télécharger */
+.btn.btn-primary.btn-sm {
+    background: #7c6cf0 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 7px !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+.btn.btn-primary.btn-sm:hover { background: #6558d4 !important; }
+
+/* Clé licence */
+div[style*="font-size: 0.75rem; color: var(--text-tertiary)"][style*="margin-top"] {
+    color: #a0907e !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 11px !important;
+}
+
+/* Séparateurs items */
+div[style*="border-bottom: 1px solid var(--border-color)"] { border-bottom: 0.5px solid #f0ece4 !important; }
+
+/* Card infos importantes */
+.card[style*="background: var(--primary-50)"] { background: #f5f3ff !important; border: 0.5px solid #ddd6c8 !important; }
+ul[style*="color: var(--primary-700)"] li { color: #534ab7 !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+a[style*="color: var(--primary-700)"] { color: #7c6cf0 !important; }
+
+/* Sidebar récap — labels */
+span[style*="color: var(--text-tertiary)"][style*="font-size: 0.875rem"] { color: #a0907e !important; font-family: 'Manrope', sans-serif !important; font-size: 12px !important; }
+span[style*="font-weight: 600; font-family: var(--font-mono)"] { font-family: 'Manrope', monospace, sans-serif !important; font-size: 12px !important; color: #1e1208 !important; }
+
+/* Total payé */
+div[style*="border-top: 2px solid var(--border-color)"] { border-top: 0.5px solid #ede8df !important; }
+span[style*="font-weight: 700; color: var(--primary-600)"] { color: #7c6cf0 !important; font-family: Georgia, serif !important; font-weight: 400 !important; font-size: 20px !important; }
+span[style*="font-weight: 700"][style*="font-size: 1.25rem"] { font-family: Georgia, serif !important; font-weight: 400 !important; color: #1e1208 !important; }
+
+/* Méthode paiement */
+div[style*="background: var(--bg-secondary)"][style*="border-radius: var(--radius)"] {
+    background: #faf9f5 !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 10px !important;
+}
+div[style*="font-size: 0.75rem; color: var(--text-tertiary); margin-bottom"] { color: #a0907e !important; font-family: 'Manrope', sans-serif !important; font-size: 11px !important; }
+span[style*="color: var(--success)"][style*="margin-left: auto"] { color: #3a7d44 !important; font-size: 11px !important; }
+
+/* Boutons actions */
+.btn.btn-primary[style*="width: 100%"] { background: #7c6cf0 !important; border-radius: 10px !important; font-family: 'Manrope', sans-serif !important; box-shadow: none !important; }
+.btn.btn-secondary[style*="width: 100%"] { background: #f5f1eb !important; color: #6b5c4e !important; border: 0.5px solid #ddd6c8 !important; border-radius: 10px !important; font-family: 'Manrope', sans-serif !important; box-shadow: none !important; }
+
+/* Support sidebar */
+div[style*="margin-top: var(--space-6)"][style*="text-align: center"] {
+    background: #faf9f5 !important;
+    border: 0.5px solid #ede8df !important;
+    border-radius: 12px !important;
+}
+a[href="/contact"][style*="color: var(--primary-600)"] { color: #7c6cf0 !important; font-family: 'Manrope', sans-serif !important; }
 
 /* Responsive */
 @media (max-width: 1024px) {
-    [style*="grid-template-columns: 1fr 400px"] {
-        grid-template-columns: 1fr !important;
-    }
+    [style*="grid-template-columns: 1fr 400px"] { grid-template-columns: 1fr !important; }
 }
-
 @media (max-width: 768px) {
-    [style*="grid-template-columns: 100px 1fr auto"] {
-        grid-template-columns: 1fr !important;
-    }
+    [style*="grid-template-columns: 100px 1fr auto"] { grid-template-columns: 1fr !important; }
 }
 </style>

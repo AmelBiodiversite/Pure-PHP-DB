@@ -24,330 +24,152 @@
  */
 ?>
 
-<!-- ============================================================
-     HERO SECTION - Section d'accueil
-     ============================================================ -->
+<!-- HERO -->
 <section class="hero-section">
-    	<div class="hero-orbs"></div> 
-	<div class="container">
-        <div class="hero-content">
-	    <!-- Titre principal avec gradient -->
-            <h1 class="hero-title animate-fade-in">
-                La marketplace pour les 
-                <span class="gradient-text">créateurs digitaux</span>
-            </h1>
-            
-            <!-- Sous-titre descriptif -->
-            <p class="hero-subtitle animate-fade-in">
-                Vendez et achetez des templates, designs, codes et ressources premium. 
-                Rejoignez des milliers de créateurs qui génèrent des revenus passifs.
-            </p>
-            
-            <!-- Call-to-actions -->
-            <div class="hero-cta animate-fade-in">
-                <a href="/products" class="btn-hero-primary">
-                    Explorer les produits
-                    <span>→</span>
-                </a>
-                <a href="/register" class="btn-hero-secondary">
-                    Devenir vendeur
-                    <span>🚀</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================================
-     SECTION CATÉGORIES - Minimal Luxe
-     ============================================================ -->
-<section class="categories-section">
     <div class="container">
-        
-        <!-- En-tête de section -->
-        <h2 class="section-title">Explorez nos catégories</h2>
-        <p class="section-subtitle">
-            Des milliers de produits digitaux premium dans 6 catégories principales
-        </p>
-
-        <!-- Grille de catégories -->
-        <div class="categories-grid">
-            
-            <!-- Catégorie 1 : Cours & Formations -->
-            <a href="/category/courses" class="category-card cat-1">
-                <div class="category-content">
-                    <div class="category-number">01</div>
-                    <div class="category-icon">🎓</div>
-                    <h3 class="category-title">Cours & Formations</h3>
-                    <p class="category-description">
-                        Masterclasses et programmes complets pour développer votre expertise et accélérer votre carrière professionnelle.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats"><?= number_format($categoryCounts['courses']) ?> produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Catégorie 2 : Design Assets -->
-            <a href="/category/design" class="category-card cat-2">
-                <div class="category-content">
-                    <div class="category-number">02</div>
-                    <div class="category-icon">🎨</div>
-                    <h3 class="category-title">Design Assets</h3>
-                    <p class="category-description">
-                        UI Kits professionnels et design systems pour créer des produits digitaux de classe mondiale rapidement.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats">1,923 produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Catégorie 3 : Templates Productivité -->
-            <a href="/category/templates" class="category-card cat-3">
-                <div class="category-content">
-                    <div class="category-number">03</div>
-                    <div class="category-icon">📋</div>
-                    <h3 class="category-title">Templates Productivité</h3>
-                    <p class="category-description">
-                        Systèmes d'organisation Notion et templates pour optimiser votre workflow quotidien et gagner du temps.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats">3,156 produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Catégorie 4 : Code & Scripts -->
-            <a href="/category/code" class="category-card cat-4">
-                <div class="category-content">
-                    <div class="category-number">04</div>
-                    <div class="category-icon">💻</div>
-                    <h3 class="category-title">Code & Scripts</h3>
-                    <p class="category-description">
-                        Composants React, starters et plugins pour accélérer votre développement web moderne et efficace.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats">1,548 produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Catégorie 5 : Audio & Musique -->
-            <a href="/category/audio" class="category-card cat-5">
-                <div class="category-content">
-                    <div class="category-number">05</div>
-                    <div class="category-icon">🎵</div>
-                    <h3 class="category-title">Audio & Musique</h3>
-                    <p class="category-description">
-                        Bibliothèques audio premium et presets sonores pour vos projets multimédias et créations audiovisuelles.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats">892 produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Catégorie 6 : Ressources Visuelles -->
-            <a href="/category/visual" class="category-card cat-6">
-                <div class="category-content">
-                    <div class="category-number">06</div>
-                    <div class="category-icon">✨</div>
-                    <h3 class="category-title">Ressources Visuelles</h3>
-                    <p class="category-description">
-                        Collections premium de fonts, icônes et illustrations vectorielles haute qualité pour vos designs.
-                    </p>
-                    <div class="category-meta">
-                        <span class="category-stats">2,441 produits</span>
-                        <div class="category-arrow">→</div>
-                    </div>
-                </div>
-            </a>
-
+        <div class="hero-content">
+            <h1 class="hero-title">Produits digitaux pour votre <em class="hero-accent">autonomie</em></h1>
+            <p class="hero-subtitle">Découvrez des ressources premium pour le développement personnel,<br>l'autonomie et un mode de vie plus conscient.</p>
         </div>
     </div>
 </section>
 
-<!-- ============================================================
-     SECTION PRODUITS POPULAIRES - Avec wishlist
-     ============================================================ -->
+<!-- CATÉGORIES -->
+<section class="categories-section">
+    <div class="cat-grid">
+
+        <div class="cat-row cat-row--1-2">
+            <a href="/category/developpement-personnel" class="cat-card cat-card--1">
+                <span class="cat-num">01</span>
+                <div class="cat-icon"><svg viewBox="0 0 32 32" fill="none"><path d="M16 26V10" stroke="#0f6e56" stroke-width="1.6" stroke-linecap="round"/><path d="M10 16L16 10L22 16" stroke="#0f6e56" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 22h12" stroke="#0f6e56" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                <p class="cat-label">01 · Croissance</p>
+                <h3 class="cat-title">Développement personnel</h3>
+                <span class="cat-btn">— ressources</span>
+            </a>
+            <a href="/category/sante-alimentation" class="cat-card cat-card--2">
+                <span class="cat-num">02</span>
+                <div class="cat-icon"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="14" r="6" stroke="#3b6d11" stroke-width="1.6"/><path d="M13 14h6M16 11v6" stroke="#3b6d11" stroke-width="1.6" stroke-linecap="round"/><path d="M16 20v5M12 25h8" stroke="#3b6d11" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                <p class="cat-label">02 · Nutrition</p>
+                <h3 class="cat-title">Santé &amp; alimentation</h3>
+                <span class="cat-btn">— ressources</span>
+            </a>
+        </div>
+
+        <div class="cat-row cat-row--2-1">
+            <a href="/category/jardin-autonomie" class="cat-card cat-card--3">
+                <span class="cat-num">03</span>
+                <div class="cat-icon"><svg viewBox="0 0 32 32" fill="none"><path d="M16 6C14 9 13 12 13 15a3 3 0 006 0C19 12 18 9 16 6z" stroke="#854f0b" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 12C8 14 7 17 7 20a3 3 0 006 0C13 17 12 14 10 12z" stroke="#854f0b" stroke-width="1.6" stroke-linejoin="round"/><path d="M22 12C20 14 19 17 19 20a3 3 0 006 0C25 17 24 14 22 12z" stroke="#854f0b" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+                <p class="cat-label">03 · Jardinage</p>
+                <h3 class="cat-title">Jardin &amp; autonomie</h3>
+                <span class="cat-btn">— ressources</span>
+            </a>
+            <a href="/category/maison-energie" class="cat-card cat-card--4">
+                <span class="cat-num">04</span>
+                <div class="cat-icon"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28h24M8 28V18L16 10L24 18V28" stroke="#185fa5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="13" y="20" width="6" height="8" rx="1" stroke="#185fa5" stroke-width="1.6"/></svg></div>
+                <p class="cat-label">04 · Habitat</p>
+                <h3 class="cat-title">Maison &amp; énergie</h3>
+                <span class="cat-btn">— ressources</span>
+            </a>
+        </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- PRODUITS POPULAIRES -->
 <section class="products-section">
     <div class="container">
-        
-        <!-- En-tête avec lien "Voir tout" -->
         <div class="section-header">
-            <h2 class="section-title">Produits populaires</h2>
-            <a href="/products" class="view-all-link">
-                Voir tout
-                <span class="arrow">→</span>
-            </a>
+            <h2 class="sec-title-new">Produits populaires</h2>
+            <a href="/products" class="sec-link-new">Voir tout →</a>
         </div>
-
-        <!-- Grille de produits -->
         <div class="products-grid">
-            
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
-                    
-                    <!-- Carte produit -->
-                    <div class="product-card" data-product-id="<?= e($product['id']) ?>">
-                        
-                        <!-- Container image avec wishlist et badge -->
-                        <div class="product-image-container">
-                            
-                            <!-- Bouton wishlist (cœur) - Uniquement si connecté -->
+                    <div class="prod-card-new" data-product-id="<?= e($product['id']) ?>">
+                        <div class="prod-img-new">
                             <?php if (isLoggedIn()): ?>
-                                <button class="wishlist-btn <?= isInWishlist($product['id']) ? 'active' : '' ?>" 
-                                        data-product-id="<?= e($product['id']) ?>" 
+                                <button class="wishlist-btn <?= isInWishlist($product['id']) ? 'active' : '' ?>"
+                                        data-product-id="<?= e($product['id']) ?>"
                                         title="<?= isInWishlist($product['id']) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>"
                                         aria-label="Ajouter aux favoris">
                                     <span class="heart-icon">❤️</span>
                                 </button>
                             <?php endif; ?>
-                            
-                            <!-- Image du produit -->
-                            <img src="<?= e($product['thumbnail_url'] ?? $product['thumbnail'] ?? '/public/img/placeholder.png') ?>" 
+                            <img src="<?= e($product['thumbnail_url'] ?? $product['thumbnail'] ?? '/public/img/placeholder.png') ?>"
                                  alt="<?= e($product['title']) ?>"
                                  class="product-image">
-                            
-                            <!-- Badge catégorie -->
-                            <span class="product-badge">
-                                <?= e($product['category_name'] ?? 'Digital') ?>
-                            </span>
+                            <span class="prod-badge-new"><?= e($product['category_name'] ?? 'Digital') ?></span>
                         </div>
-
-                        <!-- Contenu de la carte -->
-                        <div class="product-content">
-                            
-                            <!-- En-tête avec note (si disponible) -->
+                        <div class="prod-body-new">
                             <?php if (isset($product['rating_average']) && $product['rating_average'] > 0): ?>
-                            <div class="product-header">
-                                <div class="product-rating">
-                                    <span class="product-stars">
-                                        <?php 
-                                        $rating = round($product['rating_average'] ?? 0);
-                                        for ($i = 1; $i <= 5; $i++) {
-                                            echo $i <= $rating ? '★' : '☆';
-                                        }
-                                        ?>
-                                    </span>
-                                    <span class="product-rating-count">(<?= $product['rating_count'] ?? 0 ?>)</span>
-                                </div>
+                            <div class="prod-rating">
+                                <span class="prod-stars"><?php $rating = round($product['rating_average'] ?? 0); for ($i = 1; $i <= 5; $i++) { echo $i <= $rating ? '★' : '☆'; } ?></span>
+                                <span class="prod-rating-count">(<?= $product['rating_count'] ?? 0 ?>)</span>
                             </div>
                             <?php endif; ?>
-                            
-                            <!-- Titre du produit -->
-                            <h3 class="product-title">
-                                <a href="/products/<?= e($product['slug']) ?>">
-                                    <?= e(truncate($product['title'], 60)) ?>
-                                </a>
+                            <h3 class="prod-title-new">
+                                <a href="/products/<?= e($product['slug']) ?>"><?= e(truncate($product['title'], 60)) ?></a>
                             </h3>
-
-                            <!-- Nom du vendeur (si disponible) -->
                             <?php if (isset($product['shop_name']) || isset($product['seller_name'])): ?>
-                            <div class="product-seller">
-                                <?= e($product['shop_name'] ?? $product['seller_name'] ?? 'Créateur') ?>
-                            </div>
+                            <div class="prod-seller-new"><?= e($product['shop_name'] ?? $product['seller_name'] ?? 'Créateur') ?></div>
                             <?php endif; ?>
-
-                            <!-- Footer : prix + bouton -->
-                            <div class="product-footer">
-                                <span class="product-price">
-                                    <?= formatPrice($product['price']) ?>
-                                </span>
-                                <a href="/products/<?= e($product['slug']) ?>" class="product-btn">
-                                    Voir
-                                </a>
+                            <div class="prod-foot-new">
+                                <span class="prod-price-new"><?= formatPrice($product['price']) ?></span>
+                                <a href="/products/<?= e($product['slug']) ?>" class="prod-btn-new">Voir</a>
                             </div>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Message si aucun produit -->
                 <div class="no-products">
                     <div class="no-products-icon">📦</div>
                     Aucun produit disponible pour le moment.
                 </div>
             <?php endif; ?>
-
         </div>
     </div>
 </section>
 
-<!-- ============================================================
-     SECTION FEATURES - Pourquoi MarketFlow
-     ============================================================ -->
+<!-- FEATURES -->
 <section class="features-section">
     <div class="container">
-        
-        <!-- En-tête -->
-        <h2 class="section-title">Pourquoi MarketFlow Pro ?</h2>
-        <p class="section-subtitle">
-            La plateforme qui place les créateurs au centre
-        </p>
-
-        <!-- Grille de features -->
-
-<div class="features-grid">
-
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <h3 class="feature-title">Vente instantanée</h3>
-                <p class="feature-description">
-                    Téléchargement automatique après paiement. Vos clients reçoivent leurs fichiers en quelques secondes.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 14.5c.5 1.5 2 2.5 3.5 2.5s3-1 3-2.5-1.5-2-3-2.5-3-1-3-2.5S10.5 7 12 7s3 1 3.5 2.5"/></svg>
-                </div>
-                <h3 class="feature-title">Commission réduite</h3>
-                <p class="feature-description">
-                    Gardez la majorité de vos revenus. Les paiements sont automatiques et sécurisés via Stripe.
-                </p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
-                </div>
-                <h3 class="feature-title">Dashboard complet</h3>
-                <p class="feature-description">
-                    Suivez vos ventes, analysez vos performances et gérez vos produits facilement.
-                </p>
-            </div>
-
+        <div class="section-header">
+            <h2 class="sec-title-new">Pourquoi MarketFlow ?</h2>
         </div>
-
+        <div class="feat-grid-new">
+            <div class="feat-card-new">
+                <div class="feat-ic-new" style="background:#ede9fe;">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="#534ab7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3 class="feat-title-new">Vente instantanée</h3>
+                <p class="feat-desc-new">Téléchargement automatique après paiement. Vos clients reçoivent leurs fichiers en quelques secondes.</p>
+            </div>
+            <div class="feat-card-new">
+                <div class="feat-ic-new" style="background:#d8f0e8;">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0f6e56" stroke-width="1.5"/><path d="M8.5 14.5c.5 1.5 2 2.5 3.5 2.5s3-1 3-2.5-1.5-2-3-2.5-3-1-3-2.5S10.5 7 12 7s3 1 3.5 2.5" stroke="#0f6e56" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+                <h3 class="feat-title-new">Commission réduite</h3>
+                <p class="feat-desc-new">Gardez la majorité de vos revenus. Paiements automatiques et sécurisés via Stripe.</p>
+            </div>
+            <div class="feat-card-new">
+                <div class="feat-ic-new" style="background:#fde8ee;">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#993556" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#993556" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#993556" stroke-width="1.5"/><path d="M14 17.5h7M17.5 14v7" stroke="#993556" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+                <h3 class="feat-title-new">Dashboard complet</h3>
+                <p class="feat-desc-new">Suivez vos ventes, analysez vos performances et gérez vos produits facilement.</p>
+            </div>
+        </div>
+    </div>
 </section>
 
-<!-- ============================================================
-     CTA FINAL - Appel à l'action vendeur
-     ============================================================ -->
+<!-- CTA -->
 <section class="cta-section">
     <div class="container">
-        <div class="cta-card">
-            <!-- Titre avec appel -->
-            <h2 class="cta-title">Prêt à vendre vos créations ?</h2>
-            
-            <!-- Description -->
-            <p class="cta-description">
-                Rejoignez MarketFlow Pro et commencez à générer des revenus dès aujourd'hui
-            </p>
-            
-            <!-- Bouton CTA -->
-            <a href="/register" class="cta-button">
-                Créer mon compte vendeur →
-            </a>
+        <div class="cta-inner-new">
+            <h2 class="cta-title-new">Prêt à vendre vos créations ?</h2>
+            <p class="cta-desc-new">Rejoignez MarketFlow et commencez à générer des revenus dès aujourd'hui.</p>
+            <a href="/register" class="cta-btn-new">Créer mon compte vendeur →</a>
         </div>
     </div>
 </section>

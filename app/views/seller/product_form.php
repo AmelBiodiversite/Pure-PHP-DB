@@ -1059,32 +1059,37 @@ document.getElementById('product_file').addEventListener('change', function(e) {
     }
 });
 </script>
-
 <style>
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-form > div {
-    animation: fadeIn 0.5s ease-out backwards;
-}
-
-form > div:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-form > div:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-form > div:nth-child(4) {
-    animation-delay: 0.3s;
-}
+/* === DESIGN MAQUETTE2 — FORMULAIRE PRODUIT === */
+div[style*="min-height: 100vh"][style*="linear-gradient"]{background:#faf9f5!important}
+/* Header banner */
+div[style*="background: linear-gradient(135deg, #3b82f6"]{background:#ede9fe!important;box-shadow:none!important}
+h1[style*="color: white"]{color:#534ab7!important;font-family:Georgia,serif!important;font-size:26px!important;font-weight:400!important}
+p[style*="color: rgba(255, 255, 255, 0.9)"]{color:#6b5c4e!important}
+/* Sections formulaire */
+div[style*="border: 1px solid rgba(99, 102, 241, 0.1)"]{border:0.5px solid #ede8df!important;border-radius:14px!important;box-shadow:none!important}
+/* En-têtes section */
+div[style*="border-image: linear-gradient"]{border-bottom:0.5px solid #ede8df!important;border-image:none!important}
+div[style*="background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)"][style*="width: 48px"]{background:#ede9fe!important}
+/* Labels */
+label[style*="color: #1e293b"][style*="font-weight: 600"]{font-family:'Manrope',sans-serif!important;font-size:12px!important;font-weight:500!important;color:#1e1208!important}
+/* Inputs */
+input[style*="border: 2px solid"],select[style*="border: 2px solid"],textarea[style*="border: 2px solid"]{border:0.5px solid #ddd6c8!important;border-radius:10px!important;background:#faf9f5!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;color:#1e1208!important}
+input:focus,select:focus,textarea:focus{border-color:#7c6cf0!important;box-shadow:0 0 0 3px rgba(124,108,240,.1)!important;background:#fff!important}
+/* Cartes licence */
+.license-card{border:0.5px solid #ddd6c8!important;border-radius:12px!important}
+.license-card[style*="border-color: #6366f1"]{border-color:#7c6cf0!important;background:#f5f3ff!important}
+div[style*="background: linear-gradient(135deg, #3b82f6, #6366f1)"][style*="width: 40px"]{background:#ede9fe!important}
+div[style*="background: linear-gradient(135deg, #8b5cf6, #a78bfa)"][style*="width: 40px"]{background:#e0ddf8!important}
+/* Zone upload */
+div[style*="border: 2px dashed"]{border:0.5px dashed #ddd6c8!important;border-radius:12px!important;background:#faf9f5!important}
+/* Bouton submit */
+button#submitBtn{background:#7c6cf0!important;box-shadow:none!important;border-radius:10px!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;font-weight:500!important}
+button#submitBtn:hover{background:#6558d4!important;transform:none!important;box-shadow:none!important}
+/* Bouton annuler */
+a[href="/seller/products"][style*="color: #64748b"]{color:#6b5c4e!important;border:0.5px solid #ddd6c8!important;border-radius:10px!important;font-family:'Manrope',sans-serif!important;font-size:13px!important;font-weight:400!important}
+/* Erreurs */
+div[style*="color: #ef4444"],span[style*="color: #ef4444"]{color:#993c1d!important;font-family:'Manrope',sans-serif!important;font-size:11px!important}
+/* Déco floue → cachée */
+div[style*="filter: blur"]{display:none!important}
 </style>

@@ -125,3 +125,22 @@
         </div>
     </div>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — HELP/FAQ === */
+.container h1 { font-family: Georgia, serif; color: #1a1a2e; font-size: clamp(1.8rem,3vw,2.4rem); }
+.container > div > .card { background: #fff; border: 1px solid #eeeaf7; border-radius: 14px; box-shadow: 0 2px 12px rgba(124,108,240,.06); }
+.card h2 { font-family: Georgia, serif; font-size: 1.3rem; }
+.card h2[style*="primary"] { color: #7c6cf0 !important; }
+details { border-bottom: 1px solid #f0eeff !important; }
+details summary { font-family: 'Manrope', sans-serif; font-weight: 600; color: #1a1a2e; cursor: pointer; transition: color .2s; }
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: '+ '; color: #7c6cf0; font-weight: 700; }
+details[open] summary::before { content: '− '; }
+details summary:hover { color: #7c6cf0; }
+details p { font-family: 'Manrope', sans-serif; font-size: .93rem; line-height: 1.75; color: #4b5563 !important; }
+details p a { color: #7c6cf0 !important; font-weight: 500; text-decoration: none; border-bottom: 1px solid #c4baff; }
+.container > div > .card:last-child { background: #faf9f5 !important; border: 1px solid #e8e4f3; }
+.container > div > .card:last-child h2 { font-family: Georgia, serif; color: #1a1a2e; }
+.btn.btn-primary.btn-lg { background: #7c6cf0; border-color: #7c6cf0; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 600; border-radius: 8px; transition: background .2s, transform .15s; }
+.btn.btn-primary.btn-lg:hover { background: #6558d4; transform: translateY(-1px); }
+</style>

@@ -1,335 +1,71 @@
-<?php
-/**
- * MARKETFLOW PRO - PAGE DE CONNEXION (VERSION AMÉLIORÉE)
- * Fichier : app/views/auth/login.php
- */
-?>
-
-<div style="
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-8);
-    position: relative;
-    overflow: hidden;
-    background: #f8fafc;
-">
-        <!-- Background decoratif -->
-        <div style="
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
-            background: rgba(59, 130, 246, 0.35);
-            border-radius: 50%;
-            filter: blur(100px);
-        "></div>
-
-        <div style="
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 400px;
-            height: 400px;
-            background: rgba(37, 99, 235, 0.25);
-            border-radius: 50%;
-            filter: blur(80px);
-        "></div>
-        
-        <!-- Card de connexion -->
-        <div style="
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 480px;
-            width: 100%;
-            padding: var(--space-10);
-            position: relative;
-            z-index: 10;
-            animation: slideUp 0.6s ease-out;
-        ">    
-        <!-- Logo/Titre -->
-        <div style="text-align: center; margin-bottom: var(--space-8);">
-            <div style="
-                width: 70px;
-                height: 70px;
-                margin: 0 auto var(--space-4);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border-radius: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 2rem;
-                font-weight: 900;
-                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            ">
-                M
-            </div>
-            <h1 style="
-                font-size: 2rem;
-                margin-bottom: var(--space-2);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-            ">
-                Bon retour ! 👋
-            </h1>
-            <p style="color: #64748b; font-size: 0.95rem;">
-                Connectez-vous pour continuer
-            </p>
-        </div>
-
-        <!-- Message d'erreur -->
-        <?php if (isset($error)): ?>
-        <div style="
-            background: #fef2f2;
-            border-left: 4px solid #ef4444;
-            color: #dc2626;
-            padding: var(--space-4);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-6);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-        ">
-            <span style="font-size: 1.5rem;">⚠️</span>
-            <span><?= e($error) ?></span>
-        </div>
-        <?php endif; ?>
-
-        <!-- Formulaire -->
-        <form method="POST" action="/login" id="loginForm">
-            
-            <!-- CSRF Token -->
-            <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
-
-            <!-- Email -->
-            <div style="margin-bottom: var(--space-5);">
-                <label style="
-                    display: block;
-                    font-weight: 600;
-                    margin-bottom: var(--space-2);
-                    color: #1e293b;
-                    font-size: 0.9rem;
-                " for="email">
-                    📧 Adresse email
-                </label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    style="
-                        width: 100%;
-                        padding: var(--space-4);
-                        border: 2px solid var(--border-color);
-                        border-radius: 12px;
-                        font-size: 1rem;
-                        transition: all 0.3s;
-                    "
-                    placeholder="vous@example.com"
-                    value="<?= isset($email) ? e($email) : '' ?>"
-                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'"
-                    onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none'"
-                    required
-                    autofocus
-                >
-            </div>
-
-            <!-- Mot de passe -->
-            <div style="margin-bottom: var(--space-4);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-                    <label style="
-                        font-weight: 600;
-                        color: #1e293b;
-                        font-size: 0.9rem;
-                    " for="password">
-                        🔒 Mot de passe
-                    </label>
-                    <a href="/forgot-password" style="
-                        font-size: 0.85rem;
-                        color: #667eea;
-                        text-decoration: none;
-                        font-weight: 500;
-                        transition: color 0.2s;
-                    " onmouseover="this.style.color='#764ba2'" onmouseout="this.style.color='#667eea'">
-                        Mot de passe oublié ?
-                    </a>
-                </div>
-                <div style="position: relative;">
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        style="
-                            width: 100%;
-                            padding: var(--space-4);
-                            padding-right: 3rem;
-                            border: 2px solid var(--border-color);
-                            border-radius: 12px;
-                            font-size: 1rem;
-                            transition: all 0.3s;
-                        "
-                        placeholder="••••••••"
-                        onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'"
-                        onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none'"
-                        required
-                    >
-                    <button 
-                        type="button" 
-                        onclick="togglePassword()" 
-                        style="
-                            position: absolute;
-                            right: 12px;
-                            top: 50%;
-                            transform: translateY(-50%);
-                            background: none;
-                            border: none;
-                            cursor: pointer;
-                            font-size: 1.3rem;
-                            padding: 0.5rem;
-                            color: #94a3b8;
-                            transition: color 0.2s;
-                        "
-                        onmouseover="this.style.color='#1e293b'"
-                        onmouseout="this.style.color='#94a3b8'"
-                        title="Afficher/masquer le mot de passe"
-                    >
-                        <span id="password-toggle-icon">👁️</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Bouton de connexion -->
-            <button type="submit" style="
-                width: 100%;
-                padding: var(--space-4);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                font-size: 1.05rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
-                🚀 Se connecter
-            </button>
-
-        </form>
-
-        <!-- Séparateur -->
-        <div style="
-            display: flex;
-            align-items: center;
-            margin: var(--space-8) 0;
-            gap: var(--space-4);
-        ">
-            <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-            <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 500;">OU</span>
-            <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
-        </div>
-
-        <!-- Lien inscription -->
-        <div style="text-align: center;">
-            <p style="color: #64748b; font-size: 0.95rem; margin: 0;">
-                Vous n'avez pas de compte ?
-                <a href="/register" style="
-                    color: #667eea;
-                    font-weight: 600;
-                    text-decoration: none;
-                    transition: color 0.2s;
-                " onmouseover="this.style.color='#764ba2'" onmouseout="this.style.color='#667eea'">
-                    S'inscrire gratuitement →
-                </a>
-            </p>
-        </div>
-
-        <!-- Infos additionnelles -->
-        <div style="
-            text-align: center;
-            margin-top: var(--space-6);
-            padding-top: var(--space-6);
-            border-top: 1px solid var(--border-color);
-            color: #94a3b8;
-            font-size: 0.8rem;
-            line-height: 1.6;
-        ">
-            En vous connectant, vous acceptez nos
-            <a href="/terms" style="color: #667eea; text-decoration: none;">CGU</a>
-            et notre
-            <a href="/privacy" style="color: #667eea; text-decoration: none;">Politique de confidentialité</a>
-        </div>
-
+<?php /* MARKETFLOW PRO — CONNEXION */ ?>
+<div class="auth-wrap">
+<div class="auth-card">
+  <div class="auth-head">
+    <div class="auth-logo">M</div>
+    <h1 class="auth-title">Bon retour</h1>
+    <p class="auth-sub">Connectez-vous pour continuer</p>
+  </div>
+  <?php if (isset($error)): ?>
+  <div class="auth-err">
+    <svg viewBox="0 0 16 16" fill="none" width="15" height="15"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r=".6" fill="currentColor"/></svg>
+    <?= e($error) ?>
+  </div>
+  <?php endif; ?>
+  <form method="POST" action="/login" id="lf">
+    <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
+    <div class="af">
+      <label class="al" for="email">Adresse email</label>
+      <input type="email" id="email" name="email" class="ai" placeholder="vous@example.com"
+        value="<?= isset($email) ? e($email) : '' ?>" required autofocus>
     </div>
-
+    <div class="af">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <label class="al" for="password" style="margin:0">Mot de passe</label>
+        <a href="/forgot-password" class="auth-fgt">Oublié ?</a>
+      </div>
+      <div style="position:relative">
+        <input type="password" id="password" name="password" class="ai" style="padding-right:40px" placeholder="••••••••" required>
+        <button type="button" class="auth-eye" onclick="tp()" title="Afficher/masquer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <button type="submit" class="auth-btn" id="lsb">Se connecter</button>
+  </form>
+  <div class="auth-sep"><span>ou</span></div>
+  <p class="auth-sw">Pas encore de compte ? <a href="/register">S'inscrire gratuitement →</a></p>
+  <p class="auth-legal">En vous connectant, vous acceptez nos <a href="/terms">CGU</a> et notre <a href="/privacy">Politique de confidentialité</a></p>
 </div>
-
-<!-- JavaScript -->
+</div>
 <script>
-// Toggle password visibility
-function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    const icon = document.getElementById('password-toggle-icon');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.textContent = '🙈';
-    } else {
-        passwordInput.type = 'password';
-        icon.textContent = '👁️';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    
-    form.addEventListener('submit', function(e) {
-        const email = form.email.value.trim();
-        const password = form.password.value;
-        
-        if (!email || !password) {
-            e.preventDefault();
-            alert('❌ Veuillez remplir tous les champs');
-            return false;
-        }
-        
-        if (!email.includes('@')) {
-            e.preventDefault();
-            alert('❌ Veuillez entrer un email valide');
-            return false;
-        }
-        
-        // Désactiver le bouton pendant la soumission
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '⏳ Connexion en cours...';
-        submitBtn.style.opacity = '0.7';
-    });
-});
+function tp(){var f=document.getElementById('password');f.type=f.type==='password'?'text':'password';}
+document.getElementById('lf').addEventListener('submit',function(){var b=document.getElementById('lsb');b.textContent='Connexion…';b.disabled=true;});
 </script>
-
 <style>
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-    div[style*="padding: var(--space-10)"] {
-        padding: var(--space-6) !important;
-    }
-}
+.auth-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:#faf9f5}
+.auth-card{background:#fff;border:0.5px solid #ede8df;border-radius:20px;padding:40px;max-width:440px;width:100%}
+.auth-head{text-align:center;margin-bottom:28px}
+.auth-logo{width:48px;height:48px;border-radius:14px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#6c63d4;margin:0 auto 16px;line-height:1}
+.auth-title{font-family:Georgia,serif;font-size:26px;font-weight:400;color:#1e1208;margin-bottom:6px}
+.auth-sub{font-family:'Manrope',sans-serif;font-size:13px;color:#8a7060;margin:0}
+.auth-err{display:flex;align-items:center;gap:8px;background:#fce5df;border-radius:10px;padding:12px 14px;font-family:'Manrope',sans-serif;font-size:13px;color:#993c1d;margin-bottom:20px}
+.af{margin-bottom:16px}
+.al{font-family:'Manrope',sans-serif;font-size:12px;font-weight:500;color:#1e1208;display:block;margin-bottom:6px}
+.ai{width:100%;padding:10px 14px;border:0.5px solid #ddd6c8;border-radius:10px;background:#faf9f5;font-family:'Manrope',sans-serif;font-size:13px;color:#1e1208;outline:none;box-sizing:border-box;transition:border-color 0.15s}
+.ai:focus{border-color:#7c6cf0;background:#fff;box-shadow:0 0 0 3px rgba(124,108,240,.1)}
+.auth-fgt{font-family:'Manrope',sans-serif;font-size:12px;color:#7c6cf0;text-decoration:none}
+.auth-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#a0907e;padding:4px;display:flex}
+.auth-eye svg{width:15px;height:15px}
+.auth-btn{width:100%;padding:11px;background:#7c6cf0;color:#fff;border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.15s;margin-top:4px}
+.auth-btn:hover{background:#6558d4}
+.auth-btn:disabled{opacity:.65;cursor:not-allowed}
+.auth-sep{display:flex;align-items:center;gap:12px;margin:24px 0}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:0.5px;background:#ede8df}
+.auth-sep span{font-family:'Manrope',sans-serif;font-size:11px;color:#a0907e}
+.auth-sw{text-align:center;font-family:'Manrope',sans-serif;font-size:13px;color:#6b5c4e;margin:0 0 14px}
+.auth-sw a{color:#7c6cf0;text-decoration:none;font-weight:500}
+.auth-legal{text-align:center;font-family:'Manrope',sans-serif;font-size:11px;color:#a0907e;line-height:1.7;margin:0;padding-top:16px;border-top:0.5px solid #ede8df}
+.auth-legal a{color:#7c6cf0;text-decoration:none}
+@media(max-width:500px){.auth-card{padding:28px 20px}}
 </style>

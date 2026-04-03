@@ -76,3 +76,11 @@
         </div>
     </div>
 </div>
+<style>
+/* === DESIGN MAQUETTE2 — TERMS/CGU === */
+.container h1 { font-family: Georgia, serif; color: #1a1a2e; }
+.container > div > .card { background: #fff; border: 1px solid #eeeaf7; border-radius: 14px; box-shadow: 0 2px 12px rgba(124,108,240,.06); }
+.card h2 { font-family: Georgia, serif; font-size: 1.2rem; color: #1a1a2e; margin-top: 2rem; }
+.card p, .card li { font-family: 'Manrope', sans-serif; font-size: .93rem; line-height: 1.8; color: #4b5563 !important; }
+.card a { color: #7c6cf0 !important; text-decoration: none; border-bottom: 1px solid #c4baff; }
+</style>

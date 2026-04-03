@@ -62,3 +62,5 @@ desktop.ini
 *.sql.backup
 *.sql.gz
 *.bak
+*.bak2
+*.bak_*
