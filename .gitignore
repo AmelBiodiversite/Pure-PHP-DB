@@ -64,3 +64,5 @@ desktop.ini
 *.bak
 *.bak2
 *.bak_*
+public/phpinfo_test.php
+rapport_audit.txt
