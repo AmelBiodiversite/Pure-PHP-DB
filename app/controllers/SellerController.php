@@ -16,7 +16,6 @@ class SellerController extends Controller {
     const ALLOWED_FILE_TYPES = ['application/zip', 'application/pdf', 'application/x-zip-compressed'];
     const MAX_IMAGE_SIZE = 5242880; // 5MB en bytes
     const MAX_FILE_SIZE = 52428800; // 50MB en bytes
-    
     private $productModel;
     private $userModel;
 
@@ -25,24 +24,54 @@ class SellerController extends Controller {
         $this->productModel = new Product();
         $this->userModel = new User();
         
-        // Vérifier que l'utilisateur est vendeur
-        $this->requireSeller();
+    }
+
+
+    /**
+     * Profil public d un vendeur
+     */
+    public function publicProfile($username) {
+        $stmt = $this->db->prepare("
+            SELECT id, username, avatar_url, bio, created_at
+            FROM users
+            WHERE username = :username AND role IN ('seller', 'admin')
+        ");
+        $stmt->execute(['username' => $username]);
+        $seller = $stmt->fetch();
+        if (!$seller) {
+
+            http_response_code(404);
+            $this->render('errors/404', ['title' => 'Vendeur introuvable']);
+            return;
+        }
+
+        $stmt = $this->db->prepare("
+            SELECT * FROM products
+            WHERE seller_id = :seller_id AND status = 'approved'
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute(['seller_id' => $seller['id']]);
+        $products = $stmt->fetchAll();
+
+        $this->render('products/seller', [
+            'title' => 'Boutique de ' . htmlspecialchars($seller['username']),
+            'seller' => $seller,
+            'products' => $products
+        ]);
     }
 
     /**
      * Dashboard vendeur
      */
     public function dashboard() {
+    $this->requireSeller();
     $this->requireLogin();
     $user = $this->getCurrentUser();
-    
     if ($user['role'] !== 'seller') {
         redirectWithMessage('/', 'Accès réservé aux vendeurs', 'error');
         return;
     }
-    
     $sellerId = $user['id'];
-    
     // Stats générales
     $stmt = $this->db->prepare("
         SELECT 
@@ -55,7 +84,6 @@ class SellerController extends Controller {
     ");
     $stmt->execute(['seller_id' => $sellerId]);
     $stats = $stmt->fetch();
-    
     // Revenus totaux
     $stmt = $this->db->prepare("
         SELECT COALESCE(SUM(oi.product_price * oi.quantity), 0) as total_revenue
@@ -68,7 +96,6 @@ class SellerController extends Controller {
     $stmt->execute(['seller_id' => $sellerId]);
     $revenue = $stmt->fetch();
     $stats['total_revenue'] = $revenue['total_revenue'] ?? 0;
-    
     // Revenus par jour (30 derniers jours)
     $stmt = $this->db->prepare("
         SELECT 
@@ -86,7 +113,6 @@ class SellerController extends Controller {
     ");
     $stmt->execute(['seller_id' => $sellerId]);
     $revenueByDay = $stmt->fetchAll();
-    
     // Top 5 produits
     $stmt = $this->db->prepare("
         SELECT 
@@ -103,7 +129,6 @@ class SellerController extends Controller {
     ");
     $stmt->execute(['seller_id' => $sellerId]);
     $topProducts = $stmt->fetchAll();
-    
     // Produits récents
     $stmt = $this->db->prepare("
          SELECT * FROM products 
@@ -136,7 +161,6 @@ class SellerController extends Controller {
     ");
     $stmt->execute(['seller_id' => $sellerId]);
     $recentSales = $stmt->fetchAll();
-    
     $this->render('seller/dashboard', [
         'title' => 'Dashboard Vendeur',
         'stats' => $stats,
@@ -151,6 +175,7 @@ class SellerController extends Controller {
      * Liste des produits du vendeur
      */
     public function products() {
+        $this->requireSeller();
         $sellerId = $_SESSION['user_id'];
         $products = $this->productModel->getSellerProducts($sellerId);
 
@@ -180,6 +205,7 @@ class SellerController extends Controller {
      * Enregistrer un nouveau produit
      */
     public function storeProduct() {
+        $this->requireSeller();
         file_put_contents('/tmp/start.log', "DÉBUT storeProduct\n");
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -355,6 +381,7 @@ class SellerController extends Controller {
      * Page des ventes
      */
     public function sales() {
+        $this->requireSeller();
         $sellerId = $_SESSION['user_id'];
 
         $stmt = $this->db->prepare("
@@ -381,6 +408,7 @@ class SellerController extends Controller {
      * Page des revenus
      */
     public function earnings() {
+        $this->requireSeller();
         $sellerId = $_SESSION['user_id'];
 
         // Revenus totaux
@@ -481,6 +509,7 @@ class SellerController extends Controller {
      * Analytics
      */
     public function analytics() {
+        $this->requireSeller();
         $sellerId = $_SESSION['user_id'];
 
         // Produits les plus vendus

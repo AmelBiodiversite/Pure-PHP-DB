@@ -22,6 +22,7 @@ $router->get('/logout', 'AuthController@logout');
 // Pages info
 $router->get('/sellers', 'HomeController@sellers');
 $router->get('/seller/{username}/products', 'ProductController@sellerProducts');
+$router->get('/seller/{username}', 'SellerController@publicProfile');
 $router->get('/about', 'HomeController@about');
 $router->get('/contact', 'HomeController@contact');
 $router->post('/contact', 'HomeController@contactSubmit');
